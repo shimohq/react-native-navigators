@@ -1,9 +1,9 @@
 {
-  "version": "0.0.0-beta1",
+  "version": "0.0.1-beta2",
   "name": "react-native-navigators",
   "repository": {
     "type": "git",
-    "url": "git@github.com:magicismight/react-native-navigators.git"
+    "url": "git@github.com:shimohq/react-native-navigators.git"
   },
   "license": "MIT",
   "author": {
@@ -11,7 +11,8 @@
     "email": "master@horcrux.cn"
   },
   "homepage": "https://github.com/magicismight/react-native-navigators",
-  "description": "Native navigators system",
+  "main": "lib/index.js",
+  "description": "Native navigators system for react-native",
   "scripts": {
     "lint": "npx tsc --noEmit && npx eslint ./src/* --fix",
     "test": "echo no tests",
@@ -20,7 +21,7 @@
     "prepublishOnly": "npm run build"
   },
   "lint-staged": {
-    "*.ts": [
+    "./src/*.ts": [
       "npm run lint",
       "git add"
     ]
@@ -48,6 +49,10 @@
     "husky": "^3.0.8",
     "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
+    "react-navigation": "^4.0.10",
     "typescript": "^3.6.3"
+  },
+  "peerDependencies": {
+    "react-navigation": ">=4.0.0"
   }
 }

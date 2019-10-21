@@ -9,6 +9,9 @@
       "modules": true
     }
   },
+  "env": {
+    "node": true
+  },
   "rules": {
     "no-undef": "error",
     "react/jsx-boolean-value": 0,
