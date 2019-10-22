@@ -91,7 +91,7 @@
             case RNNativeStackSceneTransitionSlideFormTop:
                 toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(containerView.bounds), -CGRectGetMaxY(containerView.bounds));
                 break;
-            case RNNativeStackSceneTransitionSlideFormBottom:
+            case RNNativeStackSceneTransitionSlideFormBottom | RNNativeStackSceneTransitionDefault:
                 toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(containerView.bounds), CGRectGetMaxY(containerView.bounds));
                 break;
             default:
@@ -114,7 +114,7 @@
             case RNNativeStackSceneTransitionSlideFormTop:
                 fromViewFinalFrame = CGRectOffset(fromView.frame, 0, -CGRectGetHeight(fromView.frame));
                 break;
-            case RNNativeStackSceneTransitionSlideFormBottom:
+            case RNNativeStackSceneTransitionSlideFormBottom | RNNativeStackSceneTransitionDefault:
                 fromViewFinalFrame = CGRectOffset(fromView.frame, 0, CGRectGetHeight(fromView.frame));
                 break;
             default:

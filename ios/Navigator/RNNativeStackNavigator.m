@@ -42,8 +42,7 @@
         if ([targetController isKindOfClass:[RNNativeStackController class]]) {
             RNNativeStackController *controller = (RNNativeStackController *)targetController;
             RNNativeStackSceneTransition transition = controller.scene.transition;
-            if (transition != RNNativeStackSceneTransitionSlideFormRight && transition != RNNativeStackSceneTransitionNone) {
-                // 无动画，或者从右进入的动画使用系统动画
+            if (transition != RNNativeStackSceneTransitionDefault && transition != RNNativeStackSceneTransitionNone) {
                 if (operation == UINavigationControllerOperationPush) {
                     return [[RNNativePushAnimatedTransition alloc] initWithTransition:transition];
                 } else {

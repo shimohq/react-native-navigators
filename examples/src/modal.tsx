@@ -17,6 +17,11 @@ function NavigateList({
   return (
     <View style={{ marginBottom: 10 }}>
       <TouchableOpacity
+        onPress={() => navigate(NativeNavigatorTransitions.Default)}
+      >
+        <Text style={styles.link}>⬆️Navigate by default</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         onPress={() => navigate(NativeNavigatorTransitions.None)}
       >
         <Text style={styles.link}>❌Navigate with no transition</Text>

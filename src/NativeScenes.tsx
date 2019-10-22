@@ -61,7 +61,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
           if (routes.length - 1 === index) {
             if (openingRouteKeys.includes(key) || closing) {
               transition =
-                options.transition || NativeNavigatorTransitions.SlideFromRight;
+                options.transition || NativeNavigatorTransitions.Default;
             }
           }
 
