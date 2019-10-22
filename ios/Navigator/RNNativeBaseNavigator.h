@@ -27,8 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RNNativeBaseNavigator : UIView <RCTInvalidating>
 
 @property (nonatomic, strong, readonly) NSMutableArray<RNNativeStackScene *> *currentScenes;
+@property (nonatomic, weak, readonly) RCTBridge *bridge;
 
-- (instancetype)initWithViewController:(UIViewController *)viewController;
+- (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(UIViewController *)viewController;
 
 - (void)markChildUpdated;
 - (void)didUpdateChildren;

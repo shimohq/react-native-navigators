@@ -84,6 +84,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               closing={closing}
+              popover={options.popover}
               onTransitionEnd={this.handleTransitionEnd}
               route={route}
               onDismissed={onDismissRoute}

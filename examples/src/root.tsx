@@ -11,6 +11,9 @@ export default function Root(props: NavigationInjectedProps) {
       <TouchableOpacity onPress={() => props.navigation.navigate('modal')}>
         <Text style={styles.link}>Modal navigator demo</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => props.navigation.navigate('popover')}>
+        <Text style={styles.link}>Popover navigator demo</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => props.navigation.navigate('stack')}>
         <Text style={styles.link}>Stack navigator demo</Text>
       </TouchableOpacity>

@@ -32,11 +32,12 @@ build
 #
 node_modules
 npm-debug.log
-
+yarn.lock
 
 # webstorm
 #
 *.iml
+.idea
 
 Examples/ios/.DS_Store
 

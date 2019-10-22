@@ -20,16 +20,13 @@
 
 @implementation RNNativeStackNavigator
 
-- (instancetype)init
-{
+- (instancetype)initWithBridge:(RCTBridge *)bridge {
     _controller = [[RNNativeStackNavigationController alloc] init];
     _controller.delegate = self;
     [_controller setNavigationBarHidden:YES];
     
-    self = [super initWithViewController:_controller];
-    return self;
+    return [super initWithBridge:bridge viewController:_controller];
 }
-
 
 #pragma mark - UINavigationControllerDelegate
 

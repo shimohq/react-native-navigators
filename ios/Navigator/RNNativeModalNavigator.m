@@ -8,6 +8,7 @@
 
 #import "RNNativeModalNavigator.h"
 #import "RNNativeStackScene.h"
+#import <React/RCTUIManager.h>
 
 @interface RNNativeModalNavigator()
 
@@ -17,11 +18,11 @@
 
 @implementation RNNativeModalNavigator
 
-- (instancetype)init
-{
+- (instancetype)initWithBridge:(RCTBridge *)bridge {
     _controller = [UIViewController new];
-    return [super initWithViewController:_controller];
+    return [super initWithBridge:bridge viewController:_controller];
 }
+
 
 #pragma mark - RNNativeBaseNavigator
 
@@ -50,11 +51,11 @@
             if (parentController.presentedViewController) {
                 UIViewController *presentedViewController = parentController.presentedViewController;
                 [parentController dismissViewControllerAnimated:NO completion:^{
-                    [scene.controller presentViewController:presentedViewController animated:NO completion:nil];
-                    [parentController presentViewController:scene.controller animated:animated completion:nil];
+                    [self presentViewController:presentedViewController parentViewController:scene.controller animated:NO completion:nil];
+                    [self presentViewController:scene.controller parentViewController:parentController animated:animated completion:nil];
                 }];
             } else {
-                [parentController presentViewController:scene.controller animated:animated completion:nil];
+                [self presentViewController:scene.controller parentViewController:parentController animated:animated completion:nil];
             }
         }
     }
@@ -67,7 +68,7 @@
         if (parentViewController) {
             [parentViewController dismissViewControllerAnimated:animated completion:^{
                 if (scene.controller.presentedViewController) {
-                    [parentViewController presentViewController:scene.controller.presentedViewController animated:NO completion:nil];
+                    [self presentViewController:scene.controller.presentedViewController parentViewController:parentViewController animated:NO completion:nil];
                 }
             }];
         } else if (scene.controller.parentViewController) {
@@ -84,6 +85,46 @@
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC
 {
     return nil;
+}
+
+#pragma mark - Private
+
+- (void)presentViewController:(UIViewController *)viewController parentViewController:(UIViewController *)parentViewController animated: (BOOL)flag completion:(void (^ __nullable)(void))completion {
+    
+    if ([viewController.view isKindOfClass:[RNNativeStackScene class]]) {
+        RNNativeStackScene *screenView = (RNNativeStackScene *)viewController.view;
+        RNNativePopoverParams *popoverParams = screenView.popoverParams;
+        if (popoverParams) {
+            viewController.modalPresentationStyle = UIModalPresentationPopover;
+            [self getSourceView:screenView completion:^(UIView *view) {
+                RNNativePopoverParams *popoverParams = screenView.popoverParams;
+                if (!CGRectEqualToRect(CGRectZero, popoverParams.sourceRect)) {
+                    viewController.popoverPresentationController.sourceRect = popoverParams.sourceRect;
+                }
+                viewController.popoverPresentationController.sourceView = view ?: parentViewController.view;
+                viewController.popoverPresentationController.permittedArrowDirections = popoverParams.directions;
+                if (!CGSizeEqualToSize(CGSizeZero, popoverParams.contentSize)) {
+                    viewController.preferredContentSize = popoverParams.contentSize;
+                }
+                [parentViewController presentViewController:viewController animated:flag completion:completion];
+            }];
+            return;
+        }
+    }
+    [parentViewController presentViewController:viewController animated:flag completion:completion];
+}
+
+- (void)getSourceView:(RNNativeStackScene *)screenView completion:(void (^)(UIView *view))completion {
+    RNNativePopoverParams *popoverParams = screenView.popoverParams;
+    if (popoverParams.sourceViewNativeID) {
+        RCTUIManager *uiManager = self.bridge.uiManager;
+        [uiManager rootViewForReactTag:screenView.reactTag withCompletion:^(UIView *view) {
+            UIView *target = [uiManager viewForNativeID:popoverParams.sourceViewNativeID withRootTag:view.reactTag];
+            completion(target);
+        }];
+    } else {
+        completion(nil);
+    }
 }
 
 @end

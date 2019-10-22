@@ -12,9 +12,8 @@
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
-{
-    RNNativeStackNavigator *view = [RNNativeStackNavigator new];
+- (UIView *)view {
+    RNNativeStackNavigator *view = [[RNNativeStackNavigator alloc] initWithBridge:self.bridge];
     if (!_hostViews) {
         _hostViews = [NSPointerArray weakObjectsPointerArray];
     }

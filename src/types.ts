@@ -8,7 +8,10 @@ import {
 } from 'react-navigation';
 
 export interface NativeNavigationPopover {
-  directions?: number[];
+  sourceViewNativeID: string;
+  contentSize: NativeNavigatorSize;
+  sourceRect?: NativeNavigatorRect;
+  directions?: NativeNavigatorDirection[];
 }
 
 export interface NativeNavigationOptions {
@@ -73,6 +76,25 @@ export interface NativeNavigatorsProps extends NavigationInjectedProps {
 
 export enum NativeNavigationHeaderTypes {
   Center = 'center',
+  Left = 'left',
+  Right = 'right'
+}
+
+export interface NativeNavigatorSize {
+  width: number;
+  height: number;
+}
+
+export interface NativeNavigatorRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export enum NativeNavigatorDirection {
+  Up = 'up',
+  Down = 'down',
   Left = 'left',
   Right = 'right'
 }
