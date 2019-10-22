@@ -28,7 +28,7 @@ export interface NativeNavigationOptions {
 export interface NavigationNativeRouterConfig {
   headerMode?: NativeNavigatorHeaderModes;
   mode?: NativeNavigatorModes;
-  initialRouteName: string;
+  initialRouteName?: string;
   defaultNavigationOptions?: NavigationScreenConfig<
     NativeNavigationOptions,
     any
