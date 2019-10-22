@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, StyleSheet, Platform } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 
 import {
@@ -13,6 +13,15 @@ export interface NativeStackHeaderProps {
   descriptor: NativeNavigationDescriptor;
   route: NavigationRoute;
 }
+
+const styles = StyleSheet.create({
+  title: {
+    fontSize: Platform.OS === 'ios' ? 17 : 20,
+    fontWeight: Platform.OS === 'ios' ? '600' : '500',
+    color: 'rgba(0, 0, 0, .9)',
+    marginHorizontal: 16
+  }
+});
 
 export default function NativeHeader(props: NativeStackHeaderProps) {
   const { route, descriptor } = props;
@@ -30,7 +39,7 @@ export default function NativeHeader(props: NativeStackHeaderProps) {
   const center = headerCenter ? (
     headerCenter
   ) : headerTitle ? (
-    <Text style={headerTitleStyle} numberOfLines={1}>
+    <Text style={[styles.title, headerTitleStyle]} numberOfLines={1}>
       {headerTitle}
     </Text>
   ) : null;
