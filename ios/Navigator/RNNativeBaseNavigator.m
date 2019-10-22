@@ -158,9 +158,9 @@
     // 当前列表为空时，无动画
     // 即将显示的顶层 screne 在当前列表中，且当前显示的顶层 screne 在即将显示的列表中，无动画
     // 当前和即将显示的顶层 screne 为同一个，无动画
-    if (_currentScenes.count > 0 && currentTopScene != nextTopScene) {
+    if (currentTopScene && currentTopScene != nextTopScene) {
         // 当前和即将显示的顶层 screne 不是同一个，有动画
-        if (![_currentScenes containsObject:nextTopScene]) {
+        if (nextTopScene && ![_currentScenes containsObject:nextTopScene]) {
             // 即将显示的顶层 screne 不在当前列表中，取即将显示的顶层 screne 的显示动画
             action = RNNativeStackNavigatorActionShow;
             transition = nextTopScene.transition;
