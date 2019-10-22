@@ -60,7 +60,10 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
 
           if (transitionEnabled && routes.length - 1 === index) {
             transition =
-              options.transition || NativeNavigatorTransitions.Default;
+              options.transition ||
+              (mode === NativeNavigatorModes.Stack
+                ? NativeNavigatorTransitions.SlideFromRight
+                : NativeNavigatorTransitions.SlideFromBottom);
           }
 
           let headerMode = options.headerHidden

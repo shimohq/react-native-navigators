@@ -112,17 +112,13 @@ export default class NativeNavigators extends PureComponent<
             ];
 
             openingRouteKeys = openingRouteKeys.filter(
-              key => key !== previousFocusedRoute.key
+              key =>
+                key !== previousFocusedRoute.key && key !== nextFocusedRoute.key
             );
             closingRouteKeys = closingRouteKeys.filter(
-              key => key !== previousFocusedRoute.key
+              key =>
+                key !== previousFocusedRoute.key && key !== nextFocusedRoute.key
             );
-
-            // Keep the old route in state because it's visible under the new route, and removing it will feel abrupt
-            // We need to insert it just before the focused one (the route being pushed)
-            // After the push animation is completed, routes being replaced will be removed completely
-            routes = routes.slice();
-            routes.splice(routes.length - 1, 0, previousFocusedRoute);
           }
         }
       } else if (!routes.find(r => r.key === previousFocusedRoute.key)) {
