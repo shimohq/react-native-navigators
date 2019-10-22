@@ -87,6 +87,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               onTransitionEnd={this.handleTransitionEnd}
               route={route}
               onDismissed={onDismissRoute}
+              style={options.cardStyle}
             >
               <SceneView
                 screenProps={screenProps}

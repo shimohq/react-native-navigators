@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
 import {
   NavigationParams,
   NavigationDescriptor,
@@ -13,6 +14,7 @@ export interface NativeNavigationPopover {
 export interface NativeNavigationOptions {
   transition?: NativeNavigatorTransitions;
   translucent?: boolean;
+  cardStyle?: StyleProp<ViewStyle>;
   gestureEnabled?: boolean;
   headerLeft?: ReactNode;
   headerCenter?: ReactNode;

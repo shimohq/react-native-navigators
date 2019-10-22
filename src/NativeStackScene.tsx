@@ -1,5 +1,10 @@
 import React, { PureComponent } from 'react';
-import { requireNativeComponent, StyleSheet } from 'react-native';
+import {
+  requireNativeComponent,
+  StyleSheet,
+  StyleProp,
+  ViewStyle
+} from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 
 import { NativeNavigatorTransitions } from './types';
@@ -12,6 +17,7 @@ interface NativeStackNavigatorProps {
   onTransitionEnd: (route: NavigationRoute, closing: boolean) => void;
   onDismissed: (route: NavigationRoute) => void;
   route: NavigationRoute;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default class NativeStackNavigator extends PureComponent<
@@ -26,7 +32,13 @@ export default class NativeStackNavigator extends PureComponent<
   };
 
   public render() {
-    const { translucent, transition, gestureEnabled, closing } = this.props;
+    const {
+      translucent,
+      transition,
+      gestureEnabled,
+      closing,
+      style
+    } = this.props;
     return (
       <RNNativeStackScene
         translucent={translucent}
@@ -35,7 +47,7 @@ export default class NativeStackNavigator extends PureComponent<
         closing={closing}
         onTransitionEnd={this.onTransitionEnd}
         onDismissed={this.onDismissed}
-        style={StyleSheet.absoluteFill}
+        style={[style, StyleSheet.absoluteFill]}
       >
         {this.props.children}
       </RNNativeStackScene>
