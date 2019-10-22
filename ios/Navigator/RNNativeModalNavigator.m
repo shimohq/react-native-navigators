@@ -78,15 +78,6 @@
     }
 }
 
-/**
- 自定义 push pop 动画
- TODO: 暂时使用系统动画
- */
-- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC
-{
-    return nil;
-}
-
 #pragma mark - Private
 
 - (void)presentViewController:(UIViewController *)viewController parentViewController:(UIViewController *)parentViewController animated: (BOOL)flag completion:(void (^ __nullable)(void))completion {

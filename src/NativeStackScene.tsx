@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 
-import { NativeNavigatorTransitions } from './types';
+import { NativeNavigatorTransitions, NativeNavigationPopover } from './types';
 
 interface NativeStackNavigatorProps {
   closing: boolean;
