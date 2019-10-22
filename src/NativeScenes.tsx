@@ -60,10 +60,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
 
           if (transitionEnabled && routes.length - 1 === index) {
             transition =
-              options.transition ||
-              (mode === NativeNavigatorModes.Stack
-                ? NativeNavigatorTransitions.SlideFromRight
-                : NativeNavigatorTransitions.SlideFromBottom);
+              options.transition || NativeNavigatorTransitions.Default;
           }
 
           let headerMode = options.headerHidden
@@ -88,6 +85,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
                 closingRouteKeys.includes(key) ||
                 replacingRouteKeys.includes(key)
               }
+              popover={options.popover}
               onTransitionEnd={this.handleTransitionEnd}
               route={route}
               onDismissed={onDismissRoute}
