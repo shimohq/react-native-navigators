@@ -19,12 +19,13 @@ export interface NativeScenesProps extends NavigationInjectedProps {
   mode: NativeNavigatorModes;
   headerMode?: NativeNavigatorHeaderModes;
   descriptors: NativeNavigationDescriptorMap;
-  openingRouteKeys: string[];
   closingRouteKeys: string[];
+  replacingRouteKeys: string[];
   screenProps?: any;
   onOpenRoute: (route: NavigationRoute) => void;
   onCloseRoute: (route: NavigationRoute) => void;
   onDismissRoute: (route: NavigationRoute) => void;
+  transitionEnabled: boolean;
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
@@ -41,10 +42,11 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
       routes,
       descriptors,
       closingRouteKeys,
-      openingRouteKeys,
+      replacingRouteKeys,
       screenProps,
       onDismissRoute,
-      mode
+      mode,
+      transitionEnabled
     } = this.props;
 
     return (
@@ -53,16 +55,12 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
           const { key } = route;
           const descriptor = descriptors[key];
           const { options, navigation } = descriptor;
-          const closing = closingRouteKeys.includes(key);
 
           let transition = NativeNavigatorTransitions.None;
 
-          // 转场动画由最后一个 route 决定
-          if (routes.length - 1 === index) {
-            if (openingRouteKeys.includes(key) || closing) {
-              transition =
-                options.transition || NativeNavigatorTransitions.Default;
-            }
+          if (transitionEnabled && routes.length - 1 === index) {
+            transition =
+              options.transition || NativeNavigatorTransitions.Default;
           }
 
           let headerMode = options.headerHidden
@@ -83,8 +81,10 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               transition={transition}
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
-              closing={closing}
-              popover={options.popover}
+              closing={
+                closingRouteKeys.includes(key) ||
+                replacingRouteKeys.includes(key)
+              }
               onTransitionEnd={this.handleTransitionEnd}
               route={route}
               onDismissed={onDismissRoute}

@@ -256,12 +256,30 @@ export default class NativeNavigators extends PureComponent<
     const {
       routes,
       descriptors,
+      replacingRouteKeys,
       openingRouteKeys,
-      closingRouteKeys
+      closingRouteKeys,
+      previousRoutes
     } = this.state;
 
     const mode: NativeNavigatorModes =
       navigationConfig.mode || NativeNavigatorModes.Modal;
+
+    const previousFocusedRoute = previousRoutes[previousRoutes.length - 1] as
+      | NavigationRoute
+      | undefined;
+    const nextFocusedRoute = routes[routes.length - 1];
+
+    let transitionEnabled = false;
+    if (
+      openingRouteKeys.includes(nextFocusedRoute.key) ||
+      closingRouteKeys.includes(nextFocusedRoute.key)
+    ) {
+      transitionEnabled = !(
+        previousFocusedRoute &&
+        replacingRouteKeys.includes(previousFocusedRoute.key)
+      );
+    }
 
     return (
       <NativeStackNavigator mode={mode}>
@@ -270,13 +288,14 @@ export default class NativeNavigators extends PureComponent<
           headerMode={navigationConfig.headerMode}
           routes={routes}
           descriptors={descriptors}
-          openingRouteKeys={openingRouteKeys}
+          replacingRouteKeys={replacingRouteKeys}
           closingRouteKeys={closingRouteKeys}
           navigation={navigation}
           screenProps={screenProps}
           onOpenRoute={this.handleOpenRoute}
           onCloseRoute={this.handleCloseRoute}
           onDismissRoute={this.handleDismissRoute}
+          transitionEnabled={transitionEnabled}
         />
       </NativeStackNavigator>
     );
