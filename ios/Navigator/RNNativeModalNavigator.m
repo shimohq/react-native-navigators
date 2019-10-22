@@ -98,7 +98,9 @@
             viewController.modalPresentationStyle = UIModalPresentationPopover;
             [self getSourceView:screenView completion:^(UIView *view) {
                 RNNativePopoverParams *popoverParams = screenView.popoverParams;
-                viewController.popoverPresentationController.sourceRect = popoverParams.sourceRect;
+                if (!CGRectEqualToRect(CGRectZero, popoverParams.sourceRect)) {
+                    viewController.popoverPresentationController.sourceRect = popoverParams.sourceRect;
+                }
                 viewController.popoverPresentationController.sourceView = view ?: parentViewController.view;
                 viewController.popoverPresentationController.permittedArrowDirections = popoverParams.directions;
                 if (!CGSizeEqualToSize(CGSizeZero, popoverParams.contentSize)) {

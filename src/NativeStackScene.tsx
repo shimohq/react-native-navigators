@@ -14,6 +14,7 @@ interface NativeStackNavigatorProps {
   translucent: boolean;
   transition: NativeNavigatorTransitions;
   gestureEnabled: boolean;
+  popover?: NativeNavigationPopover;
   onTransitionEnd: (route: NavigationRoute, closing: boolean) => void;
   onDismissed: (route: NavigationRoute) => void;
   route: NavigationRoute;
@@ -37,6 +38,7 @@ export default class NativeStackNavigator extends PureComponent<
       transition,
       gestureEnabled,
       closing,
+      popover,
       style
     } = this.props;
     return (
@@ -45,6 +47,7 @@ export default class NativeStackNavigator extends PureComponent<
         transition={transition}
         gestureEnabled={gestureEnabled}
         closing={closing}
+        popover={popover}
         onTransitionEnd={this.onTransitionEnd}
         onDismissed={this.onDismissed}
         style={[style, StyleSheet.absoluteFill]}
