@@ -13,6 +13,7 @@ import {
 
 import Root from './root';
 import Modal from './modal';
+import Popover from './popover';
 import Stack from './stack';
 import Features from './features';
 import { name as appName } from '../app.json';
@@ -21,6 +22,7 @@ const RootStack = createNativeNavigator(
   {
     root: Root,
     modal: Modal,
+    popover: Popover,
     stack: Stack,
     features: Features
   },
