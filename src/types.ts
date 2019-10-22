@@ -1,8 +1,10 @@
 import { ReactNode } from 'react';
+import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import {
   NavigationParams,
   NavigationDescriptor,
-  NavigationInjectedProps
+  NavigationInjectedProps,
+  NavigationScreenConfig
 } from 'react-navigation';
 
 export interface NativeNavigationPopover {
@@ -15,6 +17,7 @@ export interface NativeNavigationPopover {
 export interface NativeNavigationOptions {
   transition?: NativeNavigatorTransitions;
   translucent?: boolean;
+  cardStyle?: StyleProp<ViewStyle>;
   gestureEnabled?: boolean;
   headerLeft?: ReactNode;
   headerCenter?: ReactNode;
@@ -22,14 +25,19 @@ export interface NativeNavigationOptions {
   headerBackgroundColor?: string;
   headerBorderColor?: string;
   headerHidden?: boolean;
+  headerTitle?: string;
+  headerTitleStyle?: StyleProp<TextStyle>;
   popover?: NativeNavigationPopover;
 }
 
 export interface NavigationNativeRouterConfig {
   headerMode?: NativeNavigatorHeaderModes;
   mode?: NativeNavigatorModes;
-  initialRouteName: string;
-  defaultNavigationOptions?: NativeNavigationOptions;
+  initialRouteName?: string;
+  defaultNavigationOptions?: NavigationScreenConfig<
+    NativeNavigationOptions,
+    any
+  >;
 }
 
 export enum NativeNavigatorTransitions {
@@ -48,7 +56,7 @@ export enum NativeNavigatorModes {
 
 export enum NativeNavigatorHeaderModes {
   None = 'none',
-  Float = 'float'
+  Auto = 'auto'
 }
 
 export type NativeNavigationDescriptor = NavigationDescriptor<
