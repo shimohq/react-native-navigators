@@ -2,7 +2,8 @@ import { ReactNode } from 'react';
 import {
   NavigationParams,
   NavigationDescriptor,
-  NavigationInjectedProps
+  NavigationInjectedProps,
+  NavigationScreenConfig
 } from 'react-navigation';
 
 export interface NativeNavigationPopover {
@@ -26,7 +27,10 @@ export interface NavigationNativeRouterConfig {
   headerMode?: NativeNavigatorHeaderModes;
   mode?: NativeNavigatorModes;
   initialRouteName: string;
-  defaultNavigationOptions?: NativeNavigationOptions;
+  defaultNavigationOptions?: NavigationScreenConfig<
+    NativeNavigationOptions,
+    any
+  >;
 }
 
 export enum NativeNavigatorTransitions {
