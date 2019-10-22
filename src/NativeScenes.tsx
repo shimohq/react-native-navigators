@@ -67,7 +67,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
 
           let headerMode = options.headerHidden
             ? NativeNavigatorHeaderModes.None
-            : null;
+            : this.props.headerMode;
 
           if (mode === NativeNavigatorModes.Stack) {
             headerMode = headerMode || NativeNavigatorHeaderModes.Auto;
