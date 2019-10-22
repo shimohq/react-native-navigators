@@ -41,6 +41,7 @@ export interface NavigationNativeRouterConfig {
 }
 
 export enum NativeNavigatorTransitions {
+  Default = 'default',
   None = 'none',
   SlideFromTop = 'slideFromTop',
   SlideFromRight = 'slideFromRight',

@@ -53,18 +53,16 @@
             fromViewFinalFrame = CGRectOffset(fromView.frame, -CGRectGetWidth(fromView.frame), 0);
             fromViewFromShadowOffset = CGSizeMake(3, 0);
             break;
-        case RNNativeStackSceneTransitionSlideFormRight:
+        case RNNativeStackSceneTransitionSlideFormRight | RNNativeStackSceneTransitionDefault:
             toViewInitialFrame.origin = CGPointMake(-CGRectGetMaxX(containerView.bounds)/3.0, CGRectGetMinY(containerView.bounds));
             fromViewFinalFrame = CGRectOffset(fromView.frame, CGRectGetWidth(fromView.frame), 0);
             fromViewFromShadowOffset = CGSizeMake(-3, 0);
             break;
         case RNNativeStackSceneTransitionSlideFormTop:
-            toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(containerView.bounds), CGRectGetMaxY(containerView.bounds)/3.0);
             fromViewFinalFrame = CGRectOffset(fromView.frame, 0, -CGRectGetHeight(fromView.frame));
             fromViewFromShadowOffset = CGSizeMake(0, 3);
             break;
         case RNNativeStackSceneTransitionSlideFormBottom:
-            toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(containerView.bounds), -CGRectGetMaxY(containerView.bounds)/3.0);
             fromViewFinalFrame = CGRectOffset(fromView.frame, 0, CGRectGetHeight(fromView.frame));
             fromViewFromShadowOffset = CGSizeMake(0, -3);
             break;

@@ -25,7 +25,7 @@
 {
     
     if (self = [super init]) {
-        _transition = RNNativeStackSceneTransitionNone;
+        _transition = RNNativeStackSceneTransitionDefault;
         _closing = NO;
         _translucent = NO;
         _bridge = bridge;
@@ -104,7 +104,7 @@
  present 动画
  */
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    if (_transition == RNNativeStackSceneTransitionNone) {
+    if (_transition == RNNativeStackSceneTransitionDefault || _transition == RNNativeStackSceneTransitionNone) {
         return nil;
     }
     return [[RNNativeModalAnimatedTransition alloc] initWithTransition:_transition presenting:YES];
@@ -114,7 +114,7 @@
  dismiss 动画
  */
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
-    if (_transition == RNNativeStackSceneTransitionNone) {
+    if (_transition == RNNativeStackSceneTransitionDefault || _transition == RNNativeStackSceneTransitionNone) {
         return nil;
     }
     return [[RNNativeModalAnimatedTransition alloc] initWithTransition:_transition presenting:NO];
@@ -193,6 +193,7 @@
 @implementation RCTConvert (RNNativeStackScene)
 
 RCT_ENUM_CONVERTER(RNNativeStackSceneTransition, (@{
+    @"default": @(RNNativeStackSceneTransitionDefault),
     @"none": @(RNNativeStackSceneTransitionNone),
     @"slideFromTop": @(RNNativeStackSceneTransitionSlideFormTop),
     @"slideFromRight": @(RNNativeStackSceneTransitionSlideFormRight),
