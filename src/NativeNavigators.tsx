@@ -5,7 +5,6 @@ import {
   NativeNavigatorsProps,
   NativeNavigationDescriptorMap,
   NativeNavigatorTransitions,
-  NativeNavigatorHeaderModes,
   NativeNavigatorModes
 } from './types';
 import NativeStackNavigator from './NativeStackNavigator';

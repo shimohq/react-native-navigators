@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 
 import {
@@ -21,8 +22,18 @@ export default function NativeHeader(props: NativeStackHeaderProps) {
     headerLeft,
     headerRight,
     headerBackgroundColor,
-    headerBorderColor
+    headerBorderColor,
+    headerTitle,
+    headerTitleStyle
   } = descriptor.options;
+
+  const center = headerCenter ? (
+    headerCenter
+  ) : headerTitle ? (
+    <Text style={headerTitleStyle} numberOfLines={1}>
+      {headerTitle}
+    </Text>
+  ) : null;
 
   return (
     <NativeStackHeader
@@ -30,9 +41,9 @@ export default function NativeHeader(props: NativeStackHeaderProps) {
       headerBackgroundColor={headerBackgroundColor}
       headerBorderColor={headerBorderColor}
     >
-      {headerCenter ? (
+      {center ? (
         <NativeStackHeaderItem type={NativeNavigationHeaderTypes.Center}>
-          {headerCenter}
+          {center}
         </NativeStackHeaderItem>
       ) : null}
       {headerLeft ? (

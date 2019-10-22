@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
+import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import {
   NavigationParams,
   NavigationDescriptor,
@@ -22,6 +22,8 @@ export interface NativeNavigationOptions {
   headerBackgroundColor?: string;
   headerBorderColor?: string;
   headerHidden?: boolean;
+  headerTitle?: string;
+  headerTitleStyle?: StyleProp<TextStyle>;
   popover?: NativeNavigationPopover;
 }
 
@@ -51,7 +53,7 @@ export enum NativeNavigatorModes {
 
 export enum NativeNavigatorHeaderModes {
   None = 'none',
-  Float = 'float'
+  Auto = 'auto'
 }
 
 export type NativeNavigationDescriptor = NavigationDescriptor<

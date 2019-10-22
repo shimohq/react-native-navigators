@@ -47,8 +47,6 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
       mode
     } = this.props;
 
-    let { headerMode } = this.props;
-
     return (
       <>
         {routes.map((route, index) => {
@@ -67,12 +65,14 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
             }
           }
 
+          let headerMode = options.headerHidden
+            ? NativeNavigatorHeaderModes.None
+            : null;
+
           if (mode === NativeNavigatorModes.Stack) {
-            headerMode = options.headerHidden
-              ? NativeNavigatorHeaderModes.None
-              : headerMode || NativeNavigatorHeaderModes.Float;
+            headerMode = headerMode || NativeNavigatorHeaderModes.Auto;
           } else {
-            headerMode = NativeNavigatorHeaderModes.None;
+            headerMode = headerMode || NativeNavigatorHeaderModes.None;
           }
 
           const SceneComponent = descriptor.getComponent();
@@ -94,7 +94,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
                 navigation={navigation}
                 component={SceneComponent}
               />
-              {headerMode === NativeNavigatorHeaderModes.Float ? (
+              {headerMode === NativeNavigatorHeaderModes.Auto ? (
                 <NativeHeader descriptor={descriptor} route={route} />
               ) : null}
             </NativeStackScene>
