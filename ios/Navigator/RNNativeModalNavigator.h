@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RNNativeModalNavigator : RNNativeBaseNavigator
 
+- (instancetype)initWithBridge:(RCTBridge *)bridge;
+
 @end
 
 NS_ASSUME_NONNULL_END

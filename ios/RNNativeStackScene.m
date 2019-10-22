@@ -11,6 +11,8 @@
 
 @interface RNNativeStackScene() <UIViewControllerTransitioningDelegate>
 
+@property (nonatomic, strong) RNNativeStackController *controller;
+
 @end
 
 @implementation RNNativeStackScene
@@ -63,6 +65,13 @@
         [(RNNativeStackHeader *)subview detachViewController];
         [self updateBounds];
     }
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    RNNativeNavigatorFrameData *data = [[RNNativeNavigatorFrameData alloc] initWithFrame:self.frame];
+    [_bridge.uiManager setLocalData:data forView:self];
 }
 
 #pragma mark - TouchHandler
@@ -150,11 +159,9 @@
     }
 }
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    
-    RNNativeNavigatorFrameData *data = [[RNNativeNavigatorFrameData alloc] initWithFrame:self.frame];
-    [_bridge.uiManager setLocalData:data forView:self];
+- (void)setPopover:(NSDictionary *)popover {
+    _popover = popover;
+    _popoverParams = [[RNNativePopoverParams alloc] initWithParams:popover];
 }
 
 #pragma mark - Private

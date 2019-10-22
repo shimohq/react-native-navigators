@@ -15,6 +15,7 @@
 
 @interface RNNativeBaseNavigator () <UINavigationControllerDelegate, RNNativeStackSceneDelegate>
 
+@property (nonatomic, weak) RCTBridge *bridge;
 @property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, strong) NSMutableArray<RNNativeStackScene *> *currentScenes;
 @property (nonatomic, strong) NSMutableArray<RNNativeStackScene *> *nextScenes;
@@ -26,9 +27,9 @@
     BOOL _needUpdate;
 }
 
-- (instancetype)initWithViewController:(UIViewController *)viewController
-{
+- (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(UIViewController *)viewController {
     if (self = [super init]) {
+        _bridge = bridge;
         _viewController = viewController;
         _currentScenes = [NSMutableArray new];
         _nextScenes = [NSMutableArray new];
