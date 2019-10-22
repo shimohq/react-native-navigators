@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Switch } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
-import { createNativeNavigator, NativeNavigatorModes } from 'react-native-navigators';
+import { createNativeNavigator, NativeNavigatorModes, NativeNavigatorTransitions } from 'react-native-navigators';
 
 import styles from './styles';
 
@@ -264,6 +264,7 @@ export default createNativeNavigator(
         });
         const headerHidden = props.navigation.getParam('headerHidden', false);
         return {
+          transition: NativeNavigatorTransitions.SlideFromBottom,
           headerLeft: headerComponents.left ? (
             <Text style={styles.border}>Left</Text>
           ) : null,
