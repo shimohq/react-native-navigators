@@ -97,7 +97,9 @@
 
 - (void)invalidate {
     [_nextScenes removeAllObjects];
-    [self updateSceneWithNextScenes:_nextScenes];
+    RCTExecuteOnMainQueue(^{
+        [self updateSceneWithNextScenes:_nextScenes];
+    });
 }
 
 #pragma mark - RNNativeStackSceneDelegate
