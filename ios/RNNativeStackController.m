@@ -76,14 +76,13 @@
     if (responder != nil) {
         _previousFirstResponder = responder;
     }
-    
-    [[self findHeader] detachViewController];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    
+    [[self findHeader] detachViewController];
+
     if (self.parentViewController == nil && self.presentingViewController == nil) {
         if (_scene.closing) {
             [_scene transitionEnd:YES];
