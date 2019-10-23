@@ -29,6 +29,11 @@ function StackIndex(props: NavigationInjectedProps) {
         <Text style={styles.link}>translucent</Text>
       </TouchableOpacity>
       <TouchableOpacity
+        onPress={() => props.navigation.navigate('transition')}
+      >
+        <Text style={styles.link}>transition</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         onPress={() => props.navigation.navigate('headerComponents')}
       >
         <Text style={styles.link}>headerComponents</Text>
@@ -108,6 +113,49 @@ function Translucent(props: NavigationInjectedProps) {
           })
         }
       />
+    </View>
+  );
+}
+
+function Transition(props) {
+  const push = (transition: NativeNavigatorTransitions) => {
+    props.navigation.push('transition', {
+      transition
+    });
+  };
+
+  return (
+    <View style={ styles.container }>
+      <TouchableOpacity
+        onPress={() => push(NativeNavigatorTransitions.Default)}
+      >
+        <Text style={styles.link}>⬆️Navigate by default</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => push(NativeNavigatorTransitions.None)}
+      >
+        <Text style={styles.link}>❌Navigate with no transition</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => push(NativeNavigatorTransitions.SlideFromBottom)}
+      >
+        <Text style={styles.link}>⬆️Navigate from bottom</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => push(NativeNavigatorTransitions.SlideFromRight)}
+      >
+        <Text style={styles.link}>⬅️Navigate from right</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => push(NativeNavigatorTransitions.SlideFromLeft)}
+      >
+        <Text style={styles.link}>➡️Navigate from left</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => push(NativeNavigatorTransitions.SlideFromTop)}
+      >
+        <Text style={styles.link}>⬇️Navigate from top</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -251,6 +299,20 @@ export default createNativeNavigator(
       navigationOptions: (props: NavigationInjectedProps) => {
         return {
           translucent: props.navigation.getParam('translucent', false)
+        };
+      }
+    },
+    transition: {
+      screen: Transition,
+      navigationOptions: (props: NavigationInjectedProps) => {
+        return {
+          headerLeft: (
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <Text style={styles.link}>Back</Text>
+            </TouchableOpacity>
+          ),
+          headerCenter: <Text>Transition</Text>,
+          transition: props.navigation.getParam('transition')
         };
       }
     },
