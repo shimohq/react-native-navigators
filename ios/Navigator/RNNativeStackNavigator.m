@@ -61,11 +61,11 @@
  */
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                      nextScrenes:(NSArray<RNNativeStackScene *> *)nextScrenes
+                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
                     removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
                    insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes {
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
-    for (RNNativeStackScene *scene in nextScrenes) {
+    for (RNNativeStackScene *scene in nextScenes) {
         [willShowViewControllers addObject:scene.controller];
     }
     

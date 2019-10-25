@@ -13,6 +13,7 @@ import {
 
 import Root from './root';
 import Modal from './modal';
+import Card from './card';
 import Popover from './popover';
 import Stack from './stack';
 import Features from './features';
@@ -23,6 +24,7 @@ const RootStack = createNativeNavigator(
     root: Root,
     modal: Modal,
     popover: Popover,
+    card: Card,
     stack: Stack,
     features: Features
   },

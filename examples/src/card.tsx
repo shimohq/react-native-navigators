@@ -10,9 +10,9 @@ import {
 import styles from './styles';
 import { NavigateList } from "./components";
 
-function ModalTransitionModes(props: NavigationInjectedProps) {
+function TransitionModes(props: NavigationInjectedProps) {
   const push = (transition: NativeNavigatorTransitions) => {
-    props.navigation.push('modalTransitionModes', {
+    props.navigation.push('transitionModes', {
       transition
     });
   };
@@ -31,16 +31,16 @@ function ModalTransitionModes(props: NavigationInjectedProps) {
       <TouchableOpacity onPress={() => props.navigation.goBack()}>
         <Text style={styles.link}>Back to index</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Modal</Text>
+      <Text style={styles.title}>Card</Text>
       <Text style={styles.title}>{props.navigation.state.key}</Text>
       <NavigateList navigate={push} />
     </View>
   );
 }
 
-function ModalIndex(props: NavigationInjectedProps) {
+function Index(props: NavigationInjectedProps) {
   const navigate = (transition: NativeNavigatorTransitions) => {
-    props.navigation.navigate('modalTransitionModes', {
+    props.navigation.navigate('transitionModes', {
       transition
     });
   };
@@ -52,7 +52,7 @@ function ModalIndex(props: NavigationInjectedProps) {
       >
         <Text style={styles.link}>Back to index</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Modal navigator</Text>
+      <Text style={styles.title}>Card navigator</Text>
       <NavigateList navigate={navigate} />
     </View>
   );
@@ -60,9 +60,9 @@ function ModalIndex(props: NavigationInjectedProps) {
 
 export default createNativeNavigator(
   {
-    modalIndex: ModalIndex,
-    modalTransitionModes: {
-      screen: ModalTransitionModes,
+    index: Index,
+    transitionModes: {
+      screen: TransitionModes,
       navigationOptions: (
         props: NavigationInjectedProps<{
           transition: NativeNavigatorTransitions;
@@ -70,13 +70,13 @@ export default createNativeNavigator(
       ) => {
         return {
           transition: props.navigation.getParam('transition'),
-          transparent: false
+          transparent: true
         };
       }
     }
   },
   {
-    mode: NativeNavigatorModes.Modal,
-    initialRouteName: 'modalIndex'
+    mode: NativeNavigatorModes.Card,
+    initialRouteName: 'index'
   }
 );
