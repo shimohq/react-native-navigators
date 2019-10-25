@@ -82,12 +82,10 @@
     toView.layer.shadowOffset = toViewFromShadowOffset;
     
     toView.frame = toViewInitialFrame;
-    toView.alpha = 0.5;
     
     NSTimeInterval transitionDuration = [self transitionDuration:transitionContext];
     
     [UIView animateWithDuration:transitionDuration animations:^{
-        toView.alpha = 1.0;
         toView.frame = toViewFinalFrame;
         fromView.frame = fromViewFinalFrame;
     } completion:^(BOOL finished) {
