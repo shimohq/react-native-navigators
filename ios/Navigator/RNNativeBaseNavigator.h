@@ -38,10 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
  子类必须实现
  */
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
-        action:(RNNativeStackNavigatorAction)action
-   nextScrenes:(NSArray<RNNativeStackScene *> *)nextScrenes
- removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
-insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes;
+                           action:(RNNativeStackNavigatorAction)action
+                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
+                    removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
+                   insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes;
 
 @end
 

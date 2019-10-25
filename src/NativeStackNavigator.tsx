@@ -23,14 +23,20 @@ export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
     );
   }
   let Navigator;
-  if (mode === NativeNavigatorModes.Modal) {
-    Navigator = RNNativeModalNavigator;
-  } else {
-    Navigator = RNNativeStackNavigator;
+  switch (mode) {
+    case NativeNavigatorModes.Card:
+      Navigator = RNNativeCardNavigator;
+      break;
+    case NativeNavigatorModes.Modal:
+      Navigator = RNNativeModalNavigator;
+      break;
+    default:
+      Navigator = RNNativeStackNavigator;
+      break;
   }
-
   return <Navigator style={styles.navigator}>{props.children}</Navigator>;
 }
 
 const RNNativeStackNavigator = requireNativeComponent('RNNativeStackNavigator');
 const RNNativeModalNavigator = requireNativeComponent('RNNativeModalNavigator');
+const RNNativeCardNavigator = requireNativeComponent('RNNativeCardNavigator');

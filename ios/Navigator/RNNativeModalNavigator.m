@@ -32,18 +32,18 @@
  */
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                      nextScrenes:(NSArray<RNNativeStackScene *> *)nextScrenes
+                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
                     removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
                    insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes {
     // show
     for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = insertedScenes[index];
-        NSInteger willShowIndex = [nextScrenes indexOfObject:scene];
+        NSInteger willShowIndex = [nextScenes indexOfObject:scene];
         if (willShowIndex == 0 || self.currentScenes.count == 0) {
             [self.controller addChildViewController:scene.controller];
             [self.controller.view addSubview:scene.controller.view];
         } else {
-            UIViewController *parentController = nextScrenes[willShowIndex - 1].controller;
+            UIViewController *parentController = nextScenes[willShowIndex - 1].controller;
             BOOL animated = action == RNNativeStackNavigatorActionShow && index == size - 1 && transition != RNNativeStackSceneTransitionNone;
             if (parentController.presentedViewController) {
                 UIViewController *presentedViewController = parentController.presentedViewController;

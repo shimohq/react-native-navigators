@@ -41,6 +41,17 @@ export function createModalNavigator(
   });
 }
 
+export function createCardNavigator(
+  routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
+  stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>
+) {
+  const router = StackRouter(routeConfigMap, stackConfig);
+  return createNavigator(NativeNavigators, router, {
+    ...stackConfig,
+    mode: NativeNavigatorModes.Card
+  });
+}
+
 export function createSplitNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>

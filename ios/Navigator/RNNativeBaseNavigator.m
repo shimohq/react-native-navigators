@@ -40,7 +40,7 @@
 
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                      nextScrenes:(NSArray<RNNativeStackScene *> *)nextScrenes
+                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
                     removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
                    insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes {
     @throw [NSException exceptionWithName:NSInternalInconsistencyException
@@ -96,9 +96,9 @@
 #pragma mark - RCTInvalidating
 
 - (void)invalidate {
-    [_nextScenes removeAllObjects];
+    [self.nextScenes removeAllObjects];
     RCTExecuteOnMainQueue(^{
-        [self updateSceneWithNextScenes:_nextScenes];
+        [self updateSceneWithNextScenes:self.nextScenes];
     });
 }
 
@@ -122,9 +122,9 @@
         _needUpdate = YES;
         RCTExecuteOnUIManagerQueue(^{
             RCTExecuteOnMainQueue(^{
-                _needUpdate = NO;
+                self->_needUpdate = NO;
                 NSMutableArray<RNNativeStackScene *> *nextScenes = [NSMutableArray new];
-                for (RNNativeStackScene *scene in _nextScenes) {
+                for (RNNativeStackScene *scene in self.nextScenes) {
                     if (!scene.closing) {
                         [nextScenes addObject:scene];
                     }
@@ -174,7 +174,7 @@
     }
     [self updateSceneWithTransition:transition
                              action:action
-                        nextScrenes:nextScenes
+                         nextScenes:nextScenes
                       removedScenes:removedScenes
                      insertedScenes:insertedScenes];
     [_currentScenes setArray:nextScenes];
