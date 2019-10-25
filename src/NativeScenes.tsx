@@ -81,6 +81,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               transition={transition}
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
+              transparent={options.transparent === true}
               closing={
                 closingRouteKeys.includes(key) ||
                 replacingRouteKeys.includes(key)

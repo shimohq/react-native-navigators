@@ -38,13 +38,10 @@
     // show
     for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = insertedScenes[index];
-        scene.controller.modalPresentationStyle = UIModalPresentationCustom;
-        
         NSInteger willShowIndex = [nextScrenes indexOfObject:scene];
         if (willShowIndex == 0 || self.currentScenes.count == 0) {
             [self.controller addChildViewController:scene.controller];
             [self.controller.view addSubview:scene.controller.view];
-            
         } else {
             UIViewController *parentController = nextScrenes[willShowIndex - 1].controller;
             BOOL animated = action == RNNativeStackNavigatorActionShow && index == size - 1 && transition != RNNativeStackSceneTransitionNone;
@@ -83,12 +80,12 @@
 - (void)presentViewController:(UIViewController *)viewController parentViewController:(UIViewController *)parentViewController animated: (BOOL)flag completion:(void (^ __nullable)(void))completion {
     
     if ([viewController.view isKindOfClass:[RNNativeStackScene class]]) {
-        RNNativeStackScene *screenView = (RNNativeStackScene *)viewController.view;
-        RNNativePopoverParams *popoverParams = screenView.popoverParams;
-        if (popoverParams) {
+        RNNativeStackScene *scene = (RNNativeStackScene *)viewController.view;
+        RNNativePopoverParams *popoverParams = scene.popoverParams;
+        if (popoverParams) { // popover
             viewController.modalPresentationStyle = UIModalPresentationPopover;
-            [self getSourceView:screenView completion:^(UIView *view) {
-                RNNativePopoverParams *popoverParams = screenView.popoverParams;
+            [self getSourceView:scene completion:^(UIView *view) {
+                RNNativePopoverParams *popoverParams = scene.popoverParams;
                 if (!CGRectEqualToRect(CGRectZero, popoverParams.sourceRect)) {
                     viewController.popoverPresentationController.sourceRect = popoverParams.sourceRect;
                 }
@@ -100,9 +97,18 @@
                 [parentViewController presentViewController:viewController animated:flag completion:completion];
             }];
             return;
+        } else {
+            parentViewController.definesPresentationContext = !scene.transparent;
+            if (scene.transition == RNNativeStackSceneTransitionNone || scene.transition == RNNativeStackSceneTransitionDefault) { // system modal style
+                viewController.modalPresentationStyle = scene.transparent ? UIModalPresentationOverCurrentContext : UIModalPresentationCurrentContext;
+            } else { // custom modal style
+                viewController.modalPresentationStyle = UIModalPresentationCustom;
+            }
+            [parentViewController presentViewController:viewController animated:flag completion:completion];
         }
+    } else {
+        [parentViewController presentViewController:viewController animated:flag completion:completion];
     }
-    [parentViewController presentViewController:viewController animated:flag completion:completion];
 }
 
 - (void)getSourceView:(RNNativeStackScene *)screenView completion:(void (^)(UIView *view))completion {

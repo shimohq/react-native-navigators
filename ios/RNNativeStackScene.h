@@ -20,6 +20,16 @@
 @property (nonatomic, assign) BOOL closing;
 // 导航条是否沉浸
 @property (nonatomic, assign) BOOL translucent;
+/**
+ 是否透明
+ 
+ 不适用于 stack
+ 适用于 modal：
+ YES:  present 之后 presenting viewcontroller 不会移除
+ NO:  present 之后 presenting viewcontroller 会被移除，有利于内存释放。
+ 默认: NO
+ */
+@property (nonatomic, assign) BOOL transparent;
 @property (nonatomic, strong) NSDictionary *popover;
 @property (nonatomic, copy) RCTDirectEventBlock onTransitionEnd;
 @property (nonatomic, copy) RCTDirectEventBlock onDismissed;

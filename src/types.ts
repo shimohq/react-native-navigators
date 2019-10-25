@@ -17,6 +17,7 @@ export interface NativeNavigationPopover {
 export interface NativeNavigationOptions {
   transition?: NativeNavigatorTransitions;
   translucent?: boolean;
+  transparent?: boolean;
   cardStyle?: StyleProp<ViewStyle>;
   gestureEnabled?: boolean;
   headerLeft?: ReactNode;

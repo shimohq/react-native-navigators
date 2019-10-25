@@ -109,7 +109,8 @@ export default createNativeNavigator(
         }>
       ) => {
         return {
-          transition: props.navigation.getParam('transition')
+          transition: props.navigation.getParam('transition'),
+          transparent: false
         };
       }
     }

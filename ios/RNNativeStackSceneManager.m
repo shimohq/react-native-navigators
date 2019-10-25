@@ -24,6 +24,7 @@ RCT_EXPORT_VIEW_PROPERTY(transition, RNNativeStackSceneTransition)
 RCT_EXPORT_VIEW_PROPERTY(gestureEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(closing, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(translucent, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(transparent, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(popover, NSDictionary)
 
 @end

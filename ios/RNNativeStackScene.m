@@ -4,6 +4,7 @@
 #import "RNNativeNavigatorInsetsData.h"
 #import "RNNativeNavigatorFrameData.h"
 #import "RNNativeStackHeader.h"
+#import "RNNativeModalPresentationController.h"
 
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
@@ -134,6 +135,19 @@
  */
 - (nullable id <UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id <UIViewControllerAnimatedTransitioning>)animator {
     return nil;
+}
+
+- (nullable UIPresentationController *)presentationControllerForPresentedViewController:(UIViewController *)presented presentingViewController:(nullable UIViewController *)presenting sourceViewController:(UIViewController *)source {
+    if (presented.modalPresentationStyle == UIModalPresentationCustom) {
+        RNNativeModalPresentationController *presentationController = [[RNNativeModalPresentationController alloc] initWithPresentedViewController:presented presentingViewController:source];
+        if ([presented.view isKindOfClass:[RNNativeStackScene class]]) {
+            RNNativeStackScene *scene = (RNNativeStackScene *)presented.view;
+            presentationController.transparent  = scene.transparent;
+        }
+        return presentationController;
+    } else {
+        return nil;
+    }
 }
 
 #pragma mark - Setter

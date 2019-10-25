@@ -12,6 +12,7 @@ import { NativeNavigatorTransitions, NativeNavigationPopover } from './types';
 interface NativeStackNavigatorProps {
   closing: boolean;
   translucent: boolean;
+  transparent: boolean;
   transition: NativeNavigatorTransitions;
   gestureEnabled: boolean;
   popover?: NativeNavigationPopover;
@@ -35,6 +36,7 @@ export default class NativeStackNavigator extends PureComponent<
   public render() {
     const {
       translucent,
+      transparent,
       transition,
       gestureEnabled,
       closing,
@@ -44,6 +46,7 @@ export default class NativeStackNavigator extends PureComponent<
     return (
       <RNNativeStackScene
         translucent={translucent}
+        transparent={transparent}
         transition={transition}
         gestureEnabled={gestureEnabled}
         closing={closing}
