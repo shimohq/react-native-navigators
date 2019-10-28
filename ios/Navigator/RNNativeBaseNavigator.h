@@ -10,6 +10,8 @@
 #import <React/RCTViewManager.h>
 #import "RNNativeStackScene.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSInteger, RNNativeStackSceneMode) {
     RNNativeStackSceneModeStack,
     RNNativeStackSceneModePopover,
@@ -22,7 +24,7 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
     RNNativeStackNavigatorActionHide
 };
 
-NS_ASSUME_NONNULL_BEGIN
+typedef void (^RNNativeNavigatorTransitionBlock)(void);
 
 @interface RNNativeBaseNavigator : UIView <RCTInvalidating>
 
@@ -40,8 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
                        nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes;
+                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                  beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
+                    endTransition:(RNNativeNavigatorTransitionBlock)endTransition;
 
 @end
 

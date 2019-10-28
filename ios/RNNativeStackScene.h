@@ -34,14 +34,18 @@
 @property (nonatomic, copy) RCTDirectEventBlock onTransitionEnd;
 @property (nonatomic, copy) RCTDirectEventBlock onDismissed;
 
+@property (nonatomic, copy) RCTDirectEventBlock onWillFocus;
+@property (nonatomic, copy) RCTDirectEventBlock onDidFocus;
+@property (nonatomic, copy) RCTDirectEventBlock onWillBlur;
+@property (nonatomic, copy) RCTDirectEventBlock onDidBlur;
+
+@property (nonatomic, assign) RNNativeStackSceneStatus status;
 @property (nonatomic, weak) id<RNNativeStackSceneDelegate> delegate;
 @property (nonatomic, strong, readonly) RNNativeStackController *controller;
 @property (nonatomic, strong, readonly) RNNativePopoverParams *popoverParams;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 - (void)updateBounds;
-- (void)transitionEnd:(BOOL)closing;
-- (void)dismiss;
 
 @end
 

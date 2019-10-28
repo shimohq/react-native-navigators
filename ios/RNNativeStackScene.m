@@ -36,18 +36,6 @@
     return self;
 }
 
-- (void)transitionEnd:(BOOL)closing
-{
-    _onTransitionEnd(@{
-        @"closing": @(closing)
-    });
-}
-
-- (void)dismiss
-{
-    _onDismissed(nil);
-}
-
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
     [super insertReactSubview:subview atIndex:atIndex];
@@ -176,6 +164,52 @@
 - (void)setPopover:(NSDictionary *)popover {
     _popover = popover;
     _popoverParams = [[RNNativePopoverParams alloc] initWithParams:popover];
+}
+
+- (void)setStatus:(RNNativeStackSceneStatus)status {
+    if (_status == status) {
+        return;
+    }
+    if (_status == RNNativeStackSceneStatusDidBlur && status == RNNativeStackSceneStatusWillBlur) {
+        return;
+    }
+    if (_status == RNNativeStackSceneStatusDidFocus && status == RNNativeStackSceneStatusWillFocus) {
+        return;
+    }
+    _status = status;
+    switch (_status) {
+        case RNNativeStackSceneStatusWillFocus:
+            if (_onWillFocus) {
+                _onWillFocus(@{
+                    @"closing": @(_closing)
+                });
+            }
+            break;
+        case RNNativeStackSceneStatusDidFocus:
+            if (_onDidFocus) {
+                _onDidFocus(@{
+                    @"closing": @(_closing)
+                });
+            }
+            break;
+        case RNNativeStackSceneStatusWillBlur:
+            if (_onDidFocus) {
+                _onDidFocus(@{
+                    @"closing": @(_closing)
+                });
+            }
+            break;
+        case RNNativeStackSceneStatusDidBlur:
+            if (_onDidFocus) {
+                _onDidFocus(@{
+                    @"closing": @(_closing)
+                });
+            }
+            break;
+        default:
+            break;
+    }
+    NSLog(@"scene:%@ status: %ld", self, (long)_status);
 }
 
 #pragma mark - Private

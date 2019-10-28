@@ -19,6 +19,13 @@ typedef NS_ENUM(NSInteger, RNNativeStackSceneTransition) {
     RNNativeStackSceneTransitionSlideFormLeft
 };
 
+typedef NS_ENUM(NSInteger, RNNativeStackSceneStatus) {
+    RNNativeStackSceneStatusDidBlur,
+    RNNativeStackSceneStatusWillBlur,
+    RNNativeStackSceneStatusDidFocus,
+    RNNativeStackSceneStatusWillFocus
+};
+
 @interface RNNativeStackConst : NSObject
 
 @end

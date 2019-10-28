@@ -19,7 +19,7 @@ export default class CardScreen extends PureComponent {
         <View
           style={{
             width: 300,
-            height: 400,
+            height: 310,
             backgroundColor: 'red'
           }}
         >

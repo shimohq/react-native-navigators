@@ -30,9 +30,13 @@
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
                        nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes {
-    // insertedScenes ViewController
+                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                  beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
+                    endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+    beginTransition();
+    
+    // addChildViewController
     for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = insertedScenes[index];
         [self.controller addChildViewController:scene.controller];
@@ -45,11 +49,8 @@
         nextTopScene.frame = [self getFrameWithContainerView:_controller.view transition:transition];
     }
     
-    // nextScenes view
+    // addSubview
     for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
-        RNNativeStackScene *scene = nextScenes[index];
-        UIView *currentView = scene.controller.view;
-        
         BOOL willShow = NO;
         if (index + 1 == size) {
             willShow = YES;
@@ -57,42 +58,62 @@
             RNNativeStackScene *nextScene = nextScenes[index + 1];
             willShow = nextScene.transparent;
         }
-        
         if (willShow) {
-            [self addSubview:scene.controller.view toView:_controller.view];
-        } else {
-            [currentView removeFromSuperview];
+            RNNativeStackScene *scene = nextScenes[index];
+            [self addSubview:scene toView:_controller.view];
         }
     }
     
     // transition
     if (transition == RNNativeStackSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        [self removeScenes:removedScenes];
+        [self removeScenesWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+        endTransition();
     } else if (action == RNNativeStackNavigatorActionShow) {
         [UIView animateWithDuration:0.35 animations:^{
             nextTopScene.frame = self.controller.view.bounds;
         } completion:^(BOOL finished) {
-            [self removeScenes:removedScenes];
+            [nextTopScene.controller didMoveToParentViewController:self.controller];
+            [self removeScenesWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+            endTransition();
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
         [self addSubview:currentTopScene toView:_controller.view];
+        [currentTopScene.controller willMoveToParentViewController:nil];
         [UIView animateWithDuration:0.35 animations:^{
             currentTopScene.frame = [self getFrameWithContainerView:self.controller.view transition:transition];
         } completion:^(BOOL finished) {
-            [self removeScenes:removedScenes];
+            [self removeScenesWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+            endTransition();
         }];
     }
 }
 
-- (void)removeScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes {
+#pragma mark - Layout
+
+- (void)removeScenesWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
+                     removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
+                            action:(RNNativeStackNavigatorAction)action {
+    // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = removedScenes[index];
+        [scene removeFromSuperview];
         [scene.controller.view removeFromSuperview];
-        [scene.controller removeFromParentViewController];
+        [scene setStatus:RNNativeStackSceneStatusDidBlur];
+    }
+    
+    // nextScenes
+    for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
+        if (index + 1 == size) {
+            continue;
+        }
+        RNNativeStackScene *scene = nextScenes[index];
+        RNNativeStackScene *nextScene = nextScenes[index + 1];
+        if (!nextScene.transparent && [scene superview]) {
+            [scene removeFromSuperview];
+        }
+        [scene setStatus:RNNativeStackSceneStatusDidBlur];
     }
 }
-
-#pragma mark - Private
 
 - (void)addSubview:(UIView *)subview toView:(UIView *)view {
     UIView *superView = [subview superview];
@@ -122,6 +143,7 @@
             frame = CGRectMake(CGRectGetMinX(containerBounds), -CGRectGetMaxY(containerBounds), CGRectGetWidth(containerBounds), CGRectGetHeight(containerBounds));
             break;
         case RNNativeStackSceneTransitionSlideFormBottom:
+        case RNNativeStackSceneTransitionDefault:
             frame = CGRectMake(CGRectGetMinX(containerBounds), CGRectGetMaxY(containerBounds), CGRectGetWidth(containerBounds), CGRectGetHeight(containerBounds));
             break;
         default:
