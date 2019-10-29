@@ -8,6 +8,8 @@
 
 #import "RNNativeModalNavigator.h"
 #import "RNNativeStackScene.h"
+#import "RNNativeModalNavigatorTransitionManager.h"
+
 #import <React/RCTUIManager.h>
 
 @interface RNNativeModalNavigator()
@@ -58,8 +60,9 @@
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition();
-    NSNumber *key = [NSNumber numberWithDouble:[[[NSDate alloc] init] timeIntervalSince1970]];
-    [self incrementNumberWithKey:key];
+    RNNativeModalNavigatorTransitionManager *transitionManager = [[RNNativeModalNavigatorTransitionManager alloc] init];
+    [transitionManager setEndTransition:endTransition];
+    [transitionManager increment];
     // show
     for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = insertedScenes[index];
@@ -72,12 +75,12 @@
             BOOL animated = action == RNNativeStackNavigatorActionShow && index == size - 1 && transition != RNNativeStackSceneTransitionNone;
             if (parentController.presentedViewController) {
                 UIViewController *presentedViewController = parentController.presentedViewController;
-                [self dismissViewController: parentController key:key animated:NO completion:^{
-                    [self presentViewController:presentedViewController parentViewController:scene.controller key:key animated:NO completion:nil endTransition:endTransition];
-                    [self presentViewController:scene.controller parentViewController:parentController key:key animated:animated completion:nil endTransition:endTransition];
-                } endTransition:endTransition];
+                [transitionManager dismissViewController: parentController animated:NO completion:^{
+                    [self presentViewController:presentedViewController parentViewController:scene.controller transitionManager:transitionManager animated:NO completion:nil];
+                    [self presentViewController:scene.controller parentViewController:parentController transitionManager:transitionManager animated:animated completion:nil];
+                }];
             } else {
-                [self presentViewController:scene.controller parentViewController:parentController key:key animated:animated completion:nil endTransition:endTransition];
+                [self presentViewController:scene.controller parentViewController:parentController transitionManager:transitionManager animated:animated completion:nil];
             }
         }
     }
@@ -88,27 +91,26 @@
         BOOL animated = action == RNNativeStackNavigatorActionHide && index == size - 1 && transition != RNNativeStackSceneTransitionNone;
         UIViewController *parentViewController = scene.controller.presentingViewController;
         if (parentViewController) {
-            [self dismissViewController:parentViewController key:key animated:animated completion:^{
+            [transitionManager dismissViewController:parentViewController animated:animated completion:^{
                 if (scene.controller.presentedViewController) {
-                    [self presentViewController:scene.controller.presentedViewController parentViewController:parentViewController key:key animated:NO completion:nil endTransition:endTransition];
+                    [self presentViewController:scene.controller.presentedViewController parentViewController:parentViewController transitionManager:transitionManager animated:NO completion:nil];
                 }
-            } endTransition:endTransition];
+            }];
         } else if (scene.controller.parentViewController) {
             [scene.controller removeFromParentViewController];
             [scene.controller.view removeFromSuperview];
         }
     }
-    [self decreaseAndHandleEndTransition:endTransition withKey:key];
+    [transitionManager decreaseAndHandleEndTransition];
 }
 
-#pragma mark - Present And Dismiss
+#pragma mark - Private
 
 - (void)presentViewController:(UIViewController *)viewController
          parentViewController:(UIViewController *)parentViewController
-                          key:(NSNumber *)key
+            transitionManager:(RNNativeModalNavigatorTransitionManager *)transitionManager
                      animated:(BOOL)animated
-                   completion:(void (^ __nullable)(void))completion
-                endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+                   completion:(void (^ __nullable)(void))completion {
     if ([viewController.view isKindOfClass:[RNNativeStackScene class]]) {
         RNNativeStackScene *scene = (RNNativeStackScene *)viewController.view;
         RNNativePopoverParams *popoverParams = scene.popoverParams;
@@ -124,7 +126,7 @@
                 if (!CGSizeEqualToSize(CGSizeZero, popoverParams.contentSize)) {
                     viewController.preferredContentSize = popoverParams.contentSize;
                 }
-                [self customPresentViewController:viewController parentViewController:parentViewController key:key animated:animated completion:completion endTransition:endTransition];
+                [transitionManager presentViewController:viewController parentViewController:parentViewController animated:animated completion:completion];
             }];
             return;
         } else {
@@ -134,76 +136,12 @@
             } else { // custom modal style
                 viewController.modalPresentationStyle = UIModalPresentationCustom;
             }
-            [self customPresentViewController:viewController parentViewController:parentViewController key:key animated:animated completion:completion endTransition:endTransition];
+            [transitionManager presentViewController:viewController parentViewController:parentViewController animated:animated completion:completion];
         }
     } else {
-        [self customPresentViewController:viewController parentViewController:parentViewController key:key animated:animated completion:completion endTransition:endTransition];
+        [transitionManager presentViewController:viewController parentViewController:parentViewController animated:animated completion:completion];
     }
 }
-
-- (void)customPresentViewController:(UIViewController *)viewController
-               parentViewController:(UIViewController *)parentViewController
-                                key:(NSNumber *)key
-                           animated:(BOOL)animated
-                         completion:(void (^ __nullable)(void))completion
-                      endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    [self incrementNumberWithKey:key];
-    [parentViewController presentViewController:viewController animated:animated completion:^{
-        if (completion) {
-            completion();
-        }
-        [self decreaseAndHandleEndTransition:endTransition withKey:key];
-    }];
-}
-
-- (void)dismissViewController:(UIViewController *)viewController
-                          key:(NSNumber *)key
-                     animated:(BOOL)animated
-                   completion:(void (^ __nullable)(void))completion
-                endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    [self incrementNumberWithKey:key];
-    [viewController dismissViewControllerAnimated:animated completion:^{
-        if (completion) {
-            completion();
-        }
-        [self decreaseAndHandleEndTransition:endTransition withKey:key];
-    }];
-}
-
-#pragma mark - Number Manager
-
-- (void)decreaseAndHandleEndTransition:(RNNativeNavigatorTransitionBlock)endTransition withKey:(NSNumber *)key {
-    NSInteger number = [self decreaseNumberWithKey:key];
-    if (number <= 0) {
-        [_numberDict removeObjectForKey:key];
-        endTransition();
-    }
-}
-
-- (NSInteger)decreaseNumberWithKey:(NSNumber *)key {
-    NSInteger number = [self getNumberWithKey:key];
-    number--;
-    [_numberDict setObject:[NSNumber numberWithInteger:number] forKey:key];
-    return number;
-}
-
-- (NSInteger)incrementNumberWithKey:(NSNumber *)key {
-    NSInteger number = [self getNumberWithKey:key];
-    number++;
-    [_numberDict setObject:[NSNumber numberWithInteger:number] forKey:key];
-    return number;
-}
-
-- (NSInteger)getNumberWithKey:(NSNumber *)key {
-    NSNumber *number = [_numberDict objectForKey:key];
-    if (!number) {
-        number = [NSNumber numberWithInteger:0];
-        [_numberDict setObject:number forKey:key];
-    }
-    return [number integerValue];
-}
-
-#pragma mark - Private
 
 - (void)getSourceView:(RNNativeStackScene *)screenView completion:(void (^)(UIView *view))completion {
     RNNativePopoverParams *popoverParams = screenView.popoverParams;

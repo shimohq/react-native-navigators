@@ -90,7 +90,6 @@
     [UIView animateWithDuration:transitionDuration animations:^{
         toView.frame = toViewFinalFrame;
         fromView.frame = fromViewFinalFrame;
-        fromView.alpha = 0.0;
     } completion:^(BOOL finished) {
         // When we complete, tell the transition context
         // passing along the BOOL that indicates whether the transition

@@ -24,8 +24,6 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
     RNNativeStackNavigatorActionHide
 };
 
-typedef void (^RNNativeNavigatorTransitionBlock)(void);
-
 @interface RNNativeBaseNavigator : UIView <RCTInvalidating>
 
 @property (nonatomic, strong, readonly) NSMutableArray<RNNativeStackScene *> *currentScenes;
