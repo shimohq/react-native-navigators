@@ -53,7 +53,8 @@
             fromViewFinalFrame = CGRectOffset(fromView.frame, -CGRectGetWidth(fromView.frame), 0);
             fromViewFromShadowOffset = CGSizeMake(3, 0);
             break;
-        case RNNativeStackSceneTransitionSlideFormRight | RNNativeStackSceneTransitionDefault:
+        case RNNativeStackSceneTransitionSlideFormRight:
+        case RNNativeStackSceneTransitionDefault:
             toViewInitialFrame.origin = CGPointMake(-CGRectGetMaxX(containerView.bounds)/3.0, CGRectGetMinY(toViewFinalFrame));
             fromViewFinalFrame = CGRectOffset(fromView.frame, CGRectGetWidth(fromView.frame), 0);
             fromViewFromShadowOffset = CGSizeMake(-3, 0);
@@ -89,6 +90,7 @@
     [UIView animateWithDuration:transitionDuration animations:^{
         toView.frame = toViewFinalFrame;
         fromView.frame = fromViewFinalFrame;
+        fromView.alpha = 0.0;
     } completion:^(BOOL finished) {
         // When we complete, tell the transition context
         // passing along the BOOL that indicates whether the transition

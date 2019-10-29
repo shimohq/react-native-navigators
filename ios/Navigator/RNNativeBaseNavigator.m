@@ -41,11 +41,19 @@
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
                        nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes {
+                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                  beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
+                    endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     @throw [NSException exceptionWithName:NSInternalInconsistencyException
                                    reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
                                  userInfo:nil];
+}
+
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException
+      reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
+    userInfo:nil];
 }
 
 - (void)layoutSubviews {
@@ -110,6 +118,10 @@
     }
 }
 
+- (BOOL)isDismissedForScene:(RNNativeStackScene *)scene {
+    return [self isDismissedForViewController:scene.controller];
+}
+
 #pragma mark - Update Container
 
 - (void)markUpdated
@@ -172,12 +184,90 @@
             transition = currentTopScene.transition;
         }
     }
+    
     [self updateSceneWithTransition:transition
                              action:action
                          nextScenes:nextScenes
                       removedScenes:removedScenes
-                     insertedScenes:insertedScenes];
+                     insertedScenes:insertedScenes
+                    beginTransition:^{
+        [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+    } endTransition:^{
+        [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+    }];
     [_currentScenes setArray:nextScenes];
+}
+
+#pragma mark - Status
+
+- (void)willUpdateStatusWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
+                         removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
+                                action:(RNNativeStackNavigatorAction)action {
+    if (action == RNNativeStackNavigatorActionHide) {
+        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes];
+        [self willFocusWithNextScenes:nextScenes];
+    } else {
+        [self willFocusWithNextScenes:nextScenes];
+        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes];
+    }
+}
+
+- (void)didUpdateStatusWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
+                        removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
+                               action:(RNNativeStackNavigatorAction)action {
+    if (action == RNNativeStackNavigatorActionHide) {
+        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes];
+        [self didFocusedWithNextScenes:nextScenes];
+    } else {
+        [self didFocusedWithNextScenes:nextScenes];
+        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes];
+    }
+}
+
+- (void)willBlurWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
+                 removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes {
+    // removedScenes
+    for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
+        RNNativeStackScene *scene = removedScenes[index];
+        [scene setStatus:RNNativeStackSceneStatusWillBlur];
+    }
+    
+    // nextScenes
+    for (NSInteger index = 0, size = nextScenes.count; index + 1 < size; index++) {
+        RNNativeStackScene *scene = nextScenes[index];
+        [scene setStatus:RNNativeStackSceneStatusWillBlur];
+    }
+}
+
+- (void)didBlurredWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
+                   removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes {
+    // removedScenes
+    for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
+        RNNativeStackScene *scene = removedScenes[index];
+        [scene setStatus:RNNativeStackSceneStatusDidBlur];
+    }
+    
+    // nextScenes
+    for (NSInteger index = 0, size = nextScenes.count; index + 1 < size; index++) {
+        RNNativeStackScene *scene = nextScenes[index];
+        [scene setStatus:RNNativeStackSceneStatusDidBlur];
+    }
+}
+
+- (void)willFocusWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
+    NSInteger size = nextScenes.count;
+    if (size > 0) {
+        RNNativeStackScene *scene = nextScenes[size - 1];
+        [scene setStatus:RNNativeStackSceneStatusWillFocus];
+    }
+}
+
+- (void)didFocusedWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
+    NSInteger size = nextScenes.count;
+    if (size > 0) {
+        RNNativeStackScene *scene = nextScenes[size - 1];
+        [scene setStatus:RNNativeStackSceneStatusDidFocus];
+    }
 }
 
 @end

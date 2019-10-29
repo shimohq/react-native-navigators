@@ -56,14 +56,22 @@
 
 #pragma mark - RNNativeBaseNavigator
 
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
+    return viewController && ![_controller.viewControllers containsObject:viewController];
+}
+
 /**
  push or pop
+ 
+ 不调用  beginTransition 和 endTransition，使用 viewXXXAppear 管理 RNNativeStackSceneStatus
  */
 - (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
                        nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSMutableArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSMutableArray<RNNativeStackScene *> *)insertedScenes {
+                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                  beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
+                    endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeStackScene *scene in nextScenes) {
         [willShowViewControllers addObject:scene.controller];
