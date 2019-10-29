@@ -26,6 +26,8 @@ typedef NS_ENUM(NSInteger, RNNativeStackSceneStatus) {
     RNNativeStackSceneStatusWillFocus
 };
 
+typedef void (^RNNativeNavigatorTransitionBlock)(void);
+
 @interface RNNativeStackConst : NSObject
 
 @end
