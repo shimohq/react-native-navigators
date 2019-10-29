@@ -194,8 +194,6 @@
             }
             break;
         case RNNativeStackSceneStatusDidBlur:
-            NSLog(@"self:%@ dismissed:%d", self, [_delegate isDismissedForScene:self]);
-            
             if (_onDidBlur) {
                 _onDidBlur(@{
                     @"dimissed": @([_delegate isDismissedForScene:self])
@@ -205,7 +203,6 @@
         default:
             break;
     }
-    NSLog(@"scene:%@ status: %ld", self, (long)_status);
 }
 
 #pragma mark - Private

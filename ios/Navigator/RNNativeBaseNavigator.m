@@ -51,7 +51,9 @@
 }
 
 - (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    return NO;
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException
+      reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
+    userInfo:nil];
 }
 
 - (void)layoutSubviews {

@@ -36,13 +36,14 @@
     if ([_controller.childViewControllers containsObject:viewController]) {
         return NO;
     }
-    NSMutableArray *presentedViewControllers = [NSMutableArray new];
     UIViewController *presentingViewController = _controller;
     while (presentingViewController.presentedViewController) {
-        [presentedViewControllers addObject:presentingViewController.presentedViewController];
+        if (presentingViewController.presentedViewController == viewController) {
+            return YES;
+        }
         presentingViewController = presentingViewController.presentedViewController;
     }
-    return ![presentedViewControllers containsObject:viewController];
+    return NO;
 }
 
 /**
