@@ -27,10 +27,11 @@
 
 - (void)updateForStatus:(RNNativeStackSceneStatus)status {
     switch (status) {
-        case RNNativeStackSceneStatusDidFocus:
+        case RNNativeStackSceneStatusWillFocus:
             // attach header
             [self updateHeader];
-            
+            break;
+        case RNNativeStackSceneStatusDidFocus:
             // first responder
             [self setBecomeFirstResponder];
             break;

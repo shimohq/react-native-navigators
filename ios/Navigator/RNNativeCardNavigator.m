@@ -121,7 +121,7 @@
     UIView *superView = [subview superview];
     if (superView) {
         if (superView == view) {
-            [superView bringSubviewToFront:superView];
+            [superView bringSubviewToFront:subview];
         } else {
             [subview removeFromSuperview];
             [view addSubview:subview];

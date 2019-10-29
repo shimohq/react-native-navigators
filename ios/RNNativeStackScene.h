@@ -32,9 +32,6 @@
  */
 @property (nonatomic, assign) BOOL transparent;
 @property (nonatomic, strong) NSDictionary *popover;
-@property (nonatomic, copy) RCTDirectEventBlock onTransitionEnd;
-@property (nonatomic, copy) RCTDirectEventBlock onDismissed;
-
 @property (nonatomic, copy) RCTDirectEventBlock onWillFocus;
 @property (nonatomic, copy) RCTDirectEventBlock onDidFocus;
 @property (nonatomic, copy) RCTDirectEventBlock onWillBlur;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Platform, PlatformIOSStatic } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
 
 import styles from './styles';
@@ -11,9 +11,11 @@ export default function Root(props: NavigationInjectedProps) {
       <TouchableOpacity onPress={() => props.navigation.navigate('modal')}>
         <Text style={styles.link}>Modal navigator demo</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => props.navigation.navigate('popover')}>
-        <Text style={styles.link}>Popover navigator demo</Text>
-      </TouchableOpacity>
+      {(Platform as PlatformIOSStatic).isPad ? (
+        <TouchableOpacity onPress={() => props.navigation.navigate('popover')}>
+          <Text style={styles.link}>Popover navigator demo</Text>
+        </TouchableOpacity>
+      ): null}
       <TouchableOpacity onPress={() => props.navigation.navigate('card')}>
         <Text style={styles.link}>Card navigator demo</Text>
       </TouchableOpacity>

@@ -22,7 +22,6 @@ function TransitionModes(props: NavigationInjectedProps) {
       style={[
         styles.container,
         {
-          backgroundColor: 'rgba(255, 255, 255, 0.75)',
           borderWidth: 2,
           borderColor: 'green'
         }
@@ -70,7 +69,6 @@ export default createNativeNavigator(
       ) => {
         return {
           transition: props.navigation.getParam('transition'),
-          transparent: true
         };
       }
     }

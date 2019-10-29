@@ -18,8 +18,6 @@ RCT_EXPORT_MODULE()
 }
 
 
-RCT_EXPORT_VIEW_PROPERTY(onTransitionEnd, RCTDirectEventBlock)
-RCT_EXPORT_VIEW_PROPERTY(onDismissed, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onWillFocus, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onDidFocus, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onWillBlur, RCTDirectEventBlock)

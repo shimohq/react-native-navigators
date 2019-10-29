@@ -11,7 +11,8 @@ interface NativeStackNavigatorProps {
 
 const styles = StyleSheet.create({
   navigator: {
-    flex: 1
+    flex: 1,
+    overflow: 'hidden'
   }
 });
 

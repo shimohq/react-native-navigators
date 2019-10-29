@@ -19,8 +19,7 @@ export default class CardScreen extends PureComponent {
         <View
           style={{
             width: 300,
-            height: 310,
-            backgroundColor: 'red'
+            height: 310
           }}
         >
           <CardNavigator {...this.props} />

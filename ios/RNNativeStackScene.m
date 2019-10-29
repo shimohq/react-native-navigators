@@ -177,6 +177,7 @@
         return;
     }
     _status = status;
+    [_controller updateForStatus:status];
     switch (_status) {
         case RNNativeStackSceneStatusWillFocus:
             if (_onWillFocus) {

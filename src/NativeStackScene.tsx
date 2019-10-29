@@ -16,8 +16,10 @@ interface NativeStackNavigatorProps {
   transition: NativeNavigatorTransitions;
   gestureEnabled: boolean;
   popover?: NativeNavigationPopover;
-  onTransitionEnd: (route: NavigationRoute, closing: boolean) => void;
-  onDismissed: (route: NavigationRoute) => void;
+  onWillFocus: (route: NavigationRoute) => void;
+  onDidFocus: (route: NavigationRoute) => void;
+  onWillBlur: (route: NavigationRoute) => void;
+  onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
   route: NavigationRoute;
   style?: StyleProp<ViewStyle>;
 }
@@ -25,13 +27,22 @@ interface NativeStackNavigatorProps {
 export default class NativeStackNavigator extends PureComponent<
   NativeStackNavigatorProps
 > {
-  private onTransitionEnd = (event: { nativeEvent: { closing: boolean } }) => {
-    this.props.onTransitionEnd(this.props.route, event.nativeEvent.closing);
+  private onWillFocus = () => {
+    this.props.onWillFocus(this.props.route);
   };
 
-  private onDismissed = () => {
-    this.props.onDismissed(this.props.route);
+  private onDidFocus = () => {
+    this.props.onDidFocus(this.props.route);
   };
+  
+  private onWillBlur = () => {
+    this.props.onWillBlur(this.props.route);
+  };
+
+  private onDidBlur = (event: { nativeEvent: { dimissed: boolean } }) => {
+    this.props.onDidBlur(this.props.route, event.nativeEvent.dimissed);
+  };
+
 
   public render() {
     const {
@@ -51,8 +62,10 @@ export default class NativeStackNavigator extends PureComponent<
         gestureEnabled={gestureEnabled}
         closing={closing}
         popover={popover}
-        onTransitionEnd={this.onTransitionEnd}
-        onDismissed={this.onDismissed}
+        onWillFocus={this.onWillFocus}
+        onDidFocus={this.onDidFocus}
+        onWillBlur={this.onWillBlur}
+        onDidBlur={this.onDidBlur}
         style={[style, StyleSheet.absoluteFill]}
       >
         {this.props.children}

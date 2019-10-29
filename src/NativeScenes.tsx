@@ -29,22 +29,40 @@ export interface NativeScenesProps extends NavigationInjectedProps {
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
-  private handleTransitionEnd = (route: NavigationRoute, closing: boolean) => {
-    if (closing) {
+  private handleWillFocus = (route: NavigationRoute) => {
+    //
+  }
+
+  private handleDidFocus = (route: NavigationRoute) => {
+    //
+    this.props.onOpenRoute(route);
+  }
+
+  private handleWillBlur = (route: NavigationRoute) => {
+    //
+  }
+
+  private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
+    if (dismissed) {
+      this.props.onDismissRoute(route);
+    } else if (this.isClosing(route.key)) {
       this.props.onCloseRoute(route);
-    } else {
-      this.props.onOpenRoute(route);
     }
+  }
+
+  private isClosing = (key: string) => {
+    const {
+      closingRouteKeys,
+      replacingRouteKeys,
+    } = this.props;
+    return closingRouteKeys.includes(key) || replacingRouteKeys.includes(key)
   };
 
   public render() {
     const {
       routes,
       descriptors,
-      closingRouteKeys,
-      replacingRouteKeys,
       screenProps,
-      onDismissRoute,
       mode,
       transitionEnabled
     } = this.props;
@@ -82,14 +100,13 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               transparent={options.transparent === true}
-              closing={
-                closingRouteKeys.includes(key) ||
-                replacingRouteKeys.includes(key)
-              }
+              closing={this.isClosing(key)}
               popover={options.popover}
-              onTransitionEnd={this.handleTransitionEnd}
+              onWillFocus={this.handleWillFocus}
+              onDidFocus={this.handleDidFocus}
+              onWillBlur={this.handleWillBlur}
+              onDidBlur={this.handleDidBlur}
               route={route}
-              onDismissed={onDismissRoute}
               style={options.cardStyle}
             >
               <SceneView
