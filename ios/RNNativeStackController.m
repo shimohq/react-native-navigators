@@ -37,11 +37,11 @@
         case RNNativeStackSceneStatusDidBlur:
             // detach header
             [[self findHeader] detachViewController];
-            
+            break;
+        case RNNativeStackSceneStatusWillBlur:
             // first responder
             [self updateFirstResponder];
             break;
-            
         default:
             break;
     }

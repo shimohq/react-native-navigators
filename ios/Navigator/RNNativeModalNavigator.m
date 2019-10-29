@@ -29,6 +29,22 @@
 
 #pragma mark - RNNativeBaseNavigator
 
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
+    if (!viewController) {
+        return NO;
+    }
+    if ([_controller.childViewControllers containsObject:viewController]) {
+        return NO;
+    }
+    NSMutableArray *presentedViewControllers = [NSMutableArray new];
+    UIViewController *presentingViewController = _controller;
+    while (presentingViewController.presentedViewController) {
+        [presentedViewControllers addObject:presentingViewController.presentedViewController];
+        presentingViewController = presentingViewController.presentedViewController;
+    }
+    return ![presentedViewControllers containsObject:viewController];
+}
+
 /**
  present or dismiss
  TODO: 不支持 ViewController 互换位置

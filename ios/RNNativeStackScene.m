@@ -180,29 +180,25 @@
     switch (_status) {
         case RNNativeStackSceneStatusWillFocus:
             if (_onWillFocus) {
-                _onWillFocus(@{
-                    @"closing": @(_closing)
-                });
+                _onWillFocus(nil);
             }
             break;
         case RNNativeStackSceneStatusDidFocus:
             if (_onDidFocus) {
-                _onDidFocus(@{
-                    @"closing": @(_closing)
-                });
+                _onDidFocus(nil);
             }
             break;
         case RNNativeStackSceneStatusWillBlur:
-            if (_onDidFocus) {
-                _onDidFocus(@{
-                    @"closing": @(_closing)
-                });
+            if (_onWillBlur) {
+                _onWillBlur(nil);
             }
             break;
         case RNNativeStackSceneStatusDidBlur:
-            if (_onDidFocus) {
-                _onDidFocus(@{
-                    @"closing": @(_closing)
+            NSLog(@"self:%@ dismissed:%d", self, [_delegate isDismissedForScene:self]);
+            
+            if (_onDidBlur) {
+                _onDidBlur(@{
+                    @"dimissed": @([_delegate isDismissedForScene:self])
                 });
             }
             break;

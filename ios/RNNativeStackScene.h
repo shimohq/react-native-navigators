@@ -9,6 +9,7 @@
 @protocol RNNativeStackSceneDelegate <NSObject>
 
 - (void)needUpdateForScene:(RNNativeStackScene *)scene;
+- (BOOL)isDismissedForScene:(RNNativeStackScene *)scene;
 
 @end
 

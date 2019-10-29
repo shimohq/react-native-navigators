@@ -50,6 +50,10 @@
                                  userInfo:nil];
 }
 
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
+    return NO;
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self reactAddControllerToClosestParent:_viewController];
@@ -110,6 +114,10 @@
     if ([_nextScenes containsObject:scene]) {
         [self markUpdated];
     }
+}
+
+- (BOOL)isDismissedForScene:(RNNativeStackScene *)scene {
+    return [self isDismissedForViewController:scene.controller];
 }
 
 #pragma mark - Update Container

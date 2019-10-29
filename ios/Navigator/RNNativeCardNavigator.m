@@ -24,6 +24,10 @@
 
 #pragma mark - RNNativeBaseNavigator
 
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
+    return viewController && ![_controller.childViewControllers containsObject:viewController];
+}
+
 /**
  addChildViewController removeFromParentViewController
  */
@@ -97,8 +101,7 @@
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = removedScenes[index];
         [scene removeFromSuperview];
-        [scene.controller.view removeFromSuperview];
-        [scene setStatus:RNNativeStackSceneStatusDidBlur];
+        [scene.controller removeFromParentViewController];
     }
     
     // nextScenes
@@ -111,7 +114,6 @@
         if (!nextScene.transparent && [scene superview]) {
             [scene removeFromSuperview];
         }
-        [scene setStatus:RNNativeStackSceneStatusDidBlur];
     }
 }
 

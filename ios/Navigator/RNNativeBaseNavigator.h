@@ -47,6 +47,8 @@ typedef void (^RNNativeNavigatorTransitionBlock)(void);
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition;
 
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController;
+
 @end
 
 NS_ASSUME_NONNULL_END

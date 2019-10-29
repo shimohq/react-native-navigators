@@ -30,10 +30,6 @@
 
 #pragma mark - UINavigationControllerDelegate
 
-- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    
-}
-
 /**
  自定义 push pop 动画
  */
@@ -59,6 +55,10 @@
 }
 
 #pragma mark - RNNativeBaseNavigator
+
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
+    return viewController && ![_controller.viewControllers containsObject:viewController];
+}
 
 /**
  push or pop
