@@ -29,17 +29,8 @@ export interface NativeScenesProps extends NavigationInjectedProps {
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
-  private handleWillFocus = (route: NavigationRoute) => {
-    //
-  }
-
   private handleDidFocus = (route: NavigationRoute) => {
-    //
     this.props.onOpenRoute(route);
-  }
-
-  private handleWillBlur = (route: NavigationRoute) => {
-    //
   }
 
   private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
@@ -102,9 +93,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               transparent={options.transparent === true}
               closing={this.isClosing(key)}
               popover={options.popover}
-              onWillFocus={this.handleWillFocus}
               onDidFocus={this.handleDidFocus}
-              onWillBlur={this.handleWillBlur}
               onDidBlur={this.handleDidBlur}
               route={route}
               style={options.cardStyle}
