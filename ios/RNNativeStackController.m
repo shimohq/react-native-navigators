@@ -33,7 +33,7 @@
             break;
         case RNNativeStackSceneStatusDidFocus:
             // first responder
-            [self setBecomeFirstResponder];
+            [self restoreFirstResponder];
             break;
         case RNNativeStackSceneStatusDidBlur:
             // detach header
@@ -41,7 +41,7 @@
             break;
         case RNNativeStackSceneStatusWillBlur:
             // first responder
-            [self updateFirstResponder];
+            [self saveFirstResponder];
             break;
         default:
             break;
@@ -114,14 +114,15 @@
 
 #pragma mark - First Responder
 
-- (void)updateFirstResponder {
+- (void)saveFirstResponder {
     id responder = [self findFirstResponder:self.view];
     if (responder != nil) {
         _previousFirstResponder = responder;
+        [_previousFirstResponder resignFirstResponder];
     }
 }
 
-- (void)setBecomeFirstResponder {
+- (void)restoreFirstResponder {
     if (_previousFirstResponder) {
         [_previousFirstResponder becomeFirstResponder];
         _previousFirstResponder = nil;
