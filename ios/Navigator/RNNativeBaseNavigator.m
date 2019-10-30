@@ -181,7 +181,9 @@
         } else if (![nextScenes containsObject:currentTopScene]) {
             // 即将显示的顶层 screne 在当前列表中，当前显示的顶层 screne 不在即将显示的列表中，取当前显示的顶层 screne 的隐藏动画
             action = RNNativeStackNavigatorActionHide;
-            transition = currentTopScene.transition;
+            if (![self isDismissedForScene:currentTopScene]) {
+                transition = currentTopScene.transition;
+            }
         }
     }
     

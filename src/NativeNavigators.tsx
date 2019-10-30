@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { NavigationRoute, StackActions } from 'react-navigation';
+import { NavigationRoute, StackActions, NavigationActions } from 'react-navigation';
 
 import {
   NativeNavigatorsProps,
@@ -21,6 +21,8 @@ interface NativeStackScenesState {
   closingRouteKeys: string[];
   // List of routes being replaced, we need to keep a copy until the new route animates in
   replacingRouteKeys: string[];
+  // List of routes being dismissed, we need to update state after next render lifecycle
+  dismissingRouteKeys: string[];
   // Since the local routes can vary from the routes from props, we need to keep the descriptors for old routes
   // Otherwise we won't be able to access the options for routes that were removed
   descriptors: NativeNavigationDescriptorMap;
@@ -61,7 +63,7 @@ export default class NativeNavigators extends PureComponent<
     }
 
     // Now we need to determine which routes were added and removed
-    let { openingRouteKeys, closingRouteKeys, replacingRouteKeys } = state;
+    let { openingRouteKeys, closingRouteKeys, replacingRouteKeys, dismissingRouteKeys } = state;
     const { previousRoutes } = state;
 
     const previousFocusedRoute = previousRoutes[previousRoutes.length - 1] as
@@ -174,11 +176,12 @@ export default class NativeNavigators extends PureComponent<
     }, {});
 
     return {
-      routes,
+      routes: routes.filter(({ key }) => !dismissingRouteKeys.includes(key)),
       previousRoutes: navigation.state.routes,
-      openingRouteKeys,
-      closingRouteKeys,
-      replacingRouteKeys,
+      openingRouteKeys: openingRouteKeys.filter(key => !dismissingRouteKeys.includes(key)),
+      closingRouteKeys: closingRouteKeys.filter(key => !dismissingRouteKeys.includes(key)),
+      replacingRouteKeys: replacingRouteKeys.filter(key => !dismissingRouteKeys.includes(key)),
+      dismissingRouteKeys: [],
       descriptors
     };
   }
@@ -189,6 +192,7 @@ export default class NativeNavigators extends PureComponent<
     openingRouteKeys: [],
     closingRouteKeys: [],
     replacingRouteKeys: [],
+    dismissingRouteKeys: [],
     descriptors: {}
   };
 
@@ -230,20 +234,14 @@ export default class NativeNavigators extends PureComponent<
   };
 
   private handleDismissRoute = (route: NavigationRoute) => {
-    this.setState(
-      state => ({
-        routes: state.routes.filter(r => r.key !== route.key),
-        openingRouteKeys: state.openingRouteKeys.filter(
-          key => key !== route.key
-        ),
-        closingRouteKeys: state.closingRouteKeys.filter(
-          key => key !== route.key
-        )
-      }),
-      () => {
-        this.props.navigation.goBack(route.key);
-      }
-    );
+    this.props.navigation.dispatch({
+      type: NavigationActions.BACK,
+      key: route.key,
+      immediate: true
+    });
+    this.setState(state => ({
+        dismissingRouteKeys: [...state.dismissingRouteKeys, route.key]
+    }));
   };
 
   public render() {
