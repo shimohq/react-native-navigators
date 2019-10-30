@@ -48,30 +48,20 @@
     }
     
     // add scene
-    for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
-        BOOL willShow = NO;
-        if (index + 1 == size) {
-            willShow = YES;
-        } else {
-            RNNativeStackScene *nextScene = nextScenes[index + 1];
-            willShow = nextScene.transparent;
-        }
-        if (willShow) {
-            RNNativeStackScene *scene = nextScenes[index];
-            [self addScene:scene];
-        }
+    for (RNNativeStackScene *scene in nextScenes) {
+        [self addScene:scene];
     }
     
     // transition
     if (transition == RNNativeStackSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        [self removeScenesWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+        [self removeScenesWithRemovedScenes:removedScenes];
         endTransition();
     } else if (action == RNNativeStackNavigatorActionShow) {
         [UIView animateWithDuration:0.35 animations:^{
             nextTopScene.frame = self.controller.view.bounds;
         } completion:^(BOOL finished) {
             [nextTopScene.controller didMoveToParentViewController:self.controller];
-            [self removeScenesWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+            [self removeScenesWithRemovedScenes:removedScenes];
             endTransition();
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
@@ -80,7 +70,7 @@
         [UIView animateWithDuration:0.35 animations:^{
             currentTopScene.frame = [self getFrameWithContainerView:self.controller.view transition:transition];
         } completion:^(BOOL finished) {
-            [self removeScenesWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+            [self removeScenesWithRemovedScenes:removedScenes];
             endTransition();
         }];
     }
@@ -88,25 +78,9 @@
 
 #pragma mark - Layout
 
-- (void)removeScenesWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                     removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
-                            action:(RNNativeStackNavigatorAction)action {
-    // removedScenes
-    for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
-        RNNativeStackScene *scene = removedScenes[index];
+- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeStackScene *> *)removedScenes {
+    for (RNNativeStackScene *scene in removedScenes) {
         [self removeScene:scene];
-    }
-    
-    // nextScenes
-    for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
-        if (index + 1 == size) {
-            continue;
-        }
-        RNNativeStackScene *scene = nextScenes[index];
-        RNNativeStackScene *nextScene = nextScenes[index + 1];
-        if (!nextScene.transparent) {
-            [self removeScene:scene];
-        }
     }
 }
 

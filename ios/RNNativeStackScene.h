@@ -24,7 +24,7 @@
 /**
  是否透明
  
- 不适用于 stack
+ 不适用于 stack Card
  适用于 modal：
  YES:  present 之后 presenting viewcontroller 不会移除
  NO:  present 之后 presenting viewcontroller 会被移除，有利于内存释放。
