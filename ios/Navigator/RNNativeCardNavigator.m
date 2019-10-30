@@ -40,12 +40,6 @@
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition();
     
-    // addChildViewController
-    for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
-        RNNativeStackScene *scene = insertedScenes[index];
-        [self.controller addChildViewController:scene.controller];
-    }
-    
     // update will show view frame
     RNNativeStackScene *currentTopScene = self.currentScenes.lastObject;
     RNNativeStackScene *nextTopScene = nextScenes.lastObject;
@@ -53,7 +47,7 @@
         nextTopScene.frame = [self getFrameWithContainerView:_controller.view transition:transition];
     }
     
-    // addSubview
+    // add scene
     for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
         BOOL willShow = NO;
         if (index + 1 == size) {
@@ -64,7 +58,7 @@
         }
         if (willShow) {
             RNNativeStackScene *scene = nextScenes[index];
-            [self addSubview:scene toView:_controller.view];
+            [self addScene:scene];
         }
     }
     
@@ -81,7 +75,7 @@
             endTransition();
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
-        [self addSubview:currentTopScene toView:_controller.view];
+        [self addScene:currentTopScene];
         [currentTopScene.controller willMoveToParentViewController:nil];
         [UIView animateWithDuration:0.35 animations:^{
             currentTopScene.frame = [self getFrameWithContainerView:self.controller.view transition:transition];
@@ -100,8 +94,7 @@
     // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = removedScenes[index];
-        [scene removeFromSuperview];
-        [scene.controller removeFromParentViewController];
+        [self removeScene:scene];
     }
     
     // nextScenes
@@ -111,24 +104,39 @@
         }
         RNNativeStackScene *scene = nextScenes[index];
         RNNativeStackScene *nextScene = nextScenes[index + 1];
-        if (!nextScene.transparent && [scene superview]) {
-            [scene removeFromSuperview];
+        if (!nextScene.transparent) {
+            [self removeScene:scene];
         }
     }
 }
 
-- (void)addSubview:(UIView *)subview toView:(UIView *)view {
-    UIView *superView = [subview superview];
-    if (superView) {
-        if (superView == view) {
-            [superView bringSubviewToFront:subview];
-        } else {
-            [subview removeFromSuperview];
-            [view addSubview:subview];
-        }
-    } else {
-        [view addSubview:subview];
+- (void)addScene:(RNNativeStackScene *)scene {
+    UIView *superView = [scene superview];
+    if (superView && superView != _controller.view) {
+        [scene removeFromSuperview];
+        superView = nil;
     }
+    
+    UIViewController *parentViewController = [scene.controller parentViewController];
+    if (parentViewController && parentViewController != _controller) {
+        [scene.controller removeFromParentViewController];
+        parentViewController = nil;
+    }
+    
+    if (!parentViewController) {
+        [_controller addChildViewController:scene.controller];
+    }
+    
+    if (superView) {
+        [_controller.view bringSubviewToFront:scene];
+    } else {
+        [_controller.view addSubview:scene];
+    }
+}
+
+- (void)removeScene:(RNNativeStackScene *)scene {
+    [scene removeFromSuperview];
+    [scene.controller removeFromParentViewController];
 }
 
 - (CGRect)getFrameWithContainerView:(UIView *)containerView transition:(RNNativeStackSceneTransition)transition {
