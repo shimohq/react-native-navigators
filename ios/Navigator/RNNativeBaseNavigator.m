@@ -187,6 +187,11 @@
         }
     }
     
+    if (currentTopScene != nextTopScene) {
+        [currentTopScene resignFirstResponder];
+        [nextTopScene becomeFirstResponder];
+    }
+    
     [self updateSceneWithTransition:transition
                              action:action
                          nextScenes:nextScenes
