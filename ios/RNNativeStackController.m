@@ -6,9 +6,7 @@
 
 @end
 
-@implementation RNNativeStackController {
-    __weak id _previousFirstResponder;
-}
+@implementation RNNativeStackController
 
 - (instancetype)init {
     self = [super init];
@@ -31,17 +29,9 @@
             // attach header
             [self updateHeader];
             break;
-        case RNNativeStackSceneStatusDidFocus:
-            // first responder
-            [self restoreFirstResponder];
-            break;
         case RNNativeStackSceneStatusDidBlur:
             // detach header
             [[self findHeader] detachViewController];
-            break;
-        case RNNativeStackSceneStatusWillBlur:
-            // first responder
-            [self saveFirstResponder];
             break;
         default:
             break;
@@ -107,36 +97,6 @@
     for (UIView *subview in _scene.reactSubviews) {
         if ([subview isKindOfClass:[RNNativeStackHeader class]]) {
             return (RNNativeStackHeader *)subview;
-        }
-    }
-    return nil;
-}
-
-#pragma mark - First Responder
-
-- (void)saveFirstResponder {
-    id responder = [self findFirstResponder:self.view];
-    if (responder != nil) {
-        _previousFirstResponder = responder;
-        [_previousFirstResponder resignFirstResponder];
-    }
-}
-
-- (void)restoreFirstResponder {
-    if (_previousFirstResponder) {
-        [_previousFirstResponder becomeFirstResponder];
-        _previousFirstResponder = nil;
-    }
-}
-
-- (id)findFirstResponder:(UIView*)parent {
-    if (parent.isFirstResponder) {
-        return parent;
-    }
-    for (UIView *subView in parent.subviews) {
-        id responder = [self findFirstResponder:subView];
-        if (responder != nil) {
-            return responder;
         }
     }
     return nil;
