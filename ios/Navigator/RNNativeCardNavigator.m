@@ -110,6 +110,10 @@
     if (superView) {
         [_controller.view bringSubviewToFront:scene];
     } else {
+        CGRect frame = scene.frame;
+        CGRect bounds = _controller.view.bounds;
+        scene.frame = CGRectMake(frame.origin.x, frame.origin.y, bounds.size.width, bounds.size.height);
+        scene.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [_controller.view addSubview:scene];
     }
 }
