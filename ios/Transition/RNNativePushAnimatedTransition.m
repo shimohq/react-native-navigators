@@ -39,7 +39,7 @@
     UIView *fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
     
     // This will be the current frame of fromViewController.view.
-    CGRect __unused fromViewInitialFrame = [transitionContext initialFrameForViewController:fromViewController];
+    CGRect fromViewInitialFrame = [transitionContext initialFrameForViewController:fromViewController];
     CGRect fromViewFinalFrame = [transitionContext finalFrameForViewController:fromViewController];
     CGRect toViewInitialFrame = [transitionContext initialFrameForViewController:toViewController];
     CGRect toViewFinalFrame = [transitionContext finalFrameForViewController:toViewController];
@@ -61,10 +61,12 @@
             break;
         case RNNativeStackSceneTransitionSlideFormTop:
             toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(toViewFinalFrame), -CGRectGetMaxY(containerView.bounds));
+            fromViewFinalFrame = fromViewInitialFrame;
             toViewFromShadowOffset = CGSizeMake(0, 3);
             break;
         case RNNativeStackSceneTransitionSlideFormBottom:
             toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(toViewFinalFrame), CGRectGetMaxY(containerView.bounds));
+            fromViewFinalFrame = fromViewInitialFrame;
             toViewFromShadowOffset = CGSizeMake(0, -3);
             break;
         default:
