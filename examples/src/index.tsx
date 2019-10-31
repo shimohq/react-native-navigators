@@ -38,6 +38,7 @@ const RootStack = createNativeNavigator(
 const AppContainer = createAppContainer(RootStack);
 
 AppRegistry.registerComponent(appName, () => () => (
+
   <AppContainer
     onNavigationStateChange={(
       prevNavigationState: NavigationState,

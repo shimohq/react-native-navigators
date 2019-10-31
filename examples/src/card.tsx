@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {View, Text, TouchableOpacity, TextInput} from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
 import {
   createNativeNavigator,
@@ -32,6 +32,7 @@ function TransitionModes(props: NavigationInjectedProps) {
       </TouchableOpacity>
       <Text style={styles.title}>Card</Text>
       <Text style={styles.title}>{props.navigation.state.key}</Text>
+      <TextInput style={[styles.input, {marginBottom: 10}]} placeholder='Input Text'/>
       <NavigateList navigate={push} />
     </View>
   );

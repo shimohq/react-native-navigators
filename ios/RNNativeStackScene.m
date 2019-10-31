@@ -20,6 +20,7 @@
 {
     __weak RCTBridge *_bridge;
     RCTTouchHandler *_touchHandler;
+    __weak UIView *_firstResponderView;
 }
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge
@@ -61,6 +62,25 @@
     
     RNNativeNavigatorFrameData *data = [[RNNativeNavigatorFrameData alloc] initWithFrame:self.frame];
     [_bridge.uiManager setLocalData:data forView:self];
+}
+
+- (BOOL)resignFirstResponder {
+    BOOL result = [super resignFirstResponder];
+    
+    _firstResponderView = [self findFirstResponderView:self];
+    if (_firstResponderView) {
+        [_firstResponderView resignFirstResponder];
+    }
+    return result;
+}
+
+- (BOOL)becomeFirstResponder {
+    BOOL result = [super becomeFirstResponder];
+    
+    if (_firstResponderView) {
+        [_firstResponderView becomeFirstResponder];
+    }
+    return result;
 }
 
 #pragma mark - TouchHandler
@@ -228,6 +248,19 @@
     }
     [_bridge.uiManager setLocalData:[[RNNativeNavigatorInsetsData alloc] initWithInsets:UIEdgeInsetsMake(offset, 0, 0, 0)]
                             forView:self];
+}
+
+- (UIView *)findFirstResponderView:(UIView *)view {
+    if ([view isFirstResponder]) {
+        return view;
+    }
+    for (UIView *subview in view.subviews) {
+        UIView *result = [self findFirstResponderView:subview];
+        if (result) {
+            return result;
+        }
+    }
+    return nil;
 }
 
 @end
