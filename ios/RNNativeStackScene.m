@@ -37,6 +37,8 @@
     return self;
 }
 
+#pragma mark - React Native
+
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
     [super insertReactSubview:subview atIndex:atIndex];
@@ -57,6 +59,8 @@
     }
 }
 
+#pragma mark - UIView
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     
@@ -65,22 +69,20 @@
 }
 
 - (BOOL)resignFirstResponder {
-    BOOL result = [super resignFirstResponder];
-    
     _firstResponderView = [self findFirstResponderView:self];
     if (_firstResponderView) {
-        [_firstResponderView resignFirstResponder];
+        return [_firstResponderView resignFirstResponder];
+    } else {
+        return [super resignFirstResponder];
     }
-    return result;
 }
 
 - (BOOL)becomeFirstResponder {
-    BOOL result = [super becomeFirstResponder];
-    
     if (_firstResponderView) {
-        [_firstResponderView becomeFirstResponder];
+        return [_firstResponderView becomeFirstResponder];
+    } else {
+        return [super becomeFirstResponder];
     }
-    return result;
 }
 
 #pragma mark - TouchHandler

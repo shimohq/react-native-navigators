@@ -44,11 +44,6 @@
     // update will show view frame
     RNNativeStackScene *currentTopScene = self.currentScenes.lastObject;
     RNNativeStackScene *nextTopScene = nextScenes.lastObject;
-    
-    if (currentTopScene != nextTopScene) {
-        [currentTopScene resignFirstResponder];
-        [nextTopScene becomeFirstResponder];
-    }
     if (action == RNNativeStackNavigatorActionShow && transition != RNNativeStackSceneTransitionNone) {
         nextTopScene.frame = [self getFrameWithContainerView:_controller.view transition:transition];
     }
