@@ -188,7 +188,10 @@
     }
     
     if (currentTopScene != nextTopScene) {
-        [currentTopScene resignFirstResponder];
+        if (![removedScenes containsObject:currentTopScene]) {
+            [currentTopScene resignFirstResponder];
+        }
+
         [nextTopScene becomeFirstResponder];
     }
     
