@@ -35,9 +35,11 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
 
   private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
     if (dismissed) {
-      this.props.onDismissRoute(route);
-    } else if (this.isClosing(route.key)) {
-      this.props.onCloseRoute(route);
+      if (this.isClosing(route.key)) {
+        this.props.onCloseRoute(route);
+      } else {
+        this.props.onDismissRoute(route);
+      }
     }
   }
 
