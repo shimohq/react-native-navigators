@@ -8,6 +8,8 @@
 
 #import "RNNativeStackNavigationController.h"
 #import "RNNativeStackScene.h"
+#import <React/RCTRootContentView.h>
+#import <React/RCTTouchHandler.h>
 
 @interface RNNativeStackNavigationController () <UIGestureRecognizerDelegate>
 
@@ -30,6 +32,15 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    // cancel touches in parent, this is needed to cancel RN touch events. For example when Touchable
+    // item is close to an edge and we start pulling from edge we want the Touchable to be cancelled.
+    // Without the below code the Touchable will remain active (highlighted) for the duration of back
+    // gesture and onPress may fire when we release the finger.
+    UIView *parent = self.view;
+    while (parent != nil && ![parent isKindOfClass:[RCTRootContentView class]]) parent = parent.superview;
+    RCTRootContentView *rootView = (RCTRootContentView *)parent;
+    [rootView.touchHandler cancel];
+    
     UINavigationController *navigationController = [self getTargetNavigationController:self];
     if (navigationController.viewControllers.count > 1) {
         UIView *view = navigationController.topViewController.view;
