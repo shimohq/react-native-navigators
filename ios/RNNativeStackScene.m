@@ -79,7 +79,9 @@
 
 - (BOOL)becomeFirstResponder {
     if (_firstResponderView) {
-        return [_firstResponderView becomeFirstResponder];
+        UIView *firstResponder = _firstResponderView;
+        _firstResponderView = nil;
+        return [firstResponder becomeFirstResponder];
     } else {
         return [super becomeFirstResponder];
     }
