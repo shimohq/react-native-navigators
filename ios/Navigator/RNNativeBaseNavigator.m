@@ -20,6 +20,9 @@
 @property (nonatomic, strong) NSMutableArray<RNNativeStackScene *> *currentScenes;
 @property (nonatomic, strong) NSMutableArray<RNNativeStackScene *> *nextScenes;
 
+@property (nonatomic, copy) NSArray<RNNativeStackScene *> *needUpdateScenes;
+@property (nonatomic, assign) BOOL updatingScenes;
+
 @end
 
 @implementation RNNativeBaseNavigator
@@ -101,12 +104,22 @@
     // do nothing
 }
 
+#pragma mark - Setting
+
+- (void)setUpdatingScenes:(BOOL)updatingScenes {
+    if (_updatingScenes == updatingScenes) {
+        return;
+    }
+    _updatingScenes = updatingScenes;
+    [self updateScenes];
+}
+
 #pragma mark - RCTInvalidating
 
 - (void)invalidate {
     [self.nextScenes removeAllObjects];
     RCTExecuteOnMainQueue(^{
-        [self updateSceneWithNextScenes:self.nextScenes];
+        [self updateScenesWithNextScenes:self.nextScenes];
     });
 }
 
@@ -141,13 +154,25 @@
                         [nextScenes addObject:scene];
                     }
                 }
-                [self updateSceneWithNextScenes:nextScenes];
+                [self updateScenesWithNextScenes:nextScenes];
             });
         });
     }
 }
 
-- (void)updateSceneWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
+- (void)updateScenesWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
+    [self setNeedUpdateScenes:nextScenes];
+    [self updateScenes];
+}
+
+- (void)updateScenes {
+    if (_updatingScenes || !_needUpdateScenes) {
+        return;
+    }
+    [self setUpdatingScenes:YES];
+    NSArray<RNNativeStackScene *> *nextScenes = [NSArray arrayWithArray:_needUpdateScenes];
+    [self setNeedUpdateScenes:nil];
+    
     NSMutableArray<RNNativeStackScene *> *removedScenes = [NSMutableArray new];
     NSMutableArray<RNNativeStackScene *> *insertedScenes = [NSMutableArray new];
     for (RNNativeStackScene *scene in _currentScenes) {
@@ -170,16 +195,16 @@
     RNNativeStackNavigatorAction action = RNNativeStackNavigatorActionNone;
     RNNativeStackSceneTransition transition = RNNativeStackSceneTransitionNone;
     // 当前列表为空时，无动画
-    // 即将显示的顶层 screne 在当前列表中，且当前显示的顶层 screne 在即将显示的列表中，无动画
-    // 当前和即将显示的顶层 screne 为同一个，无动画
+    // 即将显示的顶层 scene 在当前列表中，且当前显示的顶层 scene 在即将显示的列表中，无动画
+    // 当前和即将显示的顶层 scene 为同一个，无动画
     if (currentTopScene && currentTopScene != nextTopScene) {
-        // 当前和即将显示的顶层 screne 不是同一个，有动画
+        // 当前和即将显示的顶层 scene 不是同一个，有动画
         if (nextTopScene && ![_currentScenes containsObject:nextTopScene]) {
-            // 即将显示的顶层 screne 不在当前列表中，取即将显示的顶层 screne 的显示动画
+            // 即将显示的顶层 scene 不在当前列表中，取即将显示的顶层 scene 的显示动画
             action = RNNativeStackNavigatorActionShow;
             transition = nextTopScene.transition;
         } else if (![nextScenes containsObject:currentTopScene]) {
-            // 即将显示的顶层 screne 在当前列表中，当前显示的顶层 screne 不在即将显示的列表中，取当前显示的顶层 screne 的隐藏动画
+            // 即将显示的顶层 scene 在当前列表中，当前显示的顶层 scene 不在即将显示的列表中，取当前显示的顶层 scene 的隐藏动画
             action = RNNativeStackNavigatorActionHide;
             if (![self isDismissedForScene:currentTopScene]) {
                 transition = currentTopScene.transition;
@@ -191,19 +216,23 @@
         if (![removedScenes containsObject:currentTopScene]) {
             [currentTopScene resignFirstResponder];
         }
-
         [nextTopScene becomeFirstResponder];
     }
-    
+  
     [self updateSceneWithTransition:transition
                              action:action
                          nextScenes:nextScenes
                       removedScenes:removedScenes
                      insertedScenes:insertedScenes
-                    beginTransition:^{
-        [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
-    } endTransition:^{
-        [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+                    beginTransition:^(BOOL updateStatus) {
+        if (updateStatus) {
+            [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+        }
+    } endTransition:^(BOOL updateStatus) {
+        if (updateStatus) {
+            [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+        }
+        [self setUpdatingScenes:NO];
     }];
     [_currentScenes setArray:nextScenes];
 }
