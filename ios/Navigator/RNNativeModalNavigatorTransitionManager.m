@@ -53,7 +53,7 @@
 
 - (void)decreaseAndHandleEndTransition {
     if ([self decrease] <= 0 && _endTransition) {
-        _endTransition();
+        _endTransition(YES);
     }
 }
 

@@ -72,6 +72,7 @@
                    insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+    beginTransition(NO);
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeStackScene *scene in nextScenes) {
         [willShowViewControllers addObject:scene.controller];
@@ -92,6 +93,7 @@
             [_controller popViewControllerAnimated:YES];
         }
     }
+    endTransition(NO);
 }
 
 @end

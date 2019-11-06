@@ -12,20 +12,24 @@
 @interface RNNativeCardNavigator()
 
 @property (nonatomic, strong) UIViewController *controller;
+@property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
+@property (nonatomic, assign) BOOL updating;
 
 @end
 
 @implementation RNNativeCardNavigator
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
+    _viewControllers = [NSMutableArray array];
     _controller = [UIViewController new];
+    _updating = NO;
     return [super initWithBridge:bridge viewController:_controller];
 }
 
 #pragma mark - RNNativeBaseNavigator
 
 - (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    return viewController && ![_controller.childViewControllers containsObject:viewController];
+    return viewController && ![_viewControllers containsObject:viewController];
 }
 
 /**
@@ -38,9 +42,15 @@
                    insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    beginTransition();
+    beginTransition(YES);
     
-    
+    // viewControllers
+    NSMutableArray *viewControllers = [NSMutableArray array];
+    for (RNNativeStackScene *scene in nextScenes) {
+        [viewControllers addObject:scene.controller];
+    }
+    [_viewControllers setArray:viewControllers];
+
     // update will show view frame
     RNNativeStackScene *currentTopScene = self.currentScenes.lastObject;
     RNNativeStackScene *nextTopScene = nextScenes.lastObject;
@@ -49,41 +59,59 @@
     }
     
     // add scene
-    for (RNNativeStackScene *scene in nextScenes) {
+    for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
+        RNNativeStackScene *scene = nextScenes[index];
+        if (index + 1 < size) { // 顶层 scene 必须显示
+            RNNativeStackScene *nextScene = nextScenes[index + 1];
+            if (!nextScene.transparent) { // 非顶层 scene，上层 scene 透明才显示
+                continue;
+            }
+        }
         [self addScene:scene];
     }
-    
     // transition
+    currentTopScene.userInteractionEnabled = NO;
+    nextTopScene.userInteractionEnabled = NO;
     if (transition == RNNativeStackSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        [self removeScenesWithRemovedScenes:removedScenes];
-        endTransition();
+        currentTopScene.userInteractionEnabled = YES;
+        nextTopScene.userInteractionEnabled = YES;
+        
+        nextTopScene.frame = self.controller.view.bounds;
+        [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+        endTransition(YES);
     } else if (action == RNNativeStackNavigatorActionShow) {
         [UIView animateWithDuration:0.35 animations:^{
             nextTopScene.frame = self.controller.view.bounds;
         } completion:^(BOOL finished) {
+            currentTopScene.userInteractionEnabled = YES;
+            nextTopScene.userInteractionEnabled = YES;
+            
+            if (!finished) {
+                nextTopScene.frame = self.controller.view.bounds;
+            }
             [nextTopScene.controller didMoveToParentViewController:self.controller];
-            [self removeScenesWithRemovedScenes:removedScenes];
-            endTransition();
+            [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            endTransition(YES);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
-        [self addScene:currentTopScene];
+        [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene.controller willMoveToParentViewController:nil];
         [UIView animateWithDuration:0.35 animations:^{
             currentTopScene.frame = [self getFrameWithContainerView:self.controller.view transition:transition];
         } completion:^(BOOL finished) {
-            [self removeScenesWithRemovedScenes:removedScenes];
-            endTransition();
+            currentTopScene.userInteractionEnabled = YES;
+            nextTopScene.userInteractionEnabled = YES;
+            
+            if (!finished) {
+                nextTopScene.frame = self.controller.view.bounds;
+            }
+            [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            endTransition(YES);
         }];
     }
 }
 
 #pragma mark - Layout
-
-- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeStackScene *> *)removedScenes {
-    for (RNNativeStackScene *scene in removedScenes) {
-        [self removeScene:scene];
-    }
-}
 
 - (void)addScene:(RNNativeStackScene *)scene {
     UIView *superView = [scene superview];
@@ -116,6 +144,25 @@
 - (void)removeScene:(RNNativeStackScene *)scene {
     [scene removeFromSuperview];
     [scene.controller removeFromParentViewController];
+}
+
+- (void)removeScenes:(NSArray<RNNativeStackScene *> *)scenes {
+    for (RNNativeStackScene *scene in scenes) {
+        [self removeScene:scene];
+    }
+}
+
+- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeStackScene *> *)removedScenes nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
+    for (RNNativeStackScene *scene in removedScenes) {
+        [self removeScene:scene];
+    }
+    for (NSInteger index = 0, size = nextScenes.count - 1; index < size; index++) {
+        RNNativeStackScene *scene = nextScenes[index];
+        RNNativeStackScene *nextScene = nextScenes[index + 1];
+        if (!nextScene.transparent) { // 非顶层 scene，且上层 scene 不透明
+            [self removeScene:scene];
+        }
+    }
 }
 
 - (CGRect)getFrameWithContainerView:(UIView *)containerView transition:(RNNativeStackSceneTransition)transition {

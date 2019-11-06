@@ -15,6 +15,7 @@
 @interface RNNativeModalNavigator()
 
 @property (nonatomic, strong) UIViewController *controller;
+@property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 
 @end
 
@@ -23,29 +24,16 @@
 }
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
+    _viewControllers = [NSMutableArray array];
     _controller = [UIViewController new];
     _numberDict = [NSMutableDictionary new];
     return [super initWithBridge:bridge viewController:_controller];
 }
 
-
 #pragma mark - RNNativeBaseNavigator
 
 - (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    if (!viewController) {
-        return NO;
-    }
-    if ([_controller.childViewControllers containsObject:viewController]) {
-        return NO;
-    }
-    UIViewController *presentingViewController = _controller;
-    while (presentingViewController.presentedViewController) {
-        if (presentingViewController.presentedViewController == viewController) {
-            return YES;
-        }
-        presentingViewController = presentingViewController.presentedViewController;
-    }
-    return NO;
+    return viewController && ![_viewControllers containsObject:viewController];
 }
 
 /**
@@ -59,10 +47,20 @@
                    insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    beginTransition();
+    beginTransition(YES);
+    
+    // viewControllers
+    NSMutableArray *viewControllers = [NSMutableArray array];
+    for (RNNativeStackScene *scene in nextScenes) {
+        [viewControllers addObject:scene.controller];
+    }
+    [_viewControllers setArray:viewControllers];
+
+    // TransitionManager
     RNNativeModalNavigatorTransitionManager *transitionManager = [[RNNativeModalNavigatorTransitionManager alloc] init];
     [transitionManager setEndTransition:endTransition];
     [transitionManager increment];
+    
     // show
     for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
         RNNativeStackScene *scene = insertedScenes[index];
