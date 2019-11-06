@@ -114,12 +114,24 @@
     [self updateScenes];
 }
 
+- (void)setNeedUpdateScenes:(NSArray<RNNativeStackScene *> *)neededUpdateScenes {
+    if (_needUpdateScenes == neededUpdateScenes) {
+        return;
+    }
+    if (neededUpdateScenes) {
+        _needUpdateScenes = [NSArray arrayWithArray:neededUpdateScenes];
+    } else {
+        _needUpdateScenes = neededUpdateScenes;
+    }
+    [self updateScenes];
+}
+
 #pragma mark - RCTInvalidating
 
 - (void)invalidate {
     [self.nextScenes removeAllObjects];
     RCTExecuteOnMainQueue(^{
-        [self updateScenesWithNextScenes:self.nextScenes];
+        [self setNeedUpdateScenes:self.nextScenes];
     });
 }
 
@@ -154,24 +166,19 @@
                         [nextScenes addObject:scene];
                     }
                 }
-                [self updateScenesWithNextScenes:nextScenes];
+                [self setNeedUpdateScenes:nextScenes];
             });
         });
     }
-}
-
-- (void)updateScenesWithNextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
-    [self setNeedUpdateScenes:nextScenes];
-    [self updateScenes];
 }
 
 - (void)updateScenes {
     if (_updatingScenes || !_needUpdateScenes) {
         return;
     }
-    [self setUpdatingScenes:YES];
+    _updatingScenes = YES;
     NSArray<RNNativeStackScene *> *nextScenes = [NSArray arrayWithArray:_needUpdateScenes];
-    [self setNeedUpdateScenes:nil];
+    _needUpdateScenes = nil;
     
     NSMutableArray<RNNativeStackScene *> *removedScenes = [NSMutableArray new];
     NSMutableArray<RNNativeStackScene *> *insertedScenes = [NSMutableArray new];
@@ -187,6 +194,7 @@
     }
     if (removedScenes.count == 0 && insertedScenes.count == 0) {
         // 无更新
+        [self setUpdatingScenes:NO];
         return;
     }
     RNNativeStackScene *currentTopScene = [_currentScenes lastObject];
