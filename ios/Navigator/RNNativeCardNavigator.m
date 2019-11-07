@@ -70,12 +70,7 @@
         [self addScene:scene];
     }
     // transition
-    currentTopScene.userInteractionEnabled = NO;
-    nextTopScene.userInteractionEnabled = NO;
     if (transition == RNNativeStackSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        currentTopScene.userInteractionEnabled = YES;
-        nextTopScene.userInteractionEnabled = YES;
-        
         nextTopScene.frame = self.controller.view.bounds;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES);
@@ -83,9 +78,6 @@
         [UIView animateWithDuration:0.35 animations:^{
             nextTopScene.frame = self.controller.view.bounds;
         } completion:^(BOOL finished) {
-            currentTopScene.userInteractionEnabled = YES;
-            nextTopScene.userInteractionEnabled = YES;
-            
             if (!finished) {
                 nextTopScene.frame = self.controller.view.bounds;
             }
@@ -99,9 +91,6 @@
         [UIView animateWithDuration:0.35 animations:^{
             currentTopScene.frame = [self getFrameWithContainerView:self.controller.view transition:transition];
         } completion:^(BOOL finished) {
-            currentTopScene.userInteractionEnabled = YES;
-            nextTopScene.userInteractionEnabled = YES;
-            
             if (!finished) {
                 nextTopScene.frame = self.controller.view.bounds;
             }
