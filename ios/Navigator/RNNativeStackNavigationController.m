@@ -32,6 +32,11 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [gestureRecognizer locationInView:self.view];
+    if (location.x > 40) {
+        return NO;
+    }
+    
     // cancel touches in parent, this is needed to cancel RN touch events. For example when Touchable
     // item is close to an edge and we start pulling from edge we want the Touchable to be cancelled.
     // Without the below code the Touchable will remain active (highlighted) for the duration of back
