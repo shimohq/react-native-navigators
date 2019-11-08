@@ -29,6 +29,18 @@
     self.interactivePopGestureRecognizer.enabled = NO;
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    
+    // INFO: push viewController 的同时旋转屏幕，UIViewControllerWrapperView 会保持旋转屏幕之前的 frame，新的 viewController 也会保持屏幕旋转之前的 frame。
+    // 为了修复这个问题，重新布局的时候重新设置 frame。
+    UIView *navigationTransitionView = [self findAndUpdateSubviewWithView:self.view className:@"UINavigationTransitionView"];
+    if (navigationTransitionView) {
+        UIView *viewControllerWrapperView = [self findAndUpdateSubviewWithView:navigationTransitionView className:@"UIViewControllerWrapperView"];
+    }
+    [self updateFrameWithView:self.topViewController.view parentView:self.view];
+}
+
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
@@ -69,6 +81,24 @@
         }
     }
     return navigationController;
+}
+
+#pragma mark - Private
+
+- (UIView *)findAndUpdateSubviewWithView:(UIView *)view className:(NSString *)className {
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:NSClassFromString(className)]) {
+            [self updateFrameWithView:subview parentView:view];
+            return subview;
+        }
+    }
+    return nil;
+}
+
+- (void)updateFrameWithView:(UIView *)view parentView:(UIView *)parentView {
+    CGRect parentFrame = parentView.frame;
+    CGRect frame = view.frame;
+    view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(parentFrame), CGRectGetHeight(parentFrame));
 }
 
 @end
