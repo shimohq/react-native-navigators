@@ -1,21 +1,21 @@
 //
-//  RNNativeStackNavigationController.m
+//  RNNativeStackNavigatorController.m
 //  owl
 //
 //  Created by Bell Zhong on 2019/10/21.
 //  Copyright © 2019 shimo.im. All rights reserved.
 //
 
-#import "RNNativeStackNavigationController.h"
+#import "RNNativeStackNavigatorController.h"
 #import "RNNativeStackScene.h"
 #import <React/RCTRootContentView.h>
 #import <React/RCTTouchHandler.h>
 
-@interface RNNativeStackNavigationController () <UIGestureRecognizerDelegate>
+@interface RNNativeStackNavigatorController () <UIGestureRecognizerDelegate>
 
 @end
 
-@implementation RNNativeStackNavigationController
+@implementation RNNativeStackNavigatorController
 
 - (void)viewDidLoad {
     [super viewDidLoad];

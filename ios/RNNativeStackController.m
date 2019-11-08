@@ -2,7 +2,7 @@
 #import "RNNativeStackScene.h"
 #import "RNNativeStackHeader.h"
 
-@interface RNNativeStackController () <UIGestureRecognizerDelegate>
+@interface RNNativeStackController ()
 
 @end
 

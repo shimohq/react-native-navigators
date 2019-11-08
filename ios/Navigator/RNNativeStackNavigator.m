@@ -7,7 +7,7 @@
 //
 
 #import "RNNativeStackNavigator.h"
-#import "RNNativeStackNavigationController.h"
+#import "RNNativeStackNavigatorController.h"
 #import "RNNativeStackController.h"
 #import "RNNativePushAnimatedTransition.h"
 #import "RNNativePopAnimatedTransition.h"
@@ -21,7 +21,7 @@
 @implementation RNNativeStackNavigator
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
-    _controller = [[RNNativeStackNavigationController alloc] init];
+    _controller = [[RNNativeStackNavigatorController alloc] init];
     _controller.delegate = self;
     [_controller setNavigationBarHidden:YES];
     
