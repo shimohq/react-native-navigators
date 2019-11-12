@@ -221,7 +221,7 @@
         case RNNativeStackSceneStatusDidBlur:
             if (_onDidBlur) {
                 _onDidBlur(@{
-                    @"dimissed": @([_delegate isDismissedForScene:self])
+                    @"dismissed": @([_delegate isDismissedForScene:self])
                 });
             }
             break;

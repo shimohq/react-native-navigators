@@ -29,8 +29,8 @@ export default class NativeStackNavigator extends PureComponent<
     this.props.onDidFocus(this.props.route);
   };
 
-  private onDidBlur = (event: { nativeEvent: { dimissed: boolean } }) => {
-    this.props.onDidBlur(this.props.route, event.nativeEvent.dimissed);
+  private onDidBlur = (event: { nativeEvent: { dismissed: boolean } }) => {
+    this.props.onDidBlur(this.props.route, event.nativeEvent.dismissed);
   };
 
 
