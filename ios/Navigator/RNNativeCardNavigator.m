@@ -6,12 +6,13 @@
 //
 
 #import "RNNativeCardNavigator.h"
+#import "RNNativeCardNavigatorController.h"
 #import "RNNativeStackScene.h"
 #import <React/RCTUIManager.h>
 
 @interface RNNativeCardNavigator()
 
-@property (nonatomic, strong) UIViewController *controller;
+@property (nonatomic, strong) RNNativeCardNavigatorController *controller;
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 @property (nonatomic, assign) BOOL updating;
 
@@ -21,7 +22,7 @@
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     _viewControllers = [NSMutableArray array];
-    _controller = [UIViewController new];
+    _controller = [RNNativeCardNavigatorController new];
     _updating = NO;
     return [super initWithBridge:bridge viewController:_controller];
 }
