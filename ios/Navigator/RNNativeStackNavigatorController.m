@@ -38,7 +38,10 @@
     if (navigationTransitionView) {
         UIView *viewControllerWrapperView = [self findAndUpdateSubviewWithView:navigationTransitionView className:@"UIViewControllerWrapperView"];
     }
-    [self updateFrameWithView:self.topViewController.view parentView:self.view];
+    UIView *view = self.topViewController.view;
+    if ([view isKindOfClass:[RNNativeStackScene class]]) {
+        [self updateFrameWithView:view parentView:self.view];
+    }
 }
 
 #pragma mark - UIGestureRecognizerDelegate
@@ -98,7 +101,9 @@
 - (void)updateFrameWithView:(UIView *)view parentView:(UIView *)parentView {
     CGRect parentFrame = parentView.frame;
     CGRect frame = view.frame;
-    view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(parentFrame), CGRectGetHeight(parentFrame));
+    if (!CGRectEqualToRect(frame, parentFrame)) {
+        view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(parentFrame), CGRectGetHeight(parentFrame));
+    }
 }
 
 @end
