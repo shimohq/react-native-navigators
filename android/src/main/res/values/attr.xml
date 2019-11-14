@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="headerBorderColor" format="color|reference" />
+    <attr name="headerBackgroundColor" format="color|reference" />
+    <attr name="headerBorderSize" format="dimension" />
+
+    <attr name="scene" format="reference" />
+
+
+    <!--    <style name="Scene">-->
+    <!--        <item name="headerBorderColor">#FF444444</item>-->
+    <!--        <item name="headerBackgroundColor">#FFFFFFFF</item>-->
+
+    <!--    </style>-->
+
+
+</resources>
