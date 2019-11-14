@@ -22,7 +22,6 @@ public class RNNavigatorsPackage implements ReactPackage {
             new SceneManager(),
             new SceneStackManager(),
             new SceneStackHeaderManager(),
-            new SceneStackHeaderItemManager(),
             new SceneStackHeaderItemManager()
     );
   }

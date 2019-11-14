@@ -1,13 +1,9 @@
 package im.shimo.navigators;
 
 import android.content.Context;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import androidx.annotation.AnimRes;
-import androidx.annotation.AnimatorRes;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.core.ChoreographerCompat;
@@ -28,7 +24,7 @@ import im.shimo.navigators.event.WillFocusEvent;
  * Created by jiang on 2019-11-06
  */
 
-public class SceneContainer extends ViewGroup {
+public abstract class SceneContainer extends ViewGroup {
 
     private static final String TAG = "SceneContainer";
     protected final ArrayList<Scene> mSceneFragments = new ArrayList<>();
@@ -170,30 +166,10 @@ public class SceneContainer extends ViewGroup {
         Animation enterAnimation = null;
         Animation exitAnimation = null;
         if (!mStack.contains(newTop)) {
-            switch (newTop.getStackAnimation()) {
-                case NONE:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    break;
-                case DEFAULT:
-                case SLIDE_FROM_RIGHT:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_right);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_left_p50);
-                    break;
-                case SLIDE_FROM_LEFT:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_left);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_right_p50);
-                    break;
-                default:
-                case SLIDE_FROM_TOP:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_top);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    break;
-                case SLIDE_FROM_BOTTOM:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_bottom);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    break;
-            }
+            int[] animIds = new int[2];
+            getAnimationOnPush(newTop, animIds);
+            enterAnimation = AnimationUtils.loadAnimation(getContext(), animIds[0]);
+            exitAnimation = AnimationUtils.loadAnimation(getContext(), animIds[1]);
 
             final Scene finalBelowTop = belowTop;
             enterAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -255,30 +231,12 @@ public class SceneContainer extends ViewGroup {
             }
 
         } else if (mTopScene != null && !mTopScene.equals(newTop)) { // out
-            switch (mTopScene.getStackAnimation()) {
-                case NONE:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    break;
-                default:
-                case DEFAULT:
-                case SLIDE_FROM_RIGHT:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_left_p50);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_right);
-                    break;
-                case SLIDE_FROM_LEFT:
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_right_p50);
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_left);
-                    break;
-                case SLIDE_FROM_TOP:
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_top);
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    break;
-                case SLIDE_FROM_BOTTOM:
-                    exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_bottom);
-                    enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.no_anim);
-                    break;
-            }
+            int[] animIds = new int[2];
+            getAnimationOnPop(mTopScene, animIds);
+            enterAnimation = AnimationUtils.loadAnimation(getContext(), animIds[0]);
+            exitAnimation = AnimationUtils.loadAnimation(getContext(), animIds[1]);
+
+
             enterAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -332,47 +290,10 @@ public class SceneContainer extends ViewGroup {
         mStack.clear();
         mStack.addAll(mSceneFragments);
 
-//        for (Scene scene : mStack) {
-//            if (scene.hasHeader()) {
-//                scene.updateHeader();
-//            }
-//        }
-
     }
 
+    abstract void getAnimationOnPush(Scene scene, int[] anim);
 
-    private void setTransitionAnimation(@AnimatorRes @AnimRes int enter,
-                                        @AnimatorRes @AnimRes int exit) {
-
-    }
-
-
-    private static class EnterAnimationListener implements Animation.AnimationListener {
-
-        private View mTopView;
-        private View mBelowView;
-
-        public void setAnimationView(View topView, View belowView) {
-            mTopView = topView;
-            mBelowView = belowView;
-        }
-
-        @Override
-        public void onAnimationStart(Animation animation) {
-            mTopView.setVisibility(VISIBLE);
-
-        }
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-            mBelowView.setVisibility(GONE);
-        }
-
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-
-        }
-    }
-
+    abstract void getAnimationOnPop(Scene scene, int[] anim);
 
 }
