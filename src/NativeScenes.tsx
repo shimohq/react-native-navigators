@@ -31,7 +31,7 @@ export interface NativeScenesProps extends NavigationInjectedProps {
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
   private handleDidFocus = (route: NavigationRoute) => {
     this.props.onOpenRoute(route);
-  }
+  };
 
   private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
     if (dismissed) {
@@ -41,14 +41,11 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
         this.props.onDismissRoute(route);
       }
     }
-  }
+  };
 
   private isClosing = (key: string) => {
-    const {
-      closingRouteKeys,
-      replacingRouteKeys,
-    } = this.props;
-    return closingRouteKeys.includes(key) || replacingRouteKeys.includes(key)
+    const { closingRouteKeys, replacingRouteKeys } = this.props;
+    return closingRouteKeys.includes(key) || replacingRouteKeys.includes(key);
   };
 
   public render() {

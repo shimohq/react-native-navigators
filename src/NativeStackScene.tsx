@@ -33,7 +33,6 @@ export default class NativeStackNavigator extends PureComponent<
     this.props.onDidBlur(this.props.route, event.nativeEvent.dismissed);
   };
 
-
   public render() {
     const {
       translucent,

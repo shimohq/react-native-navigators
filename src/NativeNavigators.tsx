@@ -1,5 +1,9 @@
 import React, { PureComponent } from 'react';
-import { NavigationRoute, StackActions, NavigationActions } from 'react-navigation';
+import {
+  NavigationRoute,
+  StackActions,
+  NavigationActions
+} from 'react-navigation';
 
 import {
   NativeNavigatorsProps,
@@ -63,7 +67,12 @@ export default class NativeNavigators extends PureComponent<
     }
 
     // Now we need to determine which routes were added and removed
-    let { openingRouteKeys, closingRouteKeys, replacingRouteKeys, dismissingRouteKeys } = state;
+    let {
+      openingRouteKeys,
+      closingRouteKeys,
+      replacingRouteKeys,
+      dismissingRouteKeys
+    } = state;
     const { previousRoutes } = state;
 
     const previousFocusedRoute = previousRoutes[previousRoutes.length - 1] as
@@ -178,9 +187,15 @@ export default class NativeNavigators extends PureComponent<
     return {
       routes: routes.filter(({ key }) => !dismissingRouteKeys.includes(key)),
       previousRoutes: navigation.state.routes,
-      openingRouteKeys: openingRouteKeys.filter(key => !dismissingRouteKeys.includes(key)),
-      closingRouteKeys: closingRouteKeys.filter(key => !dismissingRouteKeys.includes(key)),
-      replacingRouteKeys: replacingRouteKeys.filter(key => !dismissingRouteKeys.includes(key)),
+      openingRouteKeys: openingRouteKeys.filter(
+        key => !dismissingRouteKeys.includes(key)
+      ),
+      closingRouteKeys: closingRouteKeys.filter(
+        key => !dismissingRouteKeys.includes(key)
+      ),
+      replacingRouteKeys: replacingRouteKeys.filter(
+        key => !dismissingRouteKeys.includes(key)
+      ),
       dismissingRouteKeys: [],
       descriptors
     };
@@ -240,7 +255,7 @@ export default class NativeNavigators extends PureComponent<
       immediate: true
     });
     this.setState(state => ({
-        dismissingRouteKeys: [...state.dismissingRouteKeys, route.key]
+      dismissingRouteKeys: [...state.dismissingRouteKeys, route.key]
     }));
   };
 
