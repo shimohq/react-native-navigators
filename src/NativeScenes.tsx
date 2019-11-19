@@ -62,6 +62,11 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
         {routes.map((route, index) => {
           const { key } = route;
           const descriptor = descriptors[key];
+
+          if (!descriptor) {
+            return null;
+          }
+
           const { options, navigation } = descriptor;
 
           let transition = NativeNavigatorTransitions.None;
