@@ -2,7 +2,6 @@ package im.shimo.navigators;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
@@ -238,8 +237,10 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
             View child = getChildAt(i);
             Log.d(TAG, "setTranslucent() called with: child = [" + child + "], i = [" + i + "]");
             if (child instanceof SceneStackHeader) {
-                child.setBackgroundColor(Color.BLACK);
-                child.setAlpha(0.8f);
+//                child.setBackgroundColor(Color.BLACK);
+                child.setAlpha(0.5f);
+            }else {
+                child.setAlpha(1f);
             }
         }
         mIsTranslucent = translucent;
