@@ -144,7 +144,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
         } else {
             parent.removeView(view);
         }
-        Log.d(TAG, "removeViewAt() called with: parent = [" + parent + "], index = [" + index + "]");
     }
 
 
