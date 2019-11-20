@@ -14,8 +14,8 @@ public class SceneModal extends SceneContainer {
     void getAnimationOnPush(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-                anim[0] = R.anim.no_anim;
-                anim[1] = R.anim.no_anim;
+//                anim[0] = R.anim.no_anim;
+//                anim[1] = R.anim.no_anim;
                 break;
 
             case SLIDE_FROM_RIGHT:
@@ -43,8 +43,8 @@ public class SceneModal extends SceneContainer {
     void getAnimationOnPop(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-                anim[0] = R.anim.no_anim;
-                anim[1] = R.anim.no_anim;
+//                anim[0] = R.anim.no_anim;
+//                anim[1] = R.anim.no_anim;
                 break;
             case SLIDE_FROM_RIGHT:
                 anim[0] = R.anim.slide_in_left_p50;

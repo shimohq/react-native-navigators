@@ -9,13 +9,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.facebook.react.bridge.GuardedRunnable;
 import com.facebook.react.bridge.ReactContext;
@@ -45,9 +45,9 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         @Override
         public void onViewAttachedToWindow(View view) {
             ((ReactEditText) view).requestFocusFromJS();
-//            InputMethodManager inputMethodManager =
-//                    (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//            inputMethodManager.showSoftInput(view, 0);
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(view, 0);
             view.removeOnAttachStateChangeListener(sShowSoftKeyboardOnAttach);
         }
 
@@ -56,6 +56,8 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
         }
     };
+
+    private Fragment mFragment;
 
     @Nullable
     private SceneContainer mContainer;
@@ -71,69 +73,10 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     public Scene(ReactContext context) {
         super(context);
-        maybeInitActionBarSize(context);
-    }
-
-    private void maybeInitActionBarSize(Context context) {
-        if (actionBarHeight == 0) {
-            TypedValue tv = new TypedValue();
-            if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
-            }
-        }
-    }
-
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mHasHeader = false;
-        final int count = getChildCount();
-        for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
-            if (child instanceof SceneStackHeader) {
-                measureActionBar(child);
-                mHasHeader = true;
-            } else {
-                measureChild(child);
-            }
-        }
-
-    }
-
-    public boolean hasHeader() {
-        return mHasHeader;
-    }
-
-    private void measureActionBar(View child) {
-        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
-                MeasureSpec.EXACTLY);
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(actionBarHeight,
-                MeasureSpec.EXACTLY);
-        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
-    }
-
-    private void measureChild(View child) {
-        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
-                MeasureSpec.EXACTLY);
-        int height = mHasHeader ? getHeight() - actionBarHeight : getHeight();
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height,
-                MeasureSpec.EXACTLY);
-        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
-
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        for (int i = 0, size = getChildCount(); i < size; i++) {
-            View child = getChildAt(i);
-            if (child instanceof SceneStackHeader) {
-                child.layout(0, 0, getWidth(), actionBarHeight);
-            } else {
-                int top = mHasHeader && !mIsTranslucent ? actionBarHeight : 0;
-                child.layout(0, top, getWidth(), getHeight());
-            }
-        }
         if (changed) {
             final int width = r - l;
             final int height = b - t;
@@ -159,45 +102,22 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-
-
         // This method implements a workaround for RN's autoFocus functionality. Because of the way
         // autoFocus is implemented it sometimes gets triggered before native text view is mounted. As
         // a result Android ignores calls for opening soft keyboard and here we trigger it manually
         // again after the scene is attached.
-//        View view = getFocusedChild();
-//        if (view != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            while (view instanceof ViewGroup) {
-//                view = ((ViewGroup) view).getFocusedChild();
-//            }
-//            if (view instanceof TextView) {
-//                TextView textView = (TextView) view;
-//                if (textView.getShowSoftInputOnFocus()) {
-//                    textView.addOnAttachStateChangeListener(sShowSoftKeyboardOnAttach);
-//                }
-//            }
-//        }
-//        if (mFocusedView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            if (mFocusedView.getShowSoftInputOnFocus()) {
-////                mFocusedView.addOnAttachStateChangeListener(sShowSoftKeyboardOnAttach);
-//                if (mFocusedView instanceof ReactEditText) {
-//                    ((ReactEditText) mFocusedView).requestFocusFromJS();
-//                    final InputMethodManager imm =
-//                            (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
-//                        @Override
-//                        protected void onReceiveResult(int resultCode, Bundle resultData) {
-//                            if (resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN
-//                                    || resultCode == InputMethodManager.RESULT_HIDDEN) {
-//                                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-//                            }
-//                        }
-//                    });
-//                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_NOT_ALWAYS);
-//
-//                }
-//            }
-//        }
+        View view = getFocusedChild();
+        if (view != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            while (view instanceof ViewGroup) {
+                view = ((ViewGroup) view).getFocusedChild();
+            }
+            if (view instanceof TextView) {
+                TextView textView = (TextView) view;
+                if (textView.getShowSoftInputOnFocus()) {
+                    textView.addOnAttachStateChangeListener(sShowSoftKeyboardOnAttach);
+                }
+            }
+        }
     }
 
     public void saveFocusedView() {
@@ -224,7 +144,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                     if (mFocusedView instanceof ReactEditText) {
                         ((ReactEditText) mFocusedView).requestFocusFromJS();
                     }
-
                     final InputMethodManager imm =
                             (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
@@ -275,7 +194,8 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     @Override
     public PointerEvents getPointerEvents() {
-        return mTransitioning ? PointerEvents.NONE : PointerEvents.AUTO;
+//        return mTransitioning ? PointerEvents.NONE : PointerEvents.AUTO;
+        return PointerEvents.AUTO;
     }
 
     @Override
@@ -287,15 +207,14 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         mContainer = container;
     }
 
-//    public void updateHeader() {
-//        final int count = getChildCount();
-//        for (int i = 0; i < count; i++) {
-//            View child = getChildAt(i);
-//            if (child instanceof SceneStackHeader) {
-//                ((SceneStackHeader) child).onUpdate();
-//            }
-//        }
-//    }
+    protected <T extends SceneFragment> void setFragment(T fragment) {
+        this.mFragment = fragment;
+    }
+
+    protected Fragment getFragment() {
+        return this.mFragment;
+    }
+
 
     @Nullable
     protected SceneContainer getSceneContainer() {
@@ -315,7 +234,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     }
 
     public void setTranslucent(boolean translucent) {
-
         for (int i = 0, size = getChildCount(); i < size; i++) {
             View child = getChildAt(i);
             Log.d(TAG, "setTranslucent() called with: child = [" + child + "], i = [" + i + "]");
