@@ -4,11 +4,17 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+
+import java.util.ArrayList;
 
 public class SceneStackHeader extends ViewGroup {
 
@@ -21,9 +27,11 @@ public class SceneStackHeader extends ViewGroup {
             R.attr.headerBorderSize
     };
 
-    private Bar mBar;
     private View mBottomBorderView;
     private int bottomBorderSize;
+
+    private final Toolbar mToolbar;
+    private ArrayList<SceneStackHeaderItem> mItems = new ArrayList<>(3);
 
     @SuppressLint("ResourceType")
     public SceneStackHeader(Context context) {
@@ -40,35 +48,31 @@ public class SceneStackHeader extends ViewGroup {
         int bottomBorderColor = a.getColor(1, Color.DKGRAY);
         bottomBorderSize = a.getDimensionPixelSize(2, 1);
         a.recycle();
+        TypedValue tv = new TypedValue();
+        int actionBarHeight = 0;
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+        }
 
-        mBar = new Bar(context);
-        setBackgroundColor(backBackgroundColor);
+        mToolbar = new Toolbar(context);
+        mToolbar.setBackgroundColor(backBackgroundColor);
+        mToolbar.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, actionBarHeight));
         mBottomBorderView = new View(context);
         mBottomBorderView.setBackgroundColor(bottomBorderColor);
-        addViewInLayout(mBar, 0, generateDefaultLayoutParams());
-        addViewInLayout(mBottomBorderView, 1, generateDefaultLayoutParams());
+        mBottomBorderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, bottomBorderSize));
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY && MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
-            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
-        }
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(bottomBorderSize, MeasureSpec.EXACTLY);
-        mBottomBorderView.measure(widthMeasureSpec, childHeightMeasureSpec);
-    }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        mBar.layout(left, top, right, bottom);
-        mBottomBorderView.layout(left, bottom - mBottomBorderView.getMeasuredHeight(), right, bottom);
+        // ignore
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         mIsAttachedToWindow = true;
+        onUpdate();
     }
 
     @Override
@@ -78,19 +82,21 @@ public class SceneStackHeader extends ViewGroup {
     }
 
     public View getHeaderItem(int index) {
-        return mBar.getChildAt(index);
+        return mItems.get(index);
     }
 
     public int getHeaderItemCount() {
-        return mBar.getChildCount();
+        return mItems.size();
     }
 
     public void removeHeaderItemView(int index) {
-        mBar.removeViewAt(index);
+        SceneStackHeaderItem item = mItems.remove(index);
+        mToolbar.removeView(item);
     }
 
     public void addHeaderItemView(SceneStackHeaderItem child, int index) {
-        mBar.addView(child, index);
+        mItems.add(index, child);
+        onUpdate();
     }
 
     private SceneContainer findSceneContainer(View view) {
@@ -104,84 +110,90 @@ public class SceneStackHeader extends ViewGroup {
         }
     }
 
+    private Scene getScene() {
+        ViewParent screen = getParent();
+        if (screen instanceof Scene) {
+            return (Scene) screen;
+        }
+        return null;
+    }
+
+    private SceneStack getScreenStack() {
+        Scene scene = getScene();
+        if (scene != null) {
+            SceneContainer container = scene.getSceneContainer();
+            if (container instanceof SceneStack) {
+                return (SceneStack) container;
+            }
+        }
+        return null;
+    }
+
+    private SceneStackFragment getScreenFragment() {
+        ViewParent screen = getParent();
+        if (screen instanceof Scene) {
+            Fragment fragment = ((Scene) screen).getFragment();
+            if (fragment instanceof SceneStackFragment) {
+                return (SceneStackFragment) fragment;
+            }
+        }
+        return null;
+    }
+
+    public void onUpdate() {
+        Scene parent = (Scene) getParent();
+        final SceneStack stack = getScreenStack();
+
+        boolean isRoot = stack == null || stack.getRootScreen() == parent;
+        boolean isTop = stack == null || stack.getTopScene() == parent;
+
+        if (!mIsAttachedToWindow || !isTop) {
+            return;
+        }
+
+        if (mToolbar.getParent() == null) {
+            getScreenFragment().setToolbar(mToolbar);
+            getScreenFragment().setToolBarBottomLine(mBottomBorderView);
+        }
+
+        AppCompatActivity activity = (AppCompatActivity) getScreenFragment().getActivity();
+        activity.setSupportActionBar(mToolbar);
+//        ActionBar actionBar = activity.getSupportActionBar();
+
+        mToolbar.setNavigationIcon(null);
+        mToolbar.setTitle(null);
+
+        for (SceneStackHeaderItem item : mItems) {
+            final SceneStackHeaderItem.Type type = item.getType();
+            Toolbar.LayoutParams params =
+                    new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            switch (type) {
+                default:
+                case LEFT:
+                    params.gravity = Gravity.START | Gravity.CENTER_HORIZONTAL;
+                    break;
+                case CENTER:
+                    params.gravity = Gravity.CENTER | Gravity.CENTER_HORIZONTAL;
+                    break;
+                case RIGHT:
+                    params.gravity = Gravity.END | Gravity.CENTER_HORIZONTAL;
+                    break;
+            }
+
+            item.setLayoutParams(params);
+            if (item.getParent() == null) {
+                mToolbar.addView(item);
+            }
+        }
+    }
+
     public void setBottomBorderColor(int color) {
         mBottomBorderView.setBackgroundColor(color);
     }
 
     @Override
-    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
-        return p instanceof LayoutParams;
-    }
-
-    @Override
-    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-    }
-
-    @Override
-    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new LayoutParams(getContext(), attrs);
-    }
-
-    @Override
-    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        return new LayoutParams(p);
-    }
-
-
-    public static class LayoutParams extends MarginLayoutParams {
-
-        public LayoutParams(Context c, AttributeSet attrs) {
-            super(c, attrs);
-        }
-
-        public LayoutParams(int width, int height) {
-            super(width, height);
-        }
-
-        public LayoutParams(MarginLayoutParams source) {
-            super(source);
-        }
-
-        public LayoutParams(ViewGroup.LayoutParams source) {
-            super(source);
-        }
-    }
-
-
-    private static class Bar extends ViewGroup {
-
-        public Bar(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-            int count = getChildCount();
-            int l, t, r, b;
-            for (int i = 0; i < count; i++) {
-                SceneStackHeaderItem item = (SceneStackHeaderItem) getChildAt(i);
-                final SceneStackHeaderItem.Type type = item.getType();
-                t = top + ((bottom - top) - item.getMeasuredHeight()) >> 1;
-                b = t + item.getMeasuredHeight();
-                switch (type) {
-                    default:
-                    case LEFT:
-                        l = left;
-                        r = l + item.getMeasuredWidth();
-                        break;
-                    case RIGHT:
-                        r = right;
-                        l = r - item.getMeasuredWidth();
-                        break;
-                    case CENTER:
-                        l = left + ((right - left) - item.getMeasuredWidth()) >> 1;
-                        r = l + item.getMeasuredWidth();
-                        break;
-                }
-                item.layout(l, t, r, b);
-            }
-        }
+    public void setBackgroundColor(int color) {
+        mToolbar.setBackgroundColor(color);
     }
 
 

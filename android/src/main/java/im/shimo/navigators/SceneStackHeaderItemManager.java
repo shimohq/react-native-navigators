@@ -1,5 +1,8 @@
 package im.shimo.navigators;
 
+import android.util.Log;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -42,6 +45,18 @@ public class SceneStackHeaderItemManager extends ReactViewManager {
     @Override
     public LayoutShadowNode createShadowNodeInstance(@NonNull ReactApplicationContext context) {
         return new InnerShadowNode();
+    }
+
+    @Override
+    public void addView(ReactViewGroup parent, View child, int index) {
+        super.addView(parent, child, index);
+        Log.d(TAG, "addView() called with: parent = [" + parent + "], child = [" + child + "], index = [" + index + "]");
+    }
+
+    @Override
+    public void removeViewAt(ReactViewGroup parent, int index) {
+        super.removeViewAt(parent, index);
+        Log.d(TAG, "removeViewAt() called with: parent = [" + parent + "], index = [" + index + "]");
     }
 
     @ReactProp(name = "type")
