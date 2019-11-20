@@ -3,11 +3,9 @@ package im.shimo.navigators;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -39,16 +37,6 @@ public class SceneStackFragment extends SceneFragment {
 
     public void setToolbar(Toolbar toolbar) {
         if (mAppBarLayout != null) {
-            int windowFlags = requireActivity().getWindow().getAttributes().flags;
-            if ((windowFlags & WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS) != 0
-                    || (windowFlags & WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0) {
-                TypedValue tv = new TypedValue();
-                if (requireContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-                    int statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-                    mAppBarLayout.setPadding(0, statusBarHeight, 0, 0);
-                }
-            }
             if (mAppBarLayout.getParent() == null) {
                 ((ViewGroup) requireView()).addView(mAppBarLayout, 0);
             }
