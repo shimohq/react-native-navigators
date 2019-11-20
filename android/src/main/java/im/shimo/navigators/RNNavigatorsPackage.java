@@ -19,7 +19,7 @@ public class RNNavigatorsPackage implements ReactPackage {
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
     return Arrays.<ViewManager>asList(
             new SceneModalManager(),
-            new CardSceneManager(),
+            new SceneCardManager(),
             new SceneManager(),
             new SceneStackManager(),
             new SceneStackHeaderManager(),
