@@ -25,12 +25,25 @@ interface NativeStackNavigatorProps {
 export default class NativeStackNavigator extends PureComponent<
   NativeStackNavigatorProps
 > {
+  public componentWillUnmount() {
+    if (!this.dismissed) {
+      this.props.onDidBlur(this.props.route, true);
+    }
+  }
+
+  private dismissed: boolean = false;
+
   private onDidFocus = () => {
-    this.props.onDidFocus(this.props.route);
+    if (!this.dismissed) {
+      this.props.onDidFocus(this.props.route);
+    }
   };
 
   private onDidBlur = (event: { nativeEvent: { dismissed: boolean } }) => {
-    this.props.onDidBlur(this.props.route, event.nativeEvent.dismissed);
+    if (!this.dismissed) {
+      this.props.onDidBlur(this.props.route, event.nativeEvent.dismissed);
+      this.dismissed = event.nativeEvent.dismissed;
+    }
   };
 
   public render() {
