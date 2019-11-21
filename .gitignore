@@ -39,7 +39,8 @@ yarn.lock
 *.iml
 .idea
 
-Examples/ios/.DS_Store
+# VS Code
+.vscode
 
 package-lock.json
 lib/
