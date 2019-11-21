@@ -3,17 +3,14 @@ package im.shimo.navigators;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.Map;
 
@@ -141,13 +138,20 @@ public class SceneManager extends ViewGroupManager<Scene> {
 
     @Override
     public void removeViewAt(Scene parent, int index) {
-        super.removeViewAt(parent, index);
-        Log.d(TAG, "removeViewAt() called with: parent = [" + parent + "], index = [" + index + "]");
+        View view = parent.getChildAt(index);
+        if (view instanceof SceneStackHeader) {
+            ((SceneStackFragment) parent.getFragment()).removeToolbar();
+        } else {
+            parent.removeView(view);
+        }
     }
 
 
     @Override
     public void addView(Scene parent, View child, int index) {
         super.addView(parent, child, index);
+        if (child instanceof SceneStackHeader && parent.getFragment() instanceof SceneStackFragment) {
+            ((SceneStackFragment) parent.getFragment()).onStackUpdate();
+        }
     }
 }

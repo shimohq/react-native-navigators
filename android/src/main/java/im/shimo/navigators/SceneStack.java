@@ -2,7 +2,7 @@ package im.shimo.navigators;
 
 import android.content.Context;
 
-public class SceneStack extends SceneContainer {
+public class SceneStack extends SceneContainer<SceneStackFragment> {
 
 
     private static final String TAG = "SceneStack";
@@ -52,11 +52,16 @@ public class SceneStack extends SceneContainer {
 
 
     @Override
+    protected SceneStackFragment adapt(Scene scene) {
+        return new SceneStackFragment(scene);
+    }
+
+    @Override
     void getAnimationOnPush(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-                anim[0] = R.anim.no_anim;
-                anim[1] = R.anim.no_anim;
+//                anim[0] = R.anim.no_anim;
+//                anim[1] = R.anim.no_anim;
                 break;
             default:
             case DEFAULT:
@@ -83,8 +88,8 @@ public class SceneStack extends SceneContainer {
     void getAnimationOnPop(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-                anim[0] = R.anim.no_anim;
-                anim[1] = R.anim.no_anim;
+//                anim[0] = R.anim.no_anim;
+//                anim[1] = R.anim.no_anim;
                 break;
             default:
             case DEFAULT:
@@ -107,4 +112,12 @@ public class SceneStack extends SceneContainer {
         }
     }
 
+
+    @Override
+    protected void onUpdate() {
+        super.onUpdate();
+        for (SceneStackFragment sceneFragment : mStack) {
+            sceneFragment.onStackUpdate();
+        }
+    }
 }

@@ -224,7 +224,9 @@
         if (![removedScenes containsObject:currentTopScene]) {
             [currentTopScene resignFirstResponder];
         }
-        [nextTopScene becomeFirstResponder];
+        if ([_currentScenes containsObject:nextTopScene]) {
+            [nextTopScene becomeFirstResponder];
+        }
     }
   
     [self updateSceneWithTransition:transition
