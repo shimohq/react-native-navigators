@@ -12,7 +12,7 @@
     "react": "16.9.0",
     "react-native": "0.61.2",
     "react-native-gesture-handler": "^1.4.1",
-    "react-native-navigators": "^0.0.1-beta.44",
+    "react-native-navigators": "^0.0.1-beta.48",
     "react-navigation": "^4.0.10"
   },
   "devDependencies": {
