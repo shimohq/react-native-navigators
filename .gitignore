@@ -27,6 +27,7 @@ project.xcworkspace
 .gradle
 local.properties
 build
+*/android/captures
 
 # node.js
 #
