@@ -30,6 +30,8 @@ interface NativeStackScenesState {
   // Since the local routes can vary from the routes from props, we need to keep the descriptors for old routes
   // Otherwise we won't be able to access the options for routes that were removed
   descriptors: NativeNavigationDescriptorMap;
+  // Keep old screenProps for update descriptors
+  screenProps: unknown;
 }
 
 export default class NativeNavigators extends PureComponent<
@@ -43,11 +45,12 @@ export default class NativeNavigators extends PureComponent<
     // Here we determine which routes were added or removed to animate them
     // We keep a copy of the route being removed in local state to be able to animate it
 
-    const { navigation } = props;
+    const { navigation, screenProps } = props;
 
     // If there was no change in routes, we don't need to compute anything
     if (
       navigation.state.routes === state.previousRoutes &&
+      screenProps === state.screenProps &&
       state.routes.length
     ) {
       return null;
@@ -197,7 +200,8 @@ export default class NativeNavigators extends PureComponent<
         key => !dismissingRouteKeys.includes(key)
       ),
       dismissingRouteKeys: [],
-      descriptors
+      descriptors,
+      screenProps
     };
   }
 
@@ -208,7 +212,8 @@ export default class NativeNavigators extends PureComponent<
     closingRouteKeys: [],
     replacingRouteKeys: [],
     dismissingRouteKeys: [],
-    descriptors: {}
+    descriptors: {},
+    screenProps: undefined
   };
 
   private handleOpenRoute = (route: NavigationRoute) => {
@@ -260,7 +265,7 @@ export default class NativeNavigators extends PureComponent<
   };
 
   public render() {
-    const { navigation, navigationConfig, screenProps } = this.props;
+    const { navigation, navigationConfig } = this.props;
 
     const {
       routes,
@@ -268,7 +273,8 @@ export default class NativeNavigators extends PureComponent<
       replacingRouteKeys,
       openingRouteKeys,
       closingRouteKeys,
-      previousRoutes
+      previousRoutes,
+      screenProps
     } = this.state;
 
     const mode: NativeNavigatorModes =
