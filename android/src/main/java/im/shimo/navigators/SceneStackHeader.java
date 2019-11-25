@@ -63,7 +63,8 @@ public class SceneStackHeader extends ViewGroup {
         if (activity != null) {
             int windowFlags = activity.getWindow().getAttributes().flags;
             if (((windowFlags & WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS) != 0 &&
-                    ((activity.getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LAYOUT_STABLE) != 0))
+                    ((activity.getWindow().getDecorView().getSystemUiVisibility() & (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)) != 0))
                     || (windowFlags & WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0) {
                 if (getContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
                     int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");

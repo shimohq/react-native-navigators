@@ -42,7 +42,9 @@
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
     [super insertReactSubview:subview atIndex:atIndex];
-    if ([subview isKindOfClass:[RNNativeStackHeader class]] && _controller.navigationController != nil) {
+    if ([subview isKindOfClass:[RNNativeStackHeader class]]
+        && _controller.navigationController != nil
+        && (_status == RNNativeStackSceneStatusWillFocus || _status == RNNativeStackSceneStatusDidFocus)) {
         [_controller.navigationController setNavigationBarHidden:NO];
         [(RNNativeStackHeader *)subview attachViewController:_controller];
         [self updateBounds];
@@ -52,7 +54,9 @@
 - (void)removeReactSubview:(UIView *)subview
 {
     [super removeReactSubview:subview];
-    if ([subview isKindOfClass:[RNNativeStackHeader class]] && _controller.navigationController != nil) {
+    if ([subview isKindOfClass:[RNNativeStackHeader class]]
+        && _controller.navigationController != nil
+        && (_status == RNNativeStackSceneStatusWillFocus || _status == RNNativeStackSceneStatusDidFocus)) {
         [_controller.navigationController setNavigationBarHidden:YES];
         [(RNNativeStackHeader *)subview detachViewController];
         [self updateBounds];

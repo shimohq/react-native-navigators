@@ -11,20 +11,12 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.facebook.react.ReactRootView;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.core.ChoreographerCompat;
 import com.facebook.react.modules.core.ReactChoreographer;
-import com.facebook.react.uimanager.UIManagerModule;
-import com.facebook.react.uimanager.events.EventDispatcher;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import im.shimo.navigators.event.DidBlurEvent;
-import im.shimo.navigators.event.DidFocusEvent;
-import im.shimo.navigators.event.WillBlurEvent;
-import im.shimo.navigators.event.WillFocusEvent;
 
 /**
  * Created by jiang on 2019-11-06
@@ -44,9 +36,6 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
     private boolean mNeedUpdate;
     private boolean mIsAttached;
-
-    protected SceneFragment mTopScene = null;
-
 
     private ChoreographerCompat.FrameCallback mFrameCallback = new ChoreographerCompat.FrameCallback() {
         @Override
@@ -204,178 +193,203 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
     }
 
     public Scene getTopScene() {
-        return mTopScene.getScene();
+        int size = mStack.size();
+        return size > 0 ? mStack.get(size - 1).getScene() : null;
     }
-
 
     protected void onUpdate() {
-        for (SceneFragment fragment : mSceneFragments) {
-            if (fragment.getScene().isClosing()) {
-                mDismissed.add(fragment);
+        final ArrayList<T> nextFragments = new ArrayList<>();
+        for (T fragment: mSceneFragments) {
+            if (!fragment.getScene().isClosing()) {
+                nextFragments.add(fragment);
             }
-//            if (!mStack.contains(fragment)) {
-//                mWellAdded.add(fragment);
-//            }
         }
 
+        final ArrayList<T> removedFragments = new ArrayList<>();
+        for (T fragment: mStack) {
+            if (fragment.getScene().isClosing() || !mSceneFragments.contains(fragment)) {
+                removedFragments.add(fragment);
+            }
+        }
 
-        SceneFragment newTop = null;
-        SceneFragment belowTop = null;
+        ArrayList<T> insertedFragments = new ArrayList<>();
+        for (T fragment: nextFragments) {
+            if (!mStack.contains(fragment)) {
+                insertedFragments.add(fragment);
+            }
+        }
 
         // find top scene
-        for (int i = mSceneFragments.size() - 1; i >= 0; i--) {
-            SceneFragment fragment = mSceneFragments.get(i);
-            if (!mDismissed.contains(fragment)) {
-                if (newTop == null) {
-                    newTop = fragment;
-                } else {
-                    belowTop = fragment;
-                    break;
-                }
+        T nextTopFragment = nextFragments.size() > 0 ? nextFragments.get(nextFragments.size() - 1) : null;
+        T currentTopFragment = mStack.size() > 0 ? mStack.get(mStack.size() - 1) : null;
+
+        // save or restore focused view
+        if (currentTopFragment != nextTopFragment) {
+            if (currentTopFragment != null && !removedFragments.contains(currentTopFragment)) {
+                currentTopFragment.getScene().saveFocusedView();
+            }
+            if (nextTopFragment != null && mStack.contains(nextTopFragment)) {
+                nextTopFragment.getScene().restoreFocus();
             }
         }
-        if (newTop == null) return;
 
-        if (newTop.getScene().isTransparent()) {
-            mDismissed.add(belowTop);
-        }
-        final SceneFragment finalNewTop = newTop;
-        final SceneFragment finalBelowTop = belowTop;
         int[] animIds = new int[2];
         boolean isPushAction = false;
-        if (!mStack.contains(newTop)) {
-            isPushAction = true;
-            getAnimationOnPush(newTop.getScene(), animIds);
-            for (SceneFragment scene : mSceneFragments) {
-                if (scene != finalNewTop && !mDismissed.contains(scene)
-                        && scene.isVisible()) {
-                    scene.getScene().saveFocusedView();
-                }
-            }
-            getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
-            newTop.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    onPushStart(finalNewTop, finalBelowTop);
-                }
+        if (currentTopFragment != null && currentTopFragment != nextTopFragment) {
+            if (nextTopFragment != null && !mStack.contains(nextTopFragment)) { // push
+                isPushAction = true;
+                getAnimationOnPush(nextTopFragment.getScene(), animIds);
+                getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
+                nextTopFragment.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        onPushStart(nextFragments, removedFragments);
+                    }
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    onPushEnd(finalNewTop, finalBelowTop);
-                }
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        onPushEnd(nextFragments, removedFragments);
+                    }
 
-                @Override
-                public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-                }
-            });
+                    }
+                });
+            } else if (!nextFragments.contains(currentTopFragment)) { // pop
+                getAnimationOnPop(currentTopFragment.getScene(), animIds);
+                getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
+                currentTopFragment.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        onPopStart(nextFragments, removedFragments);
+                    }
 
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        onPopEnd(nextFragments, removedFragments);
+                    }
 
-        } else if (mTopScene != null && !mTopScene.equals(newTop)) { // out
-            getAnimationOnPop(mTopScene.getScene(), animIds);
-            getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
-            mTopScene.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    onPopStart(finalNewTop);
-                }
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    onPopEnd(finalNewTop);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-
-        }
-
-        for (SceneFragment scene : mStack) {
-            if (!mSceneFragments.contains(scene) || mDismissed.contains(scene)) {
-                getOrCreateTransaction().remove(scene);
+                    }
+                });
             }
         }
-        for (SceneFragment sceneFragment : mSceneFragments) {
-            if (!mStack.contains(sceneFragment) && !mDismissed.contains(sceneFragment)) {
-                getOrCreateTransaction().add(getId(), sceneFragment);
-            }
-            if (sceneFragment != newTop && !mDismissed.contains(sceneFragment)) {
-                getOrCreateTransaction().hide(sceneFragment);
-            }
-        }
-        getOrCreateTransaction().show(newTop);
 
-        mTopScene = newTop;
+        // add
+        addFragments(insertedFragments);
+
+        // remove
+        removeFragments(removedFragments);
+
+        // update
+        updateFragments(nextFragments);
 
         mStack.clear();
-        mStack.addAll(mSceneFragments);
-        tryCommitTransaction();
+        mStack.addAll(nextFragments);
+
         if (animIds[0] == 0 && animIds[1] == 0) {
             if (isPushAction) {
-                onPushStart(finalNewTop, finalBelowTop);
-                onPushEnd(finalNewTop, finalBelowTop);
+                onPushStart(nextFragments, removedFragments);
+                tryCommitTransaction();
+                onPushEnd(nextFragments, removedFragments);
             } else {
-                onPopStart(finalNewTop);
-                onPopEnd(finalNewTop);
+                onPopStart(nextFragments, removedFragments);
+                tryCommitTransaction();
+                onPopEnd(nextFragments, removedFragments);
+            }
+        } else {
+            tryCommitTransaction();
+        }
+    }
+
+    private void addFragments(ArrayList<T> fragments) {
+        for (T fragment : fragments) {
+            getOrCreateTransaction().add(getId(), fragment);
+        }
+    }
+
+    private void updateFragments(ArrayList<T> nextFragments) {
+        for (int index = 0, size = nextFragments.size(); index < size; index ++) {
+            boolean show;
+            if (index + 1 == size) {
+                show = true;
+            } else {
+                SceneFragment nextFragment = nextFragments.get(index + 1);
+                show = nextFragment.getScene().isTransparent();
+            }
+            SceneFragment fragment = nextFragments.get(index);
+            if (show && !fragment.isVisible()) {
+                getOrCreateTransaction().show(fragment);
+            } else if (!show && fragment.isVisible()) {
+                getOrCreateTransaction().hide(fragment);
             }
         }
-
     }
 
-    private void onPopEnd(SceneFragment finalNewTop) {
-        final EventDispatcher eventDispatcher = ((ReactContext) getContext())
-                .getNativeModule(UIManagerModule.class)
-                .getEventDispatcher();
-
-        ((ReactContext) getContext())
-                .getNativeModule(UIManagerModule.class)
-                .getEventDispatcher()
-                .dispatchEvent(new DidFocusEvent(finalNewTop.getScene().getId()));
-
-        for (SceneFragment scene : mDismissed) {
-            eventDispatcher.dispatchEvent(new DidBlurEvent(scene.getScene().getId(), true));
-        }
-        mDismissed.clear();
-    }
-
-    private void onPopStart(SceneFragment finalNewTop) {
-        finalNewTop.getScene().restoreFocus();
-        final EventDispatcher eventDispatcher = ((ReactContext) getContext())
-                .getNativeModule(UIManagerModule.class)
-                .getEventDispatcher();
-        for (SceneFragment scene : mDismissed) {
-            eventDispatcher.dispatchEvent(new WillBlurEvent(scene.getScene().getId()));
-        }
-        eventDispatcher
-                .dispatchEvent(new WillFocusEvent(mTopScene.getScene().getId()));
-    }
-
-    private void onPushEnd(SceneFragment finalNewTop, SceneFragment finalBelowTop) {
-        ((ReactContext) getContext())
-                .getNativeModule(UIManagerModule.class)
-                .getEventDispatcher()
-                .dispatchEvent(new DidFocusEvent(finalNewTop.getId()));
-        if (finalBelowTop != null) {
-            ((ReactContext) getContext())
-                    .getNativeModule(UIManagerModule.class)
-                    .getEventDispatcher()
-                    .dispatchEvent(new DidBlurEvent(finalBelowTop.getScene().getId(), false));
+    private void removeFragments(ArrayList<T> fragments) {
+        for (T scene : fragments) {
+            getOrCreateTransaction().remove(scene);
         }
     }
 
-    private void onPushStart(SceneFragment finalNewTop, SceneFragment finalBelowTop) {
-        ((ReactContext) getContext())
-                .getNativeModule(UIManagerModule.class)
-                .getEventDispatcher()
-                .dispatchEvent(new WillFocusEvent(finalNewTop.getScene().getId()));
-        if (finalBelowTop != null) {
-            ((ReactContext) getContext())
-                    .getNativeModule(UIManagerModule.class)
-                    .getEventDispatcher()
-                    .dispatchEvent(new WillBlurEvent(finalBelowTop.getScene().getId()));
+    private void onPopEnd(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+        didBlur(nextFragments, removedFragments);
+        didFocus(nextFragments);
+    }
+
+    private void onPopStart(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+        willBlur(nextFragments, removedFragments);
+        willFocus(nextFragments);
+    }
+
+    private void onPushEnd(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+        didFocus(nextFragments);
+        didBlur(nextFragments, removedFragments);
+    }
+
+    private void onPushStart(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+        willFocus(nextFragments);
+        willBlur(nextFragments, removedFragments);
+    }
+
+    private void didFocus(ArrayList<T> nextFragments) {
+        int size = nextFragments.size();
+        if (size > 0) {
+            T fragment = nextFragments.get(size - 1);
+            fragment.getScene().setStatus(Scene.SceneStatus.DID_FOCUS);
+        }
+    }
+
+    private void didBlur(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+        int size = nextFragments.size();
+        for (int index = 0; index + 1 < size; index++) {
+            T fragment = nextFragments.get(index);
+            fragment.getScene().setStatus(Scene.SceneStatus.DID_BLUR);
+        }
+        for (T fragment: removedFragments) {
+            fragment.getScene().setStatus(Scene.SceneStatus.DID_BLUR, true);
+        }
+    }
+
+    private void willFocus(ArrayList<T> nextFragments) {
+        int size = nextFragments.size();
+        if (size > 0) {
+            T fragment = nextFragments.get(size - 1);
+            fragment.getScene().setStatus(Scene.SceneStatus.WILL_FOCUS);
+        }
+    }
+
+    private void willBlur(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+        int size = nextFragments.size();
+        for (int index = 0; index + 1 < size; index++) {
+            T fragment = nextFragments.get(index);
+            fragment.getScene().setStatus(Scene.SceneStatus.WILL_BLUR);
+        }
+        for (T fragment: removedFragments) {
+            fragment.getScene().setStatus(Scene.SceneStatus.WILL_BLUR);
         }
     }
 

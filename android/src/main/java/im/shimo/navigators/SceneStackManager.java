@@ -41,7 +41,6 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
     public void removeViewAt(SceneStack parent, int index) {
         prepareOutTransition(parent.getSceneAt(index));
         parent.removeSceneAt(index);
-        Log.d(TAG, "removeViewAt() called with: parent = [" + parent + "], index = [" + index + "]");
     }
 
 
@@ -73,6 +72,4 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
     public boolean needsCustomLayoutForChildren() {
         return true;
     }
-
-
 }
