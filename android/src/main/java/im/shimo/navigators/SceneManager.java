@@ -119,8 +119,8 @@ public class SceneManager extends ViewGroupManager<Scene> {
      * @param view
      * @param isTransparent
      */
+    @ReactProp(name = "transparent")
     public void transparent(Scene view, boolean isTransparent) {
-        Log.d(TAG, "transparent() called with: view = [" + view + "], isTransparent = [" + isTransparent + "]");
         view.setTransparent(isTransparent);
     }
 
