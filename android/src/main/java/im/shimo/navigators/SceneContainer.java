@@ -256,7 +256,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
                     }
                 });
-            } else if (!nextFragments.contains(nextTopFragment)) { // pop
+            } else if (!nextFragments.contains(currentTopFragment)) { // pop
                 getAnimationOnPop(currentTopFragment.getScene(), animIds);
                 getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
                 currentTopFragment.setAnimationListener(new Animation.AnimationListener() {

@@ -78,7 +78,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
      */
     @ReactProp(name = "gestureEnabled")
     public void gestureEnabled(Scene view, boolean enable) {
-        Log.d(TAG, "gestureEnabled() called with: view = [" + view + "], enable = [" + enable + "]");
     }
 
     //隐藏 Blur -> Focus

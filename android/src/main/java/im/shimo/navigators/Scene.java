@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -22,7 +21,6 @@ import com.facebook.react.uimanager.PointerEvents;
 import com.facebook.react.uimanager.ReactPointerEventsView;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.EventDispatcher;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.textinput.ReactEditText;
 
 import im.shimo.navigators.event.DidBlurEvent;
@@ -269,14 +267,14 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     }
 
     public void setTranslucent(boolean translucent) {
+        if (mIsTranslucent == translucent) {
+            return;
+        }
         for (int i = 0, size = getChildCount(); i < size; i++) {
             View child = getChildAt(i);
-            Log.d(TAG, "setTranslucent() called with: child = [" + child + "], i = [" + i + "]");
             if (child instanceof SceneStackHeader) {
-//                child.setBackgroundColor(Color.BLACK);
-                child.setAlpha(0.5f);
-            }else {
-                child.setAlpha(1f);
+                child.setAlpha(translucent ? 0.5f : 1f);
+                break;
             }
         }
         mIsTranslucent = translucent;
