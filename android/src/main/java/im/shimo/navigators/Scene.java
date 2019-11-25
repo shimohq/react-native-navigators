@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -21,14 +20,27 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.PointerEvents;
 import com.facebook.react.uimanager.ReactPointerEventsView;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ReactEditText;
+
+import im.shimo.navigators.event.DidBlurEvent;
+import im.shimo.navigators.event.DidFocusEvent;
+import im.shimo.navigators.event.WillBlurEvent;
+import im.shimo.navigators.event.WillFocusEvent;
 
 @SuppressLint("ViewConstructor")
 public class Scene extends ViewGroup implements ReactPointerEventsView {
     static final String TAG = "Scene";
     private static int actionBarHeight;
     private TextView mFocusedView;
+    private SceneStatus mStatus = SceneStatus.DID_BLUR;
 
+    public enum SceneStatus {
+        DID_BLUR,
+        WILL_BLUR,
+        DID_FOCUS,
+        WILL_FOCUS
+    }
 
     public enum StackAnimation {
         DEFAULT,
@@ -191,6 +203,28 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         return mIsTransparent;
     }
 
+    public SceneStatus getStatus() {
+        return mStatus;
+    }
+
+    public void setStatus(SceneStatus status) {
+        setStatus(status, false);
+    }
+
+    public void setStatus(SceneStatus status, boolean isDismissed) {
+        if (mStatus == status) {
+            return;
+        }
+        if (mStatus == SceneStatus.DID_BLUR && status == SceneStatus.WILL_BLUR) {
+            return;
+        }
+        if (mStatus == SceneStatus.DID_FOCUS && status == SceneStatus.WILL_FOCUS) {
+            return;
+        }
+        mStatus = status;
+        sendEvent(status, isDismissed);
+    }
+
     @Override
     public PointerEvents getPointerEvents() {
 //        return mTransitioning ? PointerEvents.NONE : PointerEvents.AUTO;
@@ -233,18 +267,40 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     }
 
     public void setTranslucent(boolean translucent) {
+        if (mIsTranslucent == translucent) {
+            return;
+        }
         for (int i = 0, size = getChildCount(); i < size; i++) {
             View child = getChildAt(i);
-            Log.d(TAG, "setTranslucent() called with: child = [" + child + "], i = [" + i + "]");
             if (child instanceof SceneStackHeader) {
-//                child.setBackgroundColor(Color.BLACK);
-                child.setAlpha(0.5f);
-            }else {
-                child.setAlpha(1f);
+                child.setAlpha(translucent ? 0.5f : 1f);
+                break;
             }
         }
         mIsTranslucent = translucent;
         requestLayout();
     }
 
+    private void sendEvent(SceneStatus status, boolean isDismissed) {
+        final EventDispatcher eventDispatcher = ((ReactContext) getContext())
+                .getNativeModule(UIManagerModule.class)
+                .getEventDispatcher();
+
+        switch (status) {
+            case DID_BLUR:
+                eventDispatcher.dispatchEvent(new DidBlurEvent(getId(), isDismissed));
+                break;
+            case WILL_BLUR:
+                eventDispatcher.dispatchEvent(new WillBlurEvent(getId()));
+                break;
+            case DID_FOCUS:
+                eventDispatcher.dispatchEvent(new DidFocusEvent(getId()));
+                break;
+            case WILL_FOCUS:
+                eventDispatcher.dispatchEvent(new WillFocusEvent(getId()));
+                break;
+            default:
+                break;
+        }
+    }
 }

@@ -78,7 +78,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
      */
     @ReactProp(name = "gestureEnabled")
     public void gestureEnabled(Scene view, boolean enable) {
-        Log.d(TAG, "gestureEnabled() called with: view = [" + view + "], enable = [" + enable + "]");
     }
 
     //隐藏 Blur -> Focus
@@ -119,8 +118,8 @@ public class SceneManager extends ViewGroupManager<Scene> {
      * @param view
      * @param isTransparent
      */
+    @ReactProp(name = "transparent")
     public void transparent(Scene view, boolean isTransparent) {
-        Log.d(TAG, "transparent() called with: view = [" + view + "], isTransparent = [" + isTransparent + "]");
         view.setTransparent(isTransparent);
     }
 
