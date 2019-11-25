@@ -29,10 +29,6 @@
             // attach header
             [self updateHeader];
             break;
-        case RNNativeStackSceneStatusDidBlur:
-            // detach header
-            [[self findHeader] detachViewController];
-            break;
         default:
             break;
     }
