@@ -44,10 +44,12 @@ public class SceneStackFragment extends SceneFragment {
 
         }
         mToolbar = toolbar;
-        AppBarLayout.LayoutParams params = new AppBarLayout.LayoutParams(
-                AppBarLayout.LayoutParams.MATCH_PARENT, AppBarLayout.LayoutParams.WRAP_CONTENT);
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
         params.setScrollFlags(0);
-        mToolbar.setLayoutParams(params);
+//        AppBarLayout.LayoutParams params = new AppBarLayout.LayoutParams(
+//                AppBarLayout.LayoutParams.MATCH_PARENT, AppBarLayout.LayoutParams.WRAP_CONTENT);
+//        params.setScrollFlags(0);
+//        mToolbar.setLayoutParams(params);
     }
 
 
