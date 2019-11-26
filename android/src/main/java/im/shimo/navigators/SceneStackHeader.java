@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.WindowManager;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
@@ -55,10 +58,11 @@ public class SceneStackHeader extends ViewGroup {
         if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
         }
+        Log.d(TAG, "SceneStackHeader() called with: actionBarSize = [" + actionBarHeight + "]");
 
         mToolbar = new Toolbar(context);
         mToolbar.setBackgroundColor(backBackgroundColor);
-        mToolbar.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, actionBarHeight));
+
         Activity activity = context.getCurrentActivity();
         if (activity != null) {
             int windowFlags = activity.getWindow().getAttributes().flags;
@@ -66,13 +70,12 @@ public class SceneStackHeader extends ViewGroup {
                     ((activity.getWindow().getDecorView().getSystemUiVisibility() & (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)) != 0))
                     || (windowFlags & WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0) {
-                if (getContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-                    int statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-                    mToolbar.setPadding(0, statusBarHeight, 0, 0);
-                }
+                int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+                int statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+                mToolbar.setPadding(0, statusBarHeight, 0, 0);
             }
         }
+        mToolbar.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, (actionBarHeight + mToolbar.getPaddingTop())));
 
         mBottomBorderView = new View(context);
         mBottomBorderView.setBackgroundColor(bottomBorderColor);
@@ -174,9 +177,9 @@ public class SceneStackHeader extends ViewGroup {
         }
 
 
-//        AppCompatActivity activity = (AppCompatActivity) getScreenFragment().getActivity();
-//        activity.setSupportActionBar(mToolbar);
-//        ActionBar actionBar = activity.getSupportActionBar();
+        AppCompatActivity activity = (AppCompatActivity) getScreenFragment().getActivity();
+        activity.setSupportActionBar(mToolbar);
+        ActionBar actionBar = activity.getSupportActionBar();
 
 
         mToolbar.setNavigationIcon(null);
