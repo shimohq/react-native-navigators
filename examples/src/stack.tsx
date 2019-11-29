@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Switch, Image } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
 import { createNativeNavigator, NativeNavigatorModes, NativeNavigatorTransitions } from 'react-native-navigators';
 
@@ -8,6 +8,7 @@ import styles from './styles';
 function StackIndex(props: NavigationInjectedProps) {
   return (
     <View style={styles.container}>
+      <Image source={require('./assets/ic_launcher.png')} />
       <TouchableOpacity
         onPress={() => props.navigation.navigate('stackHeaderBorderColor')}
       >
@@ -125,7 +126,7 @@ function Transition(props) {
   };
 
   return (
-    <View style={ styles.container }>
+    <View style={styles.container}>
       <TouchableOpacity
         onPress={() => push(NativeNavigatorTransitions.Default)}
       >

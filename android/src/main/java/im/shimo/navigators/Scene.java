@@ -29,27 +29,11 @@ import im.shimo.navigators.event.WillBlurEvent;
 import im.shimo.navigators.event.WillFocusEvent;
 
 @SuppressLint("ViewConstructor")
-public class Scene extends ViewGroup implements ReactPointerEventsView {
+public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresco {
     static final String TAG = "Scene";
-    private static int actionBarHeight;
+
     private TextView mFocusedView;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
-
-    public enum SceneStatus {
-        DID_BLUR,
-        WILL_BLUR,
-        DID_FOCUS,
-        WILL_FOCUS
-    }
-
-    public enum StackAnimation {
-        DEFAULT,
-        NONE,
-        SLIDE_FROM_TOP,
-        SLIDE_FROM_RIGHT,
-        SLIDE_FROM_BOTTOM,
-        SLIDE_FROM_LEFT
-    }
 
     private static OnAttachStateChangeListener sShowSoftKeyboardOnAttach = new OnAttachStateChangeListener() {
 
@@ -79,8 +63,29 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     private boolean mIsTranslucent = false;
 
-    private boolean mHasHeader = false;
+    private boolean mIsDisableSetVisibility = false;
 
+    @Override
+    public void disableSetVisibility() {
+        mIsDisableSetVisibility = true;
+    }
+
+    @Override
+    public void enableSetVisibility() {
+        mIsDisableSetVisibility = false;
+    }
+
+    @Override
+    public boolean isDisableSetVisibility() {
+        return mIsDisableSetVisibility;
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        if (!mIsDisableSetVisibility){
+            super.setVisibility(visibility);
+        }
+    }
 
     public Scene(ReactContext context) {
         super(context);
@@ -303,4 +308,24 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                 break;
         }
     }
+
+
+
+    public enum SceneStatus {
+        DID_BLUR,
+        WILL_BLUR,
+        DID_FOCUS,
+        WILL_FOCUS
+    }
+
+    public enum StackAnimation {
+        DEFAULT,
+        NONE,
+        SLIDE_FROM_TOP,
+        SLIDE_FROM_RIGHT,
+        SLIDE_FROM_BOTTOM,
+        SLIDE_FROM_LEFT
+    }
+
+
 }

@@ -2,6 +2,7 @@ package im.shimo.navigators;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Animation;
@@ -178,7 +179,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         if (!mNeedUpdate || !mIsAttached) {
             return;
         }
-        mNeedUpdate = false;
+
         onUpdate();
     }
 
@@ -199,21 +200,21 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
     protected void onUpdate() {
         final ArrayList<T> nextFragments = new ArrayList<>();
-        for (T fragment: mSceneFragments) {
+        for (T fragment : mSceneFragments) {
             if (!fragment.getScene().isClosing()) {
                 nextFragments.add(fragment);
             }
         }
 
         final ArrayList<T> removedFragments = new ArrayList<>();
-        for (T fragment: mStack) {
+        for (T fragment : mStack) {
             if (fragment.getScene().isClosing() || !mSceneFragments.contains(fragment)) {
                 removedFragments.add(fragment);
             }
         }
 
         ArrayList<T> insertedFragments = new ArrayList<>();
-        for (T fragment: nextFragments) {
+        for (T fragment : nextFragments) {
             if (!mStack.contains(fragment)) {
                 insertedFragments.add(fragment);
             }
@@ -249,6 +250,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         onPushEnd(nextFragments, removedFragments);
+                        mNeedUpdate = false;
                     }
 
                     @Override
@@ -268,6 +270,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         onPopEnd(nextFragments, removedFragments);
+                        mNeedUpdate = false;
                     }
 
                     @Override
@@ -300,6 +303,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                 tryCommitTransaction();
                 onPopEnd(nextFragments, removedFragments);
             }
+            mNeedUpdate = false;
         } else {
             tryCommitTransaction();
         }
@@ -312,7 +316,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
     }
 
     private void updateFragments(ArrayList<T> nextFragments) {
-        for (int index = 0, size = nextFragments.size(); index < size; index ++) {
+        for (int index = 0, size = nextFragments.size(); index < size; index++) {
             boolean show;
             if (index + 1 == size) {
                 show = true;
@@ -320,11 +324,15 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                 SceneFragment nextFragment = nextFragments.get(index + 1);
                 show = nextFragment.getScene().isTransparent();
             }
-            SceneFragment fragment = nextFragments.get(index);
+            final SceneFragment fragment = nextFragments.get(index);
             if (show && !fragment.isVisible()) {
                 getOrCreateTransaction().show(fragment);
             } else if (!show && fragment.isVisible()) {
                 getOrCreateTransaction().hide(fragment);
+                final View fixFresco = fragment.getView();
+                if (fixFresco instanceof FixFresco) {
+                    ((FixFresco) fixFresco).disableSetVisibility();
+                }
             }
         }
     }
@@ -369,7 +377,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
             T fragment = nextFragments.get(index);
             fragment.getScene().setStatus(Scene.SceneStatus.DID_BLUR);
         }
-        for (T fragment: removedFragments) {
+        for (T fragment : removedFragments) {
             fragment.getScene().setStatus(Scene.SceneStatus.DID_BLUR, true);
         }
     }
@@ -388,7 +396,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
             T fragment = nextFragments.get(index);
             fragment.getScene().setStatus(Scene.SceneStatus.WILL_BLUR);
         }
-        for (T fragment: removedFragments) {
+        for (T fragment : removedFragments) {
             fragment.getScene().setStatus(Scene.SceneStatus.WILL_BLUR);
         }
     }
