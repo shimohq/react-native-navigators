@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -74,6 +75,10 @@ public class SceneStackFragment extends SceneFragment {
         CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
+        ViewParent parent = mSceneView.getParent();
+        if (parent instanceof ViewGroup) {
+            ((ViewGroup)parent).removeView(mSceneView);
+        }
         mSceneView.setLayoutParams(params);
         view.addView(mSceneView);
         mAppBarLayout = new AppBarLayout(requireContext());
