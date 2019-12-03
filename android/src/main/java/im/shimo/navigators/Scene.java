@@ -64,6 +64,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     private boolean mIsTranslucent = false;
 
     private boolean mIsDisableSetVisibility = false;
+    private boolean mDismissed = false;
 
     @Override
     public void disableSetVisibility() {
@@ -82,7 +83,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
 
     @Override
     public void setVisibility(int visibility) {
-        if (!mIsDisableSetVisibility){
+        if (!mIsDisableSetVisibility) {
             super.setVisibility(visibility);
         }
     }
@@ -118,6 +119,9 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+
+        mDismissed = true;
+
         // This method implements a workaround for RN's autoFocus functionality. Because of the way
         // autoFocus is implemented it sometimes gets triggered before native text view is mounted. As
         // a result Android ignores calls for opening soft keyboard and here we trigger it manually
@@ -216,18 +220,16 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         setStatus(status, false);
     }
 
-    public void setStatus(SceneStatus status, boolean isDismissed) {
-        if (mStatus == status) {
-            return;
-        }
-        if (mStatus == SceneStatus.DID_BLUR && status == SceneStatus.WILL_BLUR) {
-            return;
-        }
-        if (mStatus == SceneStatus.DID_FOCUS && status == SceneStatus.WILL_FOCUS) {
+    public void setStatus(SceneStatus status, boolean dismissed) {
+        if (dismissed && status == SceneStatus.DID_BLUR && !mDismissed) {
+            mDismissed = true;
+        } else if (mStatus == status
+                || (mStatus == SceneStatus.DID_BLUR && status == SceneStatus.WILL_BLUR)
+                || (mStatus == SceneStatus.DID_FOCUS && status == SceneStatus.WILL_FOCUS)) {
             return;
         }
         mStatus = status;
-        sendEvent(status, isDismissed);
+        sendEvent(status, dismissed);
     }
 
     @Override
@@ -308,7 +310,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
                 break;
         }
     }
-
 
 
     public enum SceneStatus {
