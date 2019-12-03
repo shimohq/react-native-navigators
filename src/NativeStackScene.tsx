@@ -32,6 +32,7 @@ export default class NativeStackNavigator extends PureComponent<
   }
 
   private dismissed: boolean = false;
+  private closed: boolean = false;
 
   private onDidFocus = () => {
     if (!this.dismissed) {
@@ -52,10 +53,17 @@ export default class NativeStackNavigator extends PureComponent<
       transparent,
       transition,
       gestureEnabled,
-      closing,
       popover,
       style
     } = this.props;
+
+    let { closing } = this.props;
+    if (!this.closed && closing) {
+      this.closed = true;
+    } else if (this.closed && !closing) {
+      closing = true;
+    }
+
     return (
       <RNNativeStackScene
         translucent={translucent}
