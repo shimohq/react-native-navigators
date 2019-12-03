@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -22,7 +23,6 @@ public class SceneStackFragment extends SceneFragment {
 
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
-    private View mBottomLine;
 
     SceneStackFragment(Scene scene) {
         super(scene);
@@ -44,10 +44,8 @@ public class SceneStackFragment extends SceneFragment {
 
         }
         mToolbar = toolbar;
-        AppBarLayout.LayoutParams params = new AppBarLayout.LayoutParams(
-                AppBarLayout.LayoutParams.MATCH_PARENT, AppBarLayout.LayoutParams.WRAP_CONTENT);
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
         params.setScrollFlags(0);
-        mToolbar.setLayoutParams(params);
     }
 
 
@@ -73,10 +71,14 @@ public class SceneStackFragment extends SceneFragment {
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        CoordinatorLayout view = new CoordinatorLayout(requireContext());
+        SceneStackRootView view = new SceneStackRootView(requireContext());
         CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
+        ViewParent parent = mSceneView.getParent();
+        if (parent instanceof ViewGroup) {
+            ((ViewGroup)parent).removeView(mSceneView);
+        }
         mSceneView.setLayoutParams(params);
         view.addView(mSceneView);
         mAppBarLayout = new AppBarLayout(requireContext());

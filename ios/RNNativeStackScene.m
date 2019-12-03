@@ -21,6 +21,7 @@
     __weak RCTBridge *_bridge;
     RCTTouchHandler *_touchHandler;
     __weak UIView *_firstResponderView;
+    BOOL _dismissed;
 }
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge
@@ -31,6 +32,7 @@
         _closing = NO;
         _translucent = NO;
         _bridge = bridge;
+        _dismissed = NO;
         _controller = [[RNNativeStackController alloc] initWithScene:self];
         _controller.transitioningDelegate = self;
     }
@@ -95,6 +97,9 @@
 
 - (void)didMoveToWindow
 {
+    if (self.window) {
+        _dismissed = NO;
+    }
     // For RN touches to work we need to instantiate and connect RCTTouchHandler. This only applies
     // for screens that aren't mounted under RCTRootView e.g., modals that are mounted directly to
     // root application window.
@@ -195,18 +200,27 @@
 }
 
 - (void)setStatus:(RNNativeStackSceneStatus)status {
-    if (_status == status) {
-        return;
+    BOOL dismissed = false;
+    if (status == RNNativeStackSceneStatusDidBlur && !_dismissed) {
+        dismissed = [_delegate isDismissedForScene:self];
+        _dismissed = dismissed;
     }
-    if (_status == RNNativeStackSceneStatusDidBlur && status == RNNativeStackSceneStatusWillBlur) {
-        return;
+    BOOL statusChanged = _status != status
+    && !(_status == RNNativeStackSceneStatusDidBlur && status == RNNativeStackSceneStatusWillBlur)
+    && !(_status == RNNativeStackSceneStatusDidFocus && status == RNNativeStackSceneStatusWillFocus);
+    if (statusChanged) {
+        _status = status;
+        [_controller updateForStatus:status];
     }
-    if (_status == RNNativeStackSceneStatusDidFocus && status == RNNativeStackSceneStatusWillFocus) {
-        return;
+    if (statusChanged || dismissed) {
+        [self sendStatus:_status andDismissed:dismissed];
     }
-    _status = status;
-    [_controller updateForStatus:status];
-    switch (_status) {
+}
+
+#pragma mark - Private
+
+- (void)sendStatus:(RNNativeStackSceneStatus)status andDismissed:(BOOL)dismissed {
+    switch (status) {
         case RNNativeStackSceneStatusWillFocus:
             if (_onWillFocus) {
                 _onWillFocus(nil);
@@ -225,7 +239,7 @@
         case RNNativeStackSceneStatusDidBlur:
             if (_onDidBlur) {
                 _onDidBlur(@{
-                    @"dismissed": @([_delegate isDismissedForScene:self])
+                    @"dismissed": @(dismissed)
                 });
             }
             break;
@@ -233,8 +247,6 @@
             break;
     }
 }
-
-#pragma mark - Private
 
 - (BOOL)isMountedUnderScreenOrReactRoot
 {

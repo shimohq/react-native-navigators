@@ -77,6 +77,7 @@
 @property (nonatomic, copy) RCTDirectEventBlock onDidBlur;
 
 @property (nonatomic, assign) RNNativeStackSceneStatus status;
+@property (nonatomic, assign) BOOL dismissed;
 @property (nonatomic, weak) id<RNNativeStackSceneDelegate> delegate;
 @property (nonatomic, strong, readonly) RNNativeStackController *controller;
 @property (nonatomic, strong, readonly) RNNativePopoverParams *popoverParams;

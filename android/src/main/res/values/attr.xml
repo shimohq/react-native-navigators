@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <attr name="scene" format="reference" />
+
     <attr name="headerBorderColor" format="color|reference" />
     <attr name="headerBackgroundColor" format="color|reference" />
     <attr name="headerBorderSize" format="dimension" />
 
-    <attr name="scene" format="reference" />
 
 
     <!--    <style name="Scene">-->
@@ -13,5 +15,5 @@
 
     <!--    </style>-->
 
-
+    <integer name="sceneAnimDuration">300</integer>
 </resources>

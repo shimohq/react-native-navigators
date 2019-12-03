@@ -3,6 +3,7 @@
     <translate
         android:fromYDelta="0"
         android:toYDelta="100%p"
-        android:duration="300"
+        android:duration="@integer/sceneAnimDuration"
+        android:interpolator="@android:anim/accelerate_interpolator"
         />
 </set>

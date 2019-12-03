@@ -29,27 +29,11 @@ import im.shimo.navigators.event.WillBlurEvent;
 import im.shimo.navigators.event.WillFocusEvent;
 
 @SuppressLint("ViewConstructor")
-public class Scene extends ViewGroup implements ReactPointerEventsView {
+public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresco {
     static final String TAG = "Scene";
-    private static int actionBarHeight;
+
     private TextView mFocusedView;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
-
-    public enum SceneStatus {
-        DID_BLUR,
-        WILL_BLUR,
-        DID_FOCUS,
-        WILL_FOCUS
-    }
-
-    public enum StackAnimation {
-        DEFAULT,
-        NONE,
-        SLIDE_FROM_TOP,
-        SLIDE_FROM_RIGHT,
-        SLIDE_FROM_BOTTOM,
-        SLIDE_FROM_LEFT
-    }
 
     private static OnAttachStateChangeListener sShowSoftKeyboardOnAttach = new OnAttachStateChangeListener() {
 
@@ -79,8 +63,30 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     private boolean mIsTranslucent = false;
 
-    private boolean mHasHeader = false;
+    private boolean mIsDisableSetVisibility = false;
+    private boolean mDismissed = false;
 
+    @Override
+    public void disableSetVisibility() {
+        mIsDisableSetVisibility = true;
+    }
+
+    @Override
+    public void enableSetVisibility() {
+        mIsDisableSetVisibility = false;
+    }
+
+    @Override
+    public boolean isDisableSetVisibility() {
+        return mIsDisableSetVisibility;
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        if (!mIsDisableSetVisibility) {
+            super.setVisibility(visibility);
+        }
+    }
 
     public Scene(ReactContext context) {
         super(context);
@@ -113,6 +119,9 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+
+        mDismissed = true;
+
         // This method implements a workaround for RN's autoFocus functionality. Because of the way
         // autoFocus is implemented it sometimes gets triggered before native text view is mounted. As
         // a result Android ignores calls for opening soft keyboard and here we trigger it manually
@@ -211,18 +220,16 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         setStatus(status, false);
     }
 
-    public void setStatus(SceneStatus status, boolean isDismissed) {
-        if (mStatus == status) {
-            return;
-        }
-        if (mStatus == SceneStatus.DID_BLUR && status == SceneStatus.WILL_BLUR) {
-            return;
-        }
-        if (mStatus == SceneStatus.DID_FOCUS && status == SceneStatus.WILL_FOCUS) {
+    public void setStatus(SceneStatus status, boolean dismissed) {
+        if (dismissed && status == SceneStatus.DID_BLUR && !mDismissed) {
+            mDismissed = true;
+        } else if (mStatus == status
+                || (mStatus == SceneStatus.DID_BLUR && status == SceneStatus.WILL_BLUR)
+                || (mStatus == SceneStatus.DID_FOCUS && status == SceneStatus.WILL_FOCUS)) {
             return;
         }
         mStatus = status;
-        sendEvent(status, isDismissed);
+        sendEvent(status, dismissed);
     }
 
     @Override
@@ -303,4 +310,23 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                 break;
         }
     }
+
+
+    public enum SceneStatus {
+        DID_BLUR,
+        WILL_BLUR,
+        DID_FOCUS,
+        WILL_FOCUS
+    }
+
+    public enum StackAnimation {
+        DEFAULT,
+        NONE,
+        SLIDE_FROM_TOP,
+        SLIDE_FROM_RIGHT,
+        SLIDE_FROM_BOTTOM,
+        SLIDE_FROM_LEFT
+    }
+
+
 }
