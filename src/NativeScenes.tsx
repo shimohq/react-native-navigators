@@ -20,35 +20,36 @@ export interface NativeScenesProps extends NavigationInjectedProps {
   headerMode?: NativeNavigatorHeaderModes;
   descriptors: NativeNavigationDescriptorMap;
   screenProps?: any;
-  onTransitionComplete: (route: NavigationRoute) => void;
+  onOpenRoute: (route: NavigationRoute) => void;
+  onCloseRoute: (route: NavigationRoute) => void;
   onDismissRoute: (route: NavigationRoute) => void;
+  closingRouteKey: string | null;
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
   private handleDidFocus = (route: NavigationRoute) => {
-    this.props.onTransitionComplete(route);
+    this.props.onOpenRoute(route);
   };
 
   private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
+    // If the scene has been removed from native side.
     if (dismissed) {
-      this.props.onDismissRoute(route);
-    } else {
-      this.props.onTransitionComplete(route);
+      if (this.props.closingRouteKey === route.key) {
+        // Handle close transition complete.
+        this.props.onCloseRoute(route);
+      } else {
+        // Handle dismiss from native side.
+        this.props.onDismissRoute(route);
+      }
     }
   };
 
-
   public render() {
-    const {
-      routes,
-      descriptors,
-      screenProps,
-      mode
-    } = this.props;
+    const { routes, descriptors, screenProps, mode } = this.props;
 
     return (
       <>
-        {routes.map((route) => {
+        {routes.map(route => {
           const { key } = route;
           const descriptor = descriptors[key];
 
@@ -73,7 +74,9 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
           return (
             <NativeStackScene
               key={key}
-              transition={options.transition || NativeNavigatorTransitions.Default}
+              transition={
+                options.transition || NativeNavigatorTransitions.Default
+              }
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               transparent={options.transparent === true}
