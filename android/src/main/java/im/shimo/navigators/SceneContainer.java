@@ -2,6 +2,7 @@ package im.shimo.navigators;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -35,14 +36,16 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
     @Nullable
     private FragmentTransaction mCurrentTransaction;
 
-    private boolean mNeedUpdate;
+    private boolean mNeedUpdate =true;
     private boolean mIsAttached;
     private boolean mLayoutEnqueued = false;
+    private boolean mIsPostingFrame;
 
     private ChoreographerCompat.FrameCallback mFrameCallback = new ChoreographerCompat.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {
             updateIfNeeded();
+            mIsPostingFrame = false;
         }
     };
 
@@ -88,12 +91,14 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
     @SuppressWarnings("unchecked")
     protected T adapt(Scene scene) {
-        return (T) new SceneFragment(scene);
+        SceneFragment sceneFragment = new SceneFragment();
+        sceneFragment.setSceneView(scene);
+        return (T) sceneFragment;
     }
 
     protected void markUpdated() {
-        if (!mNeedUpdate) {
-            mNeedUpdate = true;
+        if (!mIsPostingFrame) {
+            mIsPostingFrame = true;
             // enqueue callback of NATIVE_ANIMATED_MODULE type as all view operations are executed in
             // DISPATCH_UI type and we want the callback to be called right after in the same frame.
             ReactChoreographer.getInstance().postFrameCallback(
@@ -139,6 +144,19 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         return mSceneFragments.get(index).getScene();
     }
 
+
+    @Nullable
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        return super.onSaveInstanceState();
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(state);
+
+    }
 
     protected final FragmentActivity findRootFragmentActivity() {
         ViewParent parent = this;
@@ -217,11 +235,11 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
     }
 
     private void updateIfNeeded() {
-        if (!mNeedUpdate || !mIsAttached) {
-            return;
+
+        if (mNeedUpdate && mIsAttached){
+            onUpdate();
         }
 
-        onUpdate();
     }
 
     public Scene getRootScreen() {
@@ -240,6 +258,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
     }
 
     protected void onUpdate() {
+        mNeedUpdate = false;
         final ArrayList<T> nextFragments = new ArrayList<>();
         for (T fragment : mSceneFragments) {
             if (!fragment.getScene().isClosing()) {
@@ -291,7 +310,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         onPushEnd(nextFragments, removedFragments);
-                        mNeedUpdate = false;
+                        mNeedUpdate = true;
                     }
 
                     @Override
@@ -311,7 +330,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         onPopEnd(nextFragments, removedFragments);
-                        mNeedUpdate = false;
+                        mNeedUpdate = true;
                     }
 
                     @Override
@@ -344,7 +363,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
                 tryCommitTransaction();
                 onPopEnd(nextFragments, removedFragments);
             }
-            mNeedUpdate = false;
+            mNeedUpdate = true;
         } else {
             tryCommitTransaction();
         }

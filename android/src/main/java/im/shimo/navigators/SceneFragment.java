@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -25,8 +27,12 @@ public class SceneFragment extends Fragment {
     private Animation.AnimationListener mAnimationListener;
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private long duration ;
-    private SceneFragment() {
+
+    public SceneFragment() {
+        Log.d(TAG, "SceneFragment() called");
     }
+
+
 
     @SuppressLint("ValidFragment")
     SceneFragment(Scene scene) {
@@ -44,6 +50,9 @@ public class SceneFragment extends Fragment {
         return mSceneView;
     }
 
+    public void setSceneView(Scene sceneView) {
+        mSceneView = sceneView;
+    }
 
     @Nullable
     @Override
@@ -60,6 +69,16 @@ public class SceneFragment extends Fragment {
 
     public void setAnimationListener(Animation.AnimationListener animationListener) {
         mAnimationListener = animationListener;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override

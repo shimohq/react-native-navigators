@@ -13,7 +13,9 @@ public class SceneStack extends SceneContainer<SceneStackFragment> {
 
     @Override
     protected SceneStackFragment adapt(Scene scene) {
-        return new SceneStackFragment(scene);
+        SceneStackFragment fragment = new SceneStackFragment();
+        fragment.setSceneView(scene);
+        return fragment;
     }
 
     @Override

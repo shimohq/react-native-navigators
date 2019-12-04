@@ -3,6 +3,7 @@ package im.shimo.navigators;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +25,8 @@ public class SceneStackFragment extends SceneFragment {
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
 
-    SceneStackFragment(Scene scene) {
-        super(scene);
+    SceneStackFragment() {
+        Log.d("SceneStackFragment", "SceneFragment() called");
     }
 
     public void removeToolbar() {
