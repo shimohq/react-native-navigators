@@ -77,6 +77,7 @@
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
+    [super insertReactSubview:subview atIndex:atIndex];
     if (![subview isKindOfClass:[RNNativeStackScene class]]) {
         return;
     }
@@ -89,6 +90,7 @@
 
 - (void)removeReactSubview:(UIView *)subview
 {
+    [super removeReactSubview:subview];
     if (![subview isKindOfClass:[RNNativeStackScene class]]) {
         return;
     }
@@ -99,11 +101,6 @@
 - (void)didUpdateReactSubviews
 {
     // do nothing
-}
-
-- (NSArray<UIView *> *)reactSubviews
-{
-  return _nextScenes;
 }
 
 #pragma mark - Setting
