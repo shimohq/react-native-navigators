@@ -19,47 +19,36 @@ export interface NativeScenesProps extends NavigationInjectedProps {
   mode: NativeNavigatorModes;
   headerMode?: NativeNavigatorHeaderModes;
   descriptors: NativeNavigationDescriptorMap;
-  closingRouteKeys: string[];
-  replacingRouteKeys: string[];
   screenProps?: any;
-  onOpenRoute: (route: NavigationRoute) => void;
-  onCloseRoute: (route: NavigationRoute) => void;
+  onTransitionComplete: (route: NavigationRoute) => void;
   onDismissRoute: (route: NavigationRoute) => void;
-  transitionEnabled: boolean;
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
   private handleDidFocus = (route: NavigationRoute) => {
-    this.props.onOpenRoute(route);
+    this.props.onTransitionComplete(route);
   };
 
   private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
     if (dismissed) {
-      if (this.isClosing(route.key)) {
-        this.props.onCloseRoute(route);
-      } else {
-        this.props.onDismissRoute(route);
-      }
+      this.props.onDismissRoute(route);
+    } else {
+      this.props.onTransitionComplete(route);
     }
   };
 
-  private isClosing = (key: string) => {
-    const { closingRouteKeys, replacingRouteKeys } = this.props;
-    return closingRouteKeys.includes(key) || replacingRouteKeys.includes(key);
-  };
 
   public render() {
     const {
       routes,
       descriptors,
       screenProps,
-      mode,
-      transitionEnabled
+      mode
     } = this.props;
 
     return (
       <>
-        {routes.map((route, index) => {
+        {routes.map((route) => {
           const { key } = route;
           const descriptor = descriptors[key];
 
@@ -68,13 +57,6 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
           }
 
           const { options, navigation } = descriptor;
-
-          let transition = NativeNavigatorTransitions.None;
-
-          if (transitionEnabled && routes.length - 1 === index) {
-            transition =
-              options.transition || NativeNavigatorTransitions.Default;
-          }
 
           let headerMode = options.headerHidden
             ? NativeNavigatorHeaderModes.None
@@ -91,11 +73,10 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
           return (
             <NativeStackScene
               key={key}
-              transition={transition}
+              transition={options.transition || NativeNavigatorTransitions.Default}
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               transparent={options.transparent === true}
-              closing={this.isClosing(key)}
               popover={options.popover}
               onDidFocus={this.handleDidFocus}
               onDidBlur={this.handleDidBlur}

@@ -10,7 +10,6 @@ import { NavigationRoute } from 'react-navigation';
 import { NativeNavigatorTransitions, NativeNavigationPopover } from './types';
 
 interface NativeStackNavigatorProps {
-  closing: boolean;
   translucent: boolean;
   transparent: boolean;
   transition: NativeNavigatorTransitions;
@@ -25,26 +24,12 @@ interface NativeStackNavigatorProps {
 export default class NativeStackNavigator extends PureComponent<
   NativeStackNavigatorProps
 > {
-  public componentWillUnmount() {
-    if (!this.dismissed) {
-      this.props.onDidBlur(this.props.route, true);
-    }
-  }
-
-  private dismissed: boolean = false;
-  private closed: boolean = false;
-
   private onDidFocus = () => {
-    if (!this.dismissed) {
-      this.props.onDidFocus(this.props.route);
-    }
+    this.props.onDidFocus(this.props.route);
   };
 
   private onDidBlur = (event: { nativeEvent: { dismissed: boolean } }) => {
-    if (!this.dismissed) {
-      this.props.onDidBlur(this.props.route, event.nativeEvent.dismissed);
-      this.dismissed = event.nativeEvent.dismissed;
-    }
+    this.props.onDidBlur(this.props.route, event.nativeEvent.dismissed);
   };
 
   public render() {
@@ -57,20 +42,12 @@ export default class NativeStackNavigator extends PureComponent<
       style
     } = this.props;
 
-    let { closing } = this.props;
-    if (!this.closed && closing) {
-      this.closed = true;
-    } else if (this.closed && !closing) {
-      closing = true;
-    }
-
     return (
       <RNNativeStackScene
         translucent={translucent}
         transparent={transparent}
         transition={transition}
         gestureEnabled={gestureEnabled}
-        closing={closing}
         popover={popover}
         onDidFocus={this.onDidFocus}
         onDidBlur={this.onDidBlur}
