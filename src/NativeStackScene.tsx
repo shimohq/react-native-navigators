@@ -10,6 +10,7 @@ import { NavigationRoute } from 'react-navigation';
 import { NativeNavigatorTransitions, NativeNavigationPopover } from './types';
 
 interface NativeStackNavigatorProps {
+  closing: boolean;
   translucent: boolean;
   transparent: boolean;
   transition: NativeNavigatorTransitions;
@@ -44,6 +45,7 @@ export default class NativeStackNavigator extends PureComponent<
 
   public render() {
     const {
+      closing,
       translucent,
       transparent,
       transition,
@@ -54,6 +56,7 @@ export default class NativeStackNavigator extends PureComponent<
 
     return (
       <RNNativeStackScene
+        closing={closing}
         translucent={translucent}
         transparent={transparent}
         transition={transition}

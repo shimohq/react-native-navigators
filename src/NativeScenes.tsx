@@ -45,7 +45,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
   };
 
   public render() {
-    const { routes, descriptors, screenProps, mode } = this.props;
+    const { routes, descriptors, screenProps, mode, closingRouteKey } = this.props;
 
     return (
       <>
@@ -77,6 +77,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               transition={
                 options.transition || NativeNavigatorTransitions.Default
               }
+              closing={closingRouteKey === route.key}
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               transparent={options.transparent === true}
