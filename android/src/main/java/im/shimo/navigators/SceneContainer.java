@@ -37,6 +37,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
     private boolean mNeedUpdate;
     private boolean mIsAttached;
+    private boolean mLayoutEnqueued = false;
 
     private ChoreographerCompat.FrameCallback mFrameCallback = new ChoreographerCompat.FrameCallback() {
         @Override
@@ -49,9 +50,40 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         super(context);
     }
 
+
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        // no-op
+        for (int i = 0, size = getChildCount(); i < size; i++) {
+            getChildAt(i).layout(0, 0, getWidth(), getHeight());
+        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        for (int i = 0, size = getChildCount(); i < size; i++) {
+            getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+
+
+    private final Runnable mLayoutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mLayoutEnqueued = false;
+            measure(MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
+            layout(getLeft(), getTop(), getRight(), getBottom());
+        }
+    };
+
+    @Override
+    public void requestLayout() {
+        super.requestLayout();
+        if (!mLayoutEnqueued) {
+            mLayoutEnqueued = true;
+            post(mLayoutRunnable);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -76,6 +108,15 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
 
     protected void addScene(Scene scene, int index) {
+        LayoutParams layoutParams = scene.getLayoutParams();
+        if (layoutParams == null) {
+            layoutParams = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            scene.setLayoutParams(layoutParams);
+        } else {
+            layoutParams.width = LayoutParams.MATCH_PARENT;
+            layoutParams.height = LayoutParams.MATCH_PARENT;
+        }
+
         T fragment = adapt(scene);
         scene.setFragment(fragment);
         mSceneFragments.add(index, fragment);
