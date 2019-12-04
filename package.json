@@ -50,7 +50,7 @@
     "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
     "react-navigation": "^4.0.10",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.3"
   },
   "peerDependencies": {
     "react-navigation": ">=4.0.0"
