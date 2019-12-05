@@ -18,6 +18,7 @@ interface NativeStackScenesState {
   routes: NavigationRoute[];
   closingRouteKey: string | null;
   descriptors: NativeNavigationDescriptorMap;
+  screenProps: unknown;
 }
 
 export default class NativeNavigators extends PureComponent<
@@ -27,9 +28,9 @@ export default class NativeNavigators extends PureComponent<
     props: Readonly<NativeNavigatorsProps>,
     state: Readonly<NativeStackScenesState>
   ): NativeStackScenesState | null {
-    const { navigation } = props;
+    const { navigation, screenProps } = props;
 
-    if (navigation.state.routes === state.propRoutes && state.routes.length) {
+    if (navigation.state.routes === state.propRoutes && screenProps === state.screenProps && state.routes.length) {
       return null;
     }
 
@@ -73,7 +74,8 @@ export default class NativeNavigators extends PureComponent<
       descriptors,
       closingRouteKey,
       routes,
-      propRoutes: navigation.state.routes
+      propRoutes: navigation.state.routes,
+      screenProps
     };
   }
 
@@ -81,7 +83,8 @@ export default class NativeNavigators extends PureComponent<
     propRoutes: [],
     routes: [],
     closingRouteKey: null,
-    descriptors: {}
+    descriptors: {},
+    screenProps: undefined
   };
 
   private handleOpenRoute = (route: NavigationRoute) => {
@@ -124,10 +127,9 @@ export default class NativeNavigators extends PureComponent<
   public render() {
     const {
       navigation,
-      navigationConfig,
-      screenProps
+      navigationConfig
     } = this.props;
-    const { closingRouteKey, routes, descriptors } = this.state;
+    const { closingRouteKey, routes, descriptors, screenProps } = this.state;
     const mode: NativeNavigatorModes =
       navigationConfig.mode || NativeNavigatorModes.Modal;
 
