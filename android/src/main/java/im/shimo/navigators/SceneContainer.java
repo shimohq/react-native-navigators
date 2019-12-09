@@ -212,7 +212,7 @@ public abstract class SceneContainer extends ViewGroup {
     public Scene getRootScreen() {
         for (int i = 0, size = getSceneCount(); i < size; i++) {
             Scene scene = getSceneAt(i);
-            if (!mDismissed.contains(scene.getFragment())) {
+            if (!mDismissed.contains(scene)) {
                 return scene;
             }
         }

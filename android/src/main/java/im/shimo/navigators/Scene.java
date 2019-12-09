@@ -52,7 +52,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         }
     };
 
-    private SceneModel mFragment;
 
     @Nullable
     private SceneContainer mContainer;
@@ -105,7 +104,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mHasHeader = false;
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
@@ -114,9 +112,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
 
     }
 
-    public boolean hasHeader() {
-        return mHasHeader;
-    }
 
     private void measureActionBar(View child) {
         int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
@@ -293,13 +288,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         mContainer = container;
     }
 
-    protected <T extends SceneModel> void setFragment(T fragment) {
-        this.mFragment = fragment;
-    }
-
-    protected SceneModel getFragment() {
-        return this.mFragment;
-    }
 
 
     @Nullable
