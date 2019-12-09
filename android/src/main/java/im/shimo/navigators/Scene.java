@@ -29,7 +29,7 @@ import im.shimo.navigators.event.WillBlurEvent;
 import im.shimo.navigators.event.WillFocusEvent;
 
 @SuppressLint("ViewConstructor")
-public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresco {
+public class Scene extends ViewGroup implements ReactPointerEventsView {
     static final String TAG = "Scene";
     private static int actionBarHeight;
     private TextView mFocusedView;
@@ -60,31 +60,9 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     private boolean mIsTransparent = false;
     private StackAnimation mStackAnimation = StackAnimation.DEFAULT;
 
-    private boolean mIsDisableSetVisibility = false;
     private boolean mDismissed = false;
     private boolean mHasHeader = false;
 
-    @Override
-    public void disableSetVisibility() {
-        mIsDisableSetVisibility = true;
-    }
-
-    @Override
-    public void enableSetVisibility() {
-        mIsDisableSetVisibility = false;
-    }
-
-    @Override
-    public boolean isDisableSetVisibility() {
-        return mIsDisableSetVisibility;
-    }
-
-    @Override
-    public void setVisibility(int visibility) {
-        if (!mIsDisableSetVisibility) {
-            super.setVisibility(visibility);
-        }
-    }
 
     public Scene(ReactContext context) {
         super(context);
@@ -287,7 +265,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     protected void setContainer(@Nullable SceneContainer container) {
         mContainer = container;
     }
-
 
 
     @Nullable

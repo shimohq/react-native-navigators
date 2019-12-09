@@ -287,6 +287,7 @@ public abstract class SceneContainer extends ViewGroup {
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
+                            updateFragments(nextFragments);
                             onPushEnd(nextFragments, removedFragments);
                             mNeedUpdate = true;
                         }
@@ -317,6 +318,7 @@ public abstract class SceneContainer extends ViewGroup {
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
+                            updateFragments(nextFragments);
                             onPopEnd(nextFragments, removedFragments);
                             mNeedUpdate = true;
                         }
@@ -338,7 +340,7 @@ public abstract class SceneContainer extends ViewGroup {
         removeFragments(removedFragments);
 
         // update
-        updateFragments(nextFragments);
+
 
         mStack.clear();
         mStack.addAll(nextFragments);
@@ -351,7 +353,7 @@ public abstract class SceneContainer extends ViewGroup {
                 onPopStart(nextFragments, removedFragments);
                 onPopEnd(nextFragments, removedFragments);
             }
-
+            updateFragments(nextFragments);
             mNeedUpdate = true;
         } else {
 

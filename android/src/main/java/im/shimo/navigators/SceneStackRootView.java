@@ -9,7 +9,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
  * Created by jiang on 2019-11-28
  */
 
-public class SceneStackRootView extends CoordinatorLayout implements FixFresco {
+public class SceneStackRootView extends CoordinatorLayout {
 
     private Scene mScene;
 
@@ -20,29 +20,7 @@ public class SceneStackRootView extends CoordinatorLayout implements FixFresco {
     }
 
 
-    private boolean mIsDisableSetVisibility = false;
 
-    @Override
-    public void disableSetVisibility() {
-        mIsDisableSetVisibility = true;
-    }
-
-    @Override
-    public void enableSetVisibility() {
-        mIsDisableSetVisibility = false;
-    }
-
-    @Override
-    public boolean isDisableSetVisibility() {
-        return mIsDisableSetVisibility;
-    }
-
-    @Override
-    public void setVisibility(int visibility) {
-        if (!mIsDisableSetVisibility){
-            super.setVisibility(visibility);
-        }
-    }
 
     public Scene getScene() {
         return mScene;
