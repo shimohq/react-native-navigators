@@ -37,6 +37,7 @@ public abstract class SceneContainer extends ViewGroup {
     private FragmentTransaction mCurrentTransaction;
 
     private boolean mNeedUpdate = true;
+    private boolean mNeedUpdateOnAnimEnd = false;
     private boolean mIsAttached;
     private boolean mLayoutEnqueued = false;
     private boolean mIsPostingFrame;
@@ -204,8 +205,11 @@ public abstract class SceneContainer extends ViewGroup {
     }
 
     private void updateIfNeeded() {
-        if (mNeedUpdate && mIsAttached) {
+        if (!mIsAttached) return;
+        if (mNeedUpdate) {
             onUpdate();
+        } else {
+            mNeedUpdateOnAnimEnd = true;
         }
     }
 
@@ -290,6 +294,10 @@ public abstract class SceneContainer extends ViewGroup {
                             updateFragments(nextFragments);
                             onPushEnd(nextFragments, removedFragments);
                             mNeedUpdate = true;
+                            if (mNeedUpdateOnAnimEnd) {
+                                mNeedUpdateOnAnimEnd = false;
+                                markUpdated();
+                            }
                         }
 
                         @Override
@@ -321,6 +329,10 @@ public abstract class SceneContainer extends ViewGroup {
                             updateFragments(nextFragments);
                             onPopEnd(nextFragments, removedFragments);
                             mNeedUpdate = true;
+                            if (mNeedUpdateOnAnimEnd) {
+                                mNeedUpdateOnAnimEnd = false;
+                                markUpdated();
+                            }
                         }
 
                         @Override
