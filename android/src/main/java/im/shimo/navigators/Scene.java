@@ -61,8 +61,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     private boolean mIsTransparent = false;
     private StackAnimation mStackAnimation = StackAnimation.DEFAULT;
 
-    private boolean mIsTranslucent = false;
-
     private boolean mIsDisableSetVisibility = false;
     private boolean mDismissed = false;
     private boolean mHasHeader = false;
@@ -111,12 +109,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
-            if (child instanceof SceneStackHeader) {
-                measureActionBar(child);
-                mHasHeader = true;
-            } else {
-                measureChild(child);
-            }
+            measureChild(child);
         }
 
     }
@@ -145,15 +138,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int top = 0;
-        for (int i = 0, size = getChildCount(); i < size; i++) {
-            View child = getChildAt(i);
-            if (child instanceof SceneStackHeader) {
-                child.layout(0, 0, getWidth(), actionBarHeight);
-            } else {
-                top = mHasHeader && !mIsTranslucent ? actionBarHeight : 0;
-                child.layout(0, top, getWidth(), getHeight());
-            }
-        }
         if (changed) {
             final int width = r - l;
             final int height = b - t - top;
@@ -334,21 +318,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
 
     public boolean isClosing() {
         return mClosing;
-    }
-
-    public void setTranslucent(boolean translucent) {
-        if (mIsTranslucent == translucent) {
-            return;
-        }
-        for (int i = 0, size = getChildCount(); i < size; i++) {
-            View child = getChildAt(i);
-            if (child instanceof SceneStackHeader) {
-                child.setAlpha(translucent ? 0.5f : 1f);
-                break;
-            }
-        }
-        mIsTranslucent = translucent;
-        requestLayout();
     }
 
     private void sendEvent(SceneStatus status, boolean isDismissed) {

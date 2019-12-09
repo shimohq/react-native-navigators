@@ -13,6 +13,7 @@ import {
 } from './types';
 import NativeStackScene from './NativeStackScene';
 import NativeHeader from './NativeHeader';
+import NativeStackSceneContainer from './NativeStackSceneContainer';
 
 export interface NativeScenesProps extends NavigationInjectedProps {
   routes: NavigationRoute[];
@@ -87,14 +88,16 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               route={route}
               style={options.cardStyle}
             >
-              <SceneView
-                screenProps={screenProps}
-                navigation={navigation}
-                component={SceneComponent}
-              />
-              {headerMode === NativeNavigatorHeaderModes.Auto ? (
-                <NativeHeader descriptor={descriptor} route={route} />
-              ) : null}
+              <NativeStackSceneContainer>
+                {headerMode === NativeNavigatorHeaderModes.Auto ? (
+                  <NativeHeader descriptor={descriptor} route={route} />
+                ) : null}
+                <SceneView
+                  screenProps={screenProps}
+                  navigation={navigation}
+                  component={SceneComponent}
+                />
+              </NativeStackSceneContainer>
             </NativeStackScene>
           );
         })}

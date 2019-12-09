@@ -94,18 +94,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
     }
 
     /**
-     * 导航条是否沉浸
-     *
-     * @param view
-     * @param isTranslucent
-     */
-    @ReactProp(name = "translucent")
-    public void translucent(Scene view, boolean isTranslucent) {
-        view.setTranslucent(isTranslucent);
-    }
-
-
-    /**
      * 是否透明
      * <p>
      * YES:  scene 显示之后下层的 scene 不会移除。
