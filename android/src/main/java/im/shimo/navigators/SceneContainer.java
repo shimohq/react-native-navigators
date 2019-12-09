@@ -3,10 +3,10 @@ package im.shimo.navigators;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Parcelable;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -24,19 +24,19 @@ import java.util.Set;
  * Created by jiang on 2019-11-06
  */
 
-public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup {
+public abstract class SceneContainer extends ViewGroup {
 
     private static final String TAG = "SceneContainer";
-    protected final ArrayList<T> mSceneFragments = new ArrayList<>();
-    protected final ArrayList<T> mStack = new ArrayList<>();
+    protected final ArrayList<Scene> mSceneFragments = new ArrayList<>();
+    protected final ArrayList<Scene> mStack = new ArrayList<>();
 
-    protected final Set<SceneFragment> mDismissed = new HashSet<>();
+    protected final Set<Scene> mDismissed = new HashSet<>();
 
 
     @Nullable
     private FragmentTransaction mCurrentTransaction;
 
-    private boolean mNeedUpdate =true;
+    private boolean mNeedUpdate = true;
     private boolean mIsAttached;
     private boolean mLayoutEnqueued = false;
     private boolean mIsPostingFrame;
@@ -89,12 +89,12 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected T adapt(Scene scene) {
-        SceneFragment sceneFragment = new SceneFragment();
-        sceneFragment.setSceneView(scene);
-        return (T) sceneFragment;
-    }
+//    @SuppressWarnings("unchecked")
+//    protected T adapt(Scene scene) {
+//        SceneFragment sceneFragment = new SceneFragment();
+//        sceneFragment.setSceneView(scene);
+//        return (T) sceneFragment;
+//    }
 
     protected void markUpdated() {
         if (!mIsPostingFrame) {
@@ -113,24 +113,14 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
 
     protected void addScene(Scene scene, int index) {
-        LayoutParams layoutParams = scene.getLayoutParams();
-        if (layoutParams == null) {
-            layoutParams = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-            scene.setLayoutParams(layoutParams);
-        } else {
-            layoutParams.width = LayoutParams.MATCH_PARENT;
-            layoutParams.height = LayoutParams.MATCH_PARENT;
-        }
-
-        T fragment = adapt(scene);
-        scene.setFragment(fragment);
-        mSceneFragments.add(index, fragment);
+//        addView(scene, index);
+        mSceneFragments.add(index, scene);
         scene.setContainer(this);
         markUpdated();
     }
 
     protected void removeSceneAt(int index) {
-        mSceneFragments.get(index).getScene().setContainer(null);
+        mSceneFragments.get(index).setContainer(null);
         mSceneFragments.remove(index);
         markUpdated();
     }
@@ -141,7 +131,7 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
 
     protected Scene getSceneAt(int index) {
-        return mSceneFragments.get(index).getScene();
+        return mSceneFragments.get(index);
     }
 
 
@@ -200,27 +190,6 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         }
     }
 
-    private void attachScreen(SceneFragment sceneFragment) {
-        getOrCreateTransaction().add(getId(), sceneFragment);
-//        mActiveScreenFragments.add(sceneFragment);
-    }
-
-    private void moveToFront(SceneFragment screenFragment) {
-        FragmentTransaction transaction = getOrCreateTransaction();
-        transaction.remove(screenFragment);
-        transaction.add(getId(), screenFragment);
-    }
-
-    private void detachScreen(SceneFragment screenFragment) {
-        getOrCreateTransaction().remove(screenFragment);
-//        mActiveScreenFragments.remove(screenFragment);
-    }
-
-//    protected boolean isScreenActive(SceneFragment screenFragment) {
-//        return screenFragment.getScene().isActive();
-//    }
-
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -235,11 +204,9 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
     }
 
     private void updateIfNeeded() {
-
-        if (mNeedUpdate && mIsAttached){
+        if (mNeedUpdate && mIsAttached) {
             onUpdate();
         }
-
     }
 
     public Scene getRootScreen() {
@@ -254,43 +221,45 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
 
     public Scene getTopScene() {
         int size = mStack.size();
-        return size > 0 ? mStack.get(size - 1).getScene() : null;
+        return size > 0 ? mStack.get(size - 1) : null;
     }
 
     protected void onUpdate() {
+        // 看能不能用task在 阻塞,
+        // 貌似可以用信号量?
         mNeedUpdate = false;
-        final ArrayList<T> nextFragments = new ArrayList<>();
-        for (T fragment : mSceneFragments) {
-            if (!fragment.getScene().isClosing()) {
-                nextFragments.add(fragment);
+        final ArrayList<Scene> nextFragments = new ArrayList<>();
+        for (Scene scene : mSceneFragments) {
+            if (!scene.isClosing()) {
+                nextFragments.add(scene);
             }
         }
 
-        final ArrayList<T> removedFragments = new ArrayList<>();
-        for (T fragment : mStack) {
-            if (fragment.getScene().isClosing() || !mSceneFragments.contains(fragment)) {
-                removedFragments.add(fragment);
+        final ArrayList<Scene> removedFragments = new ArrayList<>();
+        for (Scene scene : mStack) {
+            if (scene.isClosing() || !mSceneFragments.contains(scene)) {
+                removedFragments.add(scene);
             }
         }
 
-        ArrayList<T> insertedFragments = new ArrayList<>();
-        for (T fragment : nextFragments) {
+        ArrayList<Scene> insertedFragments = new ArrayList<>();
+        for (Scene fragment : nextFragments) {
             if (!mStack.contains(fragment)) {
                 insertedFragments.add(fragment);
             }
         }
 
         // find top scene
-        T nextTopFragment = nextFragments.size() > 0 ? nextFragments.get(nextFragments.size() - 1) : null;
-        T currentTopFragment = mStack.size() > 0 ? mStack.get(mStack.size() - 1) : null;
+        Scene nextTopFragment = nextFragments.size() > 0 ? nextFragments.get(nextFragments.size() - 1) : null;
+        Scene currentTopFragment = mStack.size() > 0 ? mStack.get(mStack.size() - 1) : null;
 
         // save or restore focused view
         if (currentTopFragment != nextTopFragment) {
             if (currentTopFragment != null && !removedFragments.contains(currentTopFragment)) {
-                currentTopFragment.getScene().saveFocusedView();
+                currentTopFragment.saveFocusedView();
             }
             if (nextTopFragment != null && mStack.contains(nextTopFragment)) {
-                nextTopFragment.getScene().restoreFocus();
+                nextTopFragment.restoreFocus();
             }
         }
 
@@ -299,45 +268,66 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         if (currentTopFragment != null && currentTopFragment != nextTopFragment) {
             if (nextTopFragment != null && !mStack.contains(nextTopFragment)) { // push
                 isPushAction = true;
-                getAnimationOnPush(nextTopFragment.getScene(), animIds);
-                getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
-                nextTopFragment.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                        onPushStart(nextFragments, removedFragments);
-                    }
+                getAnimationOnPush(nextTopFragment, animIds);
+                Animation enter = loadAnimation(animIds[0]);
+                Animation exit = loadAnimation(animIds[1]);
+                if (enter != null) {
+                    nextTopFragment.setAnimation(enter);
+                }
+                if (exit != null) {
+                    currentTopFragment.setAnimation(exit);
+                }
+                Animation anim = enter != null ? enter : exit;
+                if (anim != null) {
+                    anim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+                            onPushStart(nextFragments, removedFragments);
+                        }
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        onPushEnd(nextFragments, removedFragments);
-                        mNeedUpdate = true;
-                    }
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            onPushEnd(nextFragments, removedFragments);
+                            mNeedUpdate = true;
+                        }
 
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
 
-                    }
-                });
+                        }
+                    });
+                }
             } else if (!nextFragments.contains(currentTopFragment)) { // pop
-                getAnimationOnPop(currentTopFragment.getScene(), animIds);
-                getOrCreateTransaction().setCustomAnimations(animIds[0], animIds[1]);
-                currentTopFragment.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                        onPopStart(nextFragments, removedFragments);
-                    }
+                getAnimationOnPop(currentTopFragment, animIds);
+                Animation enter = loadAnimation(animIds[0]);
+                Animation exit = loadAnimation(animIds[1]);
+                if (enter != null) {
+                    currentTopFragment.setAnimation(exit);
+                }
+                if (exit != null && nextTopFragment != null) {
+                    nextTopFragment.setAnimation(enter);
+                }
+                Animation anim = enter != null ? enter : exit;
+                if (anim != null) {
+                    anim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+                            onPopStart(nextFragments, removedFragments);
+                        }
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        onPopEnd(nextFragments, removedFragments);
-                        mNeedUpdate = true;
-                    }
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            onPopEnd(nextFragments, removedFragments);
+                            mNeedUpdate = true;
+                        }
 
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
 
-                    }
-                });
+                        }
+                    });
+                }
+
             }
         }
 
@@ -356,108 +346,108 @@ public abstract class SceneContainer<T extends SceneFragment> extends ViewGroup 
         if (animIds[0] == 0 && animIds[1] == 0) {
             if (isPushAction) {
                 onPushStart(nextFragments, removedFragments);
-                tryCommitTransaction();
                 onPushEnd(nextFragments, removedFragments);
             } else {
                 onPopStart(nextFragments, removedFragments);
-                tryCommitTransaction();
                 onPopEnd(nextFragments, removedFragments);
             }
+
             mNeedUpdate = true;
         } else {
-            tryCommitTransaction();
+
         }
     }
 
-    private void addFragments(ArrayList<T> fragments) {
-        for (T fragment : fragments) {
-            getOrCreateTransaction().add(getId(), fragment);
+    private Animation loadAnimation(int animId) {
+        if (animId == 0) return null;
+        return AnimationUtils.loadAnimation(getContext(), animId);
+    }
+
+    private void addFragments(ArrayList<Scene> fragments) {
+        for (Scene fragment : fragments) {
+            addView(fragment);
         }
     }
 
-    private void updateFragments(ArrayList<T> nextFragments) {
+    private void updateFragments(ArrayList<Scene> nextFragments) {
         for (int index = 0, size = nextFragments.size(); index < size; index++) {
             boolean show;
             if (index + 1 == size) {
                 show = true;
             } else {
-                SceneFragment nextFragment = nextFragments.get(index + 1);
-                show = nextFragment.getScene().isTransparent();
+                Scene nextFragment = nextFragments.get(index + 1);
+                show = nextFragment.isTransparent();
             }
-            final SceneFragment fragment = nextFragments.get(index);
-            if (show && !fragment.isVisible()) {
-                getOrCreateTransaction().show(fragment);
-            } else if (!show && fragment.isVisible()) {
-                getOrCreateTransaction().hide(fragment);
-                final View fixFresco = fragment.getView();
-                if (fixFresco instanceof FixFresco) {
-                    ((FixFresco) fixFresco).disableSetVisibility();
-                }
+            final Scene fragment = nextFragments.get(index);
+            if (show && fragment.getVisibility() != VISIBLE) {
+                fragment.setVisibility(VISIBLE);
+            } else if (!show && fragment.getVisibility() == VISIBLE) {
+                fragment.setVisibility(GONE);
             }
         }
     }
 
-    private void removeFragments(ArrayList<T> fragments) {
-        for (T scene : fragments) {
-            getOrCreateTransaction().remove(scene);
+    private void removeFragments(ArrayList<Scene> fragments) {
+        for (Scene scene : fragments) {
+            removeView(scene);
         }
     }
 
-    private void onPopEnd(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+    private void onPopEnd(ArrayList<Scene> nextFragments, ArrayList<Scene> removedFragments) {
         didBlur(nextFragments, removedFragments);
         didFocus(nextFragments);
     }
 
-    private void onPopStart(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+    private void onPopStart(ArrayList<Scene> nextFragments, ArrayList<Scene> removedFragments) {
         willBlur(nextFragments, removedFragments);
         willFocus(nextFragments);
     }
 
-    private void onPushEnd(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+    private void onPushEnd(ArrayList<Scene> nextFragments, ArrayList<Scene> removedFragments) {
         didFocus(nextFragments);
         didBlur(nextFragments, removedFragments);
     }
 
-    private void onPushStart(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+    private void onPushStart(ArrayList<Scene> nextFragments, ArrayList<Scene> removedFragments) {
         willFocus(nextFragments);
         willBlur(nextFragments, removedFragments);
     }
 
-    private void didFocus(ArrayList<T> nextFragments) {
+    private void didFocus(ArrayList<Scene> nextFragments) {
         int size = nextFragments.size();
         if (size > 0) {
-            T fragment = nextFragments.get(size - 1);
-            fragment.getScene().setStatus(Scene.SceneStatus.DID_FOCUS);
+            Scene fragment = nextFragments.get(size - 1);
+            fragment.setStatus(Scene.SceneStatus.DID_FOCUS);
         }
     }
 
-    private void didBlur(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+    private void didBlur(ArrayList<Scene> nextFragments, ArrayList<Scene> removedFragments) {
         int size = nextFragments.size();
         for (int index = 0; index + 1 < size; index++) {
-            T fragment = nextFragments.get(index);
-            fragment.getScene().setStatus(Scene.SceneStatus.DID_BLUR);
+            Scene fragment = nextFragments.get(index);
+            fragment.setStatus(Scene.SceneStatus.DID_BLUR);
         }
-        for (T fragment : removedFragments) {
-            fragment.getScene().setStatus(Scene.SceneStatus.DID_BLUR, true);
+        for (Scene fragment : removedFragments) {
+            fragment.setStatus(Scene.SceneStatus.DID_BLUR, true);
         }
     }
 
-    private void willFocus(ArrayList<T> nextFragments) {
+    private void willFocus(ArrayList<Scene> nextFragments) {
         int size = nextFragments.size();
         if (size > 0) {
-            T fragment = nextFragments.get(size - 1);
-            fragment.getScene().setStatus(Scene.SceneStatus.WILL_FOCUS);
+            Scene fragment = nextFragments.get(size - 1);
+            fragment.setStatus(Scene.SceneStatus.WILL_FOCUS);
         }
     }
 
-    private void willBlur(ArrayList<T> nextFragments, ArrayList<T> removedFragments) {
+    private void willBlur(ArrayList<Scene> nextFragments, ArrayList<Scene> removedFragments) {
         int size = nextFragments.size();
         for (int index = 0; index + 1 < size; index++) {
-            T fragment = nextFragments.get(index);
-            fragment.getScene().setStatus(Scene.SceneStatus.WILL_BLUR);
+            Scene fragment = nextFragments.get(index);
+            fragment.setStatus(Scene.SceneStatus.WILL_BLUR);
         }
-        for (T fragment : removedFragments) {
-            fragment.getScene().setStatus(Scene.SceneStatus.WILL_BLUR);
+        for (Scene fragment : removedFragments) {
+            fragment.setStatus(Scene.SceneStatus.WILL_BLUR);
         }
     }
 

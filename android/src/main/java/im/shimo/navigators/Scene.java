@@ -7,13 +7,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import com.facebook.react.bridge.GuardedRunnable;
 import com.facebook.react.bridge.ReactContext;
@@ -31,7 +31,7 @@ import im.shimo.navigators.event.WillFocusEvent;
 @SuppressLint("ViewConstructor")
 public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresco {
     static final String TAG = "Scene";
-
+    private static int actionBarHeight;
     private TextView mFocusedView;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
 
@@ -52,7 +52,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         }
     };
 
-    private Fragment mFragment;
+    private SceneModel mFragment;
 
     @Nullable
     private SceneContainer mContainer;
@@ -61,10 +61,9 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     private boolean mIsTransparent = false;
     private StackAnimation mStackAnimation = StackAnimation.DEFAULT;
 
-    private boolean mIsTranslucent = false;
-
     private boolean mIsDisableSetVisibility = false;
     private boolean mDismissed = false;
+    private boolean mHasHeader = false;
 
     @Override
     public void disableSetVisibility() {
@@ -90,13 +89,58 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
 
     public Scene(ReactContext context) {
         super(context);
+        maybeInitActionBarSize(context);
+    }
+
+    private void maybeInitActionBarSize(Context context) {
+        if (actionBarHeight == 0) {
+            TypedValue tv = new TypedValue();
+            if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+            }
+        }
+    }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        mHasHeader = false;
+        final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
+            measureChild(child);
+        }
+
+    }
+
+    public boolean hasHeader() {
+        return mHasHeader;
+    }
+
+    private void measureActionBar(View child) {
+        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
+                MeasureSpec.EXACTLY);
+        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(actionBarHeight,
+                MeasureSpec.EXACTLY);
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+    }
+
+    private void measureChild(View child) {
+        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
+                MeasureSpec.EXACTLY);
+        int height = mHasHeader ? getHeight() - actionBarHeight : getHeight();
+        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height,
+                MeasureSpec.EXACTLY);
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        int top = 0;
         if (changed) {
             final int width = r - l;
-            final int height = b - t;
+            final int height = b - t - top;
             final ReactContext reactContext = (ReactContext) getContext();
             reactContext.runOnNativeModulesQueueThread(
                     new GuardedRunnable(reactContext.getExceptionHandler()) {
@@ -104,6 +148,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
                         public void runGuarded() {
                             reactContext.getNativeModule(UIManagerModule.class)
                                     .updateNodeSize(getId(), width, height);
+
                         }
                     });
         }
@@ -113,7 +158,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        clearDisappearingChildren();
+//        clearDisappearingChildren();
     }
 
     @Override
@@ -192,6 +237,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
             return;
         }
         mTransitioning = transitioning;
+        // TODO: 2019-12-06 动画优化？
         super.setLayerType(transitioning ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE, null);
     }
 
@@ -247,11 +293,11 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         mContainer = container;
     }
 
-    protected <T extends SceneFragment> void setFragment(T fragment) {
+    protected <T extends SceneModel> void setFragment(T fragment) {
         this.mFragment = fragment;
     }
 
-    protected Fragment getFragment() {
+    protected SceneModel getFragment() {
         return this.mFragment;
     }
 
@@ -267,25 +313,11 @@ public class Scene extends ViewGroup implements ReactPointerEventsView, FixFresc
         if (mContainer != null) {
             mContainer.notifyChildUpdate();
         }
+        clearDisappearingChildren();
     }
 
     public boolean isClosing() {
         return mClosing;
-    }
-
-    public void setTranslucent(boolean translucent) {
-        if (mIsTranslucent == translucent) {
-            return;
-        }
-        for (int i = 0, size = getChildCount(); i < size; i++) {
-            View child = getChildAt(i);
-            if (child instanceof SceneStackHeader) {
-                child.setAlpha(translucent ? 0.5f : 1f);
-                break;
-            }
-        }
-        mIsTranslucent = translucent;
-        requestLayout();
     }
 
     private void sendEvent(SceneStatus status, boolean isDismissed) {

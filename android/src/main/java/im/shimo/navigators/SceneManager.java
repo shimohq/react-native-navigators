@@ -90,19 +90,8 @@ public class SceneManager extends ViewGroupManager<Scene> {
     @ReactProp(name = "closing")
     public void closing(Scene view, boolean closing) {
         view.setClosing(closing);
+        Log.d(TAG, "closing() called with: view = [" + view + "], closing = [" + closing + "]");
     }
-
-    /**
-     * 导航条是否沉浸
-     *
-     * @param view
-     * @param isTranslucent
-     */
-    @ReactProp(name = "translucent")
-    public void translucent(Scene view, boolean isTranslucent) {
-        view.setTranslucent(isTranslucent);
-    }
-
 
     /**
      * 是否透明
@@ -137,20 +126,29 @@ public class SceneManager extends ViewGroupManager<Scene> {
 
     @Override
     public void removeViewAt(Scene parent, int index) {
-        View view = parent.getChildAt(index);
-        if (view instanceof SceneStackHeader) {
-            ((SceneStackFragment) parent.getFragment()).removeToolbar();
-        } else {
-            parent.removeView(view);
-        }
+        super.removeViewAt(parent, index);
+//        View view = parent.getChildAt(index);
+//        if (view instanceof SceneStackHeader) {
+//            ViewParent sceneParent = parent.getParent();
+//            if (sceneParent instanceof SceneStack) {
+////                ((SceneStack) sceneParent).removeHeader();
+//            }
+//        } else {
+//            parent.removeView(view);
+//        }
     }
 
 
     @Override
     public void addView(Scene parent, View child, int index) {
-        super.addView(parent, child, index);
-        if (child instanceof SceneStackHeader && parent.getFragment() instanceof SceneStackFragment) {
-            ((SceneStackFragment) parent.getFragment()).onStackUpdate();
-        }
+        super.addView(parent,child,index);
+//        if (child instanceof SceneStackHeader) {
+//            ViewParent sceneParent = parent.getParent();
+//            if (sceneParent instanceof SceneStack) {
+////                ((SceneStack) sceneParent).setHeader(((SceneStackHeader) child));
+//            }
+//        } else {
+//            super.addView(parent, child, index);
+//        }
     }
 }

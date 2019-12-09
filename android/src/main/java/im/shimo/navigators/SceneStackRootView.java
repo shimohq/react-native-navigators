@@ -11,8 +11,12 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 public class SceneStackRootView extends CoordinatorLayout implements FixFresco {
 
+    private Scene mScene;
+
     public SceneStackRootView(@NonNull Context context) {
         super(context);
+//        mScene = new Scene((ReactContext) context);
+//        addView(mScene);
     }
 
 
@@ -40,5 +44,7 @@ public class SceneStackRootView extends CoordinatorLayout implements FixFresco {
         }
     }
 
-
+    public Scene getScene() {
+        return mScene;
+    }
 }
