@@ -291,7 +291,7 @@ public abstract class SceneContainer extends ViewGroup {
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
-                            updateFragments(nextFragments);
+                            hideFragments(nextFragments);
                             onPushEnd(nextFragments, removedFragments);
                             mNeedUpdate = true;
                             if (mNeedUpdateOnAnimEnd) {
@@ -326,7 +326,7 @@ public abstract class SceneContainer extends ViewGroup {
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
-                            updateFragments(nextFragments);
+                            hideFragments(nextFragments);
                             onPopEnd(nextFragments, removedFragments);
                             mNeedUpdate = true;
                             if (mNeedUpdateOnAnimEnd) {
@@ -352,7 +352,7 @@ public abstract class SceneContainer extends ViewGroup {
         removeFragments(removedFragments);
 
         // update
-
+        showFragments(nextFragments);
 
         mStack.clear();
         mStack.addAll(nextFragments);
@@ -365,7 +365,8 @@ public abstract class SceneContainer extends ViewGroup {
                 onPopStart(nextFragments, removedFragments);
                 onPopEnd(nextFragments, removedFragments);
             }
-            updateFragments(nextFragments);
+            showFragments(nextFragments);
+            hideFragments(nextFragments);
             mNeedUpdate = true;
         } else {
 
@@ -383,7 +384,23 @@ public abstract class SceneContainer extends ViewGroup {
         }
     }
 
-    private void updateFragments(ArrayList<Scene> nextFragments) {
+    private void hideFragments(ArrayList<Scene> nextFragments) {
+        for (int index = 0, size = nextFragments.size(); index < size; index++) {
+            boolean show;
+            if (index + 1 == size) {
+                show = true;
+            } else {
+                Scene nextFragment = nextFragments.get(index + 1);
+                show = nextFragment.isTransparent();
+            }
+            final Scene fragment = nextFragments.get(index);
+            if (!show && fragment.getVisibility() == VISIBLE) {
+                fragment.setVisibility(GONE);
+            }
+        }
+    }
+
+    private void showFragments(ArrayList<Scene> nextFragments) {
         for (int index = 0, size = nextFragments.size(); index < size; index++) {
             boolean show;
             if (index + 1 == size) {
@@ -395,11 +412,11 @@ public abstract class SceneContainer extends ViewGroup {
             final Scene fragment = nextFragments.get(index);
             if (show && fragment.getVisibility() != VISIBLE) {
                 fragment.setVisibility(VISIBLE);
-            } else if (!show && fragment.getVisibility() == VISIBLE) {
-                fragment.setVisibility(GONE);
             }
         }
     }
+
+
 
     private void removeFragments(ArrayList<Scene> fragments) {
         for (Scene scene : fragments) {
