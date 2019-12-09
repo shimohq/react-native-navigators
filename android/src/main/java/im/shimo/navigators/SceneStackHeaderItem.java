@@ -54,18 +54,19 @@ public class SceneStackHeaderItem extends ReactViewGroup {
             @SuppressLint("DrawAllocation")
             Measurements measurements = new Measurements();
             measurements.width = right - left;
-            if (mType == Type.CENTER) {
-                // if we want the view to be centered we need to account for the fact that right and left
-                // paddings may not be equal.
-                View parent = (View) getParent();
-                int parentWidth = parent.getWidth();
-                int rightPadding = parentWidth - right;
-                measurements.width = Math.max(0, parentWidth - 2 * Math.max(rightPadding, left));
-            }
+//            if (mType == Type.CENTER) {
+//                // if we want the view to be centered we need to account for the fact that right and left
+//                // paddings may not be equal.
+//                View parent = (View) getParent();
+//                int parentWidth = parent.getWidth();
+//                int rightPadding = parentWidth - right;
+//                measurements.width = Math.max(0, parentWidth - 2 * Math.max(rightPadding, left));
+//            }
             measurements.height = bottom - top;
             mUIManager.setViewLocalData(getId(), measurements);
         }
         super.onLayout(changed, left, top, right, bottom);
+
     }
 
 
