@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import {
   NavigationRoute,
-  NavigationInjectedProps,
-  SceneView
+  NavigationInjectedProps
 } from 'react-navigation';
 
 import {
@@ -11,6 +10,7 @@ import {
   NativeNavigatorHeaderModes,
   NativeNavigatorModes
 } from './types';
+import NativeSceneView from './NativeSceneView';
 import NativeStackScene from './NativeStackScene';
 import NativeHeader from './NativeHeader';
 import NativeStackSceneContainer from './NativeStackSceneContainer';
@@ -89,7 +89,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               style={options.cardStyle}
             >
               <NativeStackSceneContainer>
-                <SceneView
+                <NativeSceneView
                   screenProps={screenProps}
                   navigation={navigation}
                   component={SceneComponent}
