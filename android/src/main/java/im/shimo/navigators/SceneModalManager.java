@@ -56,4 +56,9 @@ public class SceneModalManager extends ViewGroupManager<SceneModal> {
     public View getChildAt(SceneModal parent, int index) {
         return parent.getSceneAt(index);
     }
+
+    @Override
+    public boolean needsCustomLayoutForChildren() {
+        return true;
+    }
 }

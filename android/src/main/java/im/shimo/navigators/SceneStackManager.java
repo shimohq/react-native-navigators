@@ -56,4 +56,11 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
     public View getChildAt(SceneStack parent, int index) {
         return parent.getSceneAt(index);
     }
+
+
+
+    @Override
+    public boolean needsCustomLayoutForChildren() {
+        return true;
+    }
 }
