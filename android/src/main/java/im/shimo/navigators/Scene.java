@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -31,7 +30,6 @@ import im.shimo.navigators.event.WillFocusEvent;
 @SuppressLint("ViewConstructor")
 public class Scene extends ViewGroup implements ReactPointerEventsView {
     static final String TAG = "Scene";
-    private static int actionBarHeight;
     private TextView mFocusedView;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
 
@@ -61,52 +59,13 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     private StackAnimation mStackAnimation = StackAnimation.DEFAULT;
 
     private boolean mDismissed = false;
-    private boolean mHasHeader = false;
 
 
     public Scene(ReactContext context) {
         super(context);
-        maybeInitActionBarSize(context);
-    }
-
-    private void maybeInitActionBarSize(Context context) {
-        if (actionBarHeight == 0) {
-            TypedValue tv = new TypedValue();
-            if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
-            }
-        }
     }
 
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        final int count = getChildCount();
-        for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
-            measureChild(child);
-        }
-
-    }
-
-
-    private void measureActionBar(View child) {
-        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
-                MeasureSpec.EXACTLY);
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(actionBarHeight,
-                MeasureSpec.EXACTLY);
-        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
-    }
-
-    private void measureChild(View child) {
-        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getWidth(),
-                MeasureSpec.EXACTLY);
-        int height = mHasHeader ? getHeight() - actionBarHeight : getHeight();
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height,
-                MeasureSpec.EXACTLY);
-        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
-    }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
