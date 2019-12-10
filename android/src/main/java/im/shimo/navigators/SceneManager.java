@@ -1,7 +1,6 @@
 package im.shimo.navigators;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -36,7 +35,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
     @NonNull
     @Override
     protected Scene createViewInstance(@NonNull ThemedReactContext reactContext) {
-        Log.d(TAG, "createViewInstance() called with: reactContext = [" + reactContext + "]");
         return new Scene(reactContext);
     }
 
@@ -90,7 +88,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
     @ReactProp(name = "closing")
     public void closing(Scene view, boolean closing) {
         view.setClosing(closing);
-        Log.d(TAG, "closing() called with: view = [" + view + "], closing = [" + closing + "]");
     }
 
     /**

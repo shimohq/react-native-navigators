@@ -11,18 +11,17 @@ import androidx.annotation.AnimatorRes;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 
-import im.shimo.navigators.event.WillBlurEvent;
-import im.shimo.navigators.event.WillFocusEvent;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import im.shimo.navigators.event.WillBlurEvent;
+import im.shimo.navigators.event.WillFocusEvent;
 
 /**
  * Created by jiang on 2019-11-11
  */
 
-//@DebugLog
 public class Navigator {
 
     private final SceneContainer mContainer;
