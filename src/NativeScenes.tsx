@@ -89,14 +89,14 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               style={options.cardStyle}
             >
               <NativeStackSceneContainer>
-                {headerMode === NativeNavigatorHeaderModes.Auto ? (
-                  <NativeHeader descriptor={descriptor} route={route} />
-                ) : null}
                 <SceneView
                   screenProps={screenProps}
                   navigation={navigation}
                   component={SceneComponent}
                 />
+                {headerMode === NativeNavigatorHeaderModes.Auto ? (
+                  <NativeHeader descriptor={descriptor} route={route} />
+                ) : null}
               </NativeStackSceneContainer>
             </NativeStackScene>
           );
