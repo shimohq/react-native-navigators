@@ -92,17 +92,19 @@ export default class NativeNavigators extends PureComponent<
   };
 
   private handleCloseRoute = (route: NavigationRoute) => {
-    const { closingRouteKey } = this.state;
+    this.handleTransitionComplete(route);
+
     this.setState({
       closingRouteKey: null,
-      routes: this.state.routes.filter(route => route.key !== closingRouteKey)
+      routes: this.state.routes.filter(r => r.key !== route.key)
     });
-    this.handleTransitionComplete(route);
   };
 
   private handleTransitionComplete = (route: NavigationRoute) => {
-    if (this.props.navigation.state.isTransitioning) {
-      this.props.navigation.dispatch(
+    const { navigation } = this.props;
+
+    if (navigation.state.isTransitioning) {
+      navigation.dispatch(
         StackActions.completeTransition({ toChildKey: route.key })
       );
     }
@@ -111,7 +113,7 @@ export default class NativeNavigators extends PureComponent<
   private handleDismissRoute = (route: NavigationRoute) => {
     const { navigation } = this.props;
     const { routes, propRoutes } = this.state;
-
+    
     this.setState({
       routes: routes.filter(r => r.key !== route.key),
       propRoutes: propRoutes.filter(r => r.key !== route.key)

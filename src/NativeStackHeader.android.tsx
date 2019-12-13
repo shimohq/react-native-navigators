@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import { View, StatusBar, StyleSheet } from 'react-native';
 
 import NativeStackHeaderItem, {
@@ -25,13 +25,13 @@ const styles = StyleSheet.create({
 });
 
 export default function NativeStackHeader(props: NativeStackHeaderProps) {
+  const style = useMemo(() => [
+    styles.container,
+    { backgroundColor: props.headerBackgroundColor, borderBottomColor: props.headerBorderColor }
+  ], [props.headerBackgroundColor, props.headerBorderColor]);
+
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: props.headerBackgroundColor, borderBottomColor: props.headerBorderColor }
-      ]}
-    >
+    <View style={style}>
       {props.children}
     </View>
   );

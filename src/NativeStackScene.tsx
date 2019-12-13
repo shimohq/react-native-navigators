@@ -64,7 +64,7 @@ export default class NativeStackNavigator extends PureComponent<
         popover={popover}
         onDidFocus={this.onDidFocus}
         onDidBlur={this.onDidBlur}
-        style={[style, StyleSheet.absoluteFill]}
+        style={style ? [style, StyleSheet.absoluteFill] : StyleSheet.absoluteFill}
       >
         {this.props.children}
       </RNNativeStackScene>

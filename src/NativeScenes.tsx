@@ -76,7 +76,8 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
             <NativeStackScene
               key={key}
               transition={
-                options.transition || NativeNavigatorTransitions.Default
+                navigation.dangerouslyGetParent()?.state?.isTransitioning ? 
+                (options.transition || NativeNavigatorTransitions.Default) : NativeNavigatorTransitions.None
               }
               closing={closingRouteKey === route.key}
               gestureEnabled={options.gestureEnabled !== false}
