@@ -6,6 +6,13 @@
 #import "RNNativePopoverParams.h"
 
 @class RNNativeStackScene;
+
+@protocol RNNativeStackSceneListener <NSObject>
+
+- (void)scene:(RNNativeStackScene *)scene didUpdateStatus:(RNNativeStackSceneStatus) status;
+
+@end
+
 @protocol RNNativeStackSceneDelegate <NSObject>
 
 - (void)needUpdateForScene:(RNNativeStackScene *)scene;
@@ -76,6 +83,7 @@
 @property (nonatomic, copy) RCTDirectEventBlock onWillBlur;
 @property (nonatomic, copy) RCTDirectEventBlock onDidBlur;
 
+@property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
 @property (nonatomic, assign) RNNativeStackSceneStatus status;
 @property (nonatomic, assign) BOOL dismissed;
 @property (nonatomic, weak) id<RNNativeStackSceneDelegate> delegate;
@@ -84,6 +92,8 @@
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 - (void)updateBounds;
+- (void)registerListener:(id<RNNativeStackSceneListener>)listener;
+- (void)unregisterListener:(id<RNNativeStackSceneListener>)listener;
 
 @end
 

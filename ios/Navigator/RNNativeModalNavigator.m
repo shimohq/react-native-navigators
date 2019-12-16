@@ -9,12 +9,13 @@
 #import "RNNativeModalNavigator.h"
 #import "RNNativeStackScene.h"
 #import "RNNativeModalNavigatorTransitionManager.h"
+#import "RNNativeModalNavigatorController.h"
 
 #import <React/RCTUIManager.h>
 
 @interface RNNativeModalNavigator()
 
-@property (nonatomic, strong) UIViewController *controller;
+@property (nonatomic, strong) RNNativeModalNavigatorController *controller;
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 
 @end
@@ -25,7 +26,7 @@
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     _viewControllers = [NSMutableArray array];
-    _controller = [UIViewController new];
+    _controller = [RNNativeModalNavigatorController new];
     _numberDict = [NSMutableDictionary new];
     return [super initWithBridge:bridge viewController:_controller];
 }

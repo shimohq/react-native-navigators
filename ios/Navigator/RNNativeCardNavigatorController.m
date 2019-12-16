@@ -31,6 +31,14 @@
     }
 }
 
+-(UIViewController *)childViewControllerForStatusBarStyle {
+    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : nil;
+}
+
+-(UIViewController *)childViewControllerForStatusBarHidden {
+    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : nil;
+}
+
 #pragma mark - Private
 
 - (void)updateFrameWithView:(UIView *)view parentView:(UIView *)parentView {

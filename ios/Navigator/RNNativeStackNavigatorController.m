@@ -44,6 +44,14 @@
     }
 }
 
+-(UIViewController *)childViewControllerForStatusBarStyle {
+    return self.topViewController;
+}
+
+-(UIViewController *)childViewControllerForStatusBarHidden {
+    return self.topViewController;
+}
+
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {

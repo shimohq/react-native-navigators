@@ -8,6 +8,7 @@
 @interface RNNativeStackController : UIViewController
 
 @property (nonatomic, weak) RNNativeStackScene *scene;
+@property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
 
 - (instancetype)initWithScene:(RNNativeStackScene *)scene;
 

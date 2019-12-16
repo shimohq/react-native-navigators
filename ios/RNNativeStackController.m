@@ -12,6 +12,7 @@
     self = [super init];
     if (self) {
         self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        _statusBarStyle = -1;
     }
     return self;
 }
@@ -35,6 +36,22 @@
 }
 
 #pragma mark - UIViewController
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (_statusBarStyle > 0) {
+        return _statusBarStyle;
+    } else {
+        return [super preferredStatusBarStyle];
+    }
+}
+
+-(UIViewController *)childViewControllerForStatusBarStyle {
+    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : nil;
+}
+
+-(UIViewController *)childViewControllerForStatusBarHidden {
+    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : nil;
+}
 
 - (void)loadView {
     if (_scene != nil) {
@@ -70,6 +87,16 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [_scene setStatus:RNNativeStackSceneStatusDidBlur];
+}
+
+#pragma mark - Setter
+
+- (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {
+    if (_statusBarStyle == statusBarStyle) {
+        return;
+    }
+    _statusBarStyle = statusBarStyle;
+    [self setNeedsStatusBarAppearanceUpdate];
 }
 
 #pragma mark - Header

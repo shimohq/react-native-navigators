@@ -13,6 +13,7 @@
 @interface RNNativeStackScene() <UIViewControllerTransitioningDelegate>
 
 @property (nonatomic, strong) RNNativeStackController *controller;
+@property (nonatomic, strong) NSPointerArray *listeners;
 
 @end
 
@@ -26,7 +27,6 @@
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge
 {
-    
     if (self = [super init]) {
         _transition = RNNativeStackSceneTransitionDefault;
         _closing = NO;
@@ -35,8 +35,21 @@
         _dismissed = NO;
         _controller = [[RNNativeStackController alloc] initWithScene:self];
         _controller.transitioningDelegate = self;
+        _listeners = [NSPointerArray weakObjectsPointerArray];
     }
     return self;
+}
+
+- (void)registerListener:(id<RNNativeStackSceneListener>)listener {
+    [_listeners addPointer:(__bridge void *)(listener)];
+    [listener scene:self didUpdateStatus:_status];
+}
+
+- (void)unregisterListener:(id<RNNativeStackSceneListener>)listener {
+    NSInteger index = [_listeners indexOfAccessibilityElement:listener];
+    if (index != NSNotFound) {
+        [_listeners removePointerAtIndex:index];
+    }
 }
 
 #pragma mark - React Native
@@ -211,10 +224,20 @@
     if (statusChanged) {
         _status = status;
         [_controller updateForStatus:status];
+        
+        // send status to all listeners
+        for (id<RNNativeStackSceneListener> listener in _listeners) {
+            [listener scene:self didUpdateStatus:status];
+        }
     }
     if (statusChanged || dismissed) {
         [self sendStatus:_status andDismissed:dismissed];
     }
+}
+
+- (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {
+    _statusBarStyle = statusBarStyle;
+    [_controller setStatusBarStyle:statusBarStyle];
 }
 
 #pragma mark - Private
