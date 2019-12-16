@@ -246,12 +246,10 @@
 }
 
 - (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {
-    _statusBarStyle = statusBarStyle;
     [_controller setStatusBarStyle:statusBarStyle];
 }
 
 - (void)setStatusBarHidden:(BOOL)statusBarHidden {
-    _statusBarHidden = statusBarHidden;
     [_controller setStatusBarHidden:statusBarHidden];
 }
 
