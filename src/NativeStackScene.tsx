@@ -89,4 +89,4 @@ export default class NativeStackNavigator extends PureComponent<
   }
 }
 
-const RNNativeStackScene = requireNativeComponent('RNNativeStackScene');
+const RNNativeStackScene = requireNativeComponent('RNNativeScene');

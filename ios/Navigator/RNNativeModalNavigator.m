@@ -7,7 +7,7 @@
 //
 
 #import "RNNativeModalNavigator.h"
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 #import "RNNativeModalNavigatorTransitionManager.h"
 #import "RNNativeModalNavigatorController.h"
 
@@ -41,18 +41,18 @@
  present or dismiss
  TODO: 不支持 ViewController 互换位置
  */
-- (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
+- (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                       nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                    removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
     // viewControllers
     NSMutableArray *viewControllers = [NSMutableArray array];
-    for (RNNativeStackScene *scene in nextScenes) {
+    for (RNNativeScene *scene in nextScenes) {
         [viewControllers addObject:scene.controller];
     }
     [_viewControllers setArray:viewControllers];
@@ -64,14 +64,14 @@
     
     // show
     for (NSInteger index = 0, size = insertedScenes.count; index < size; index++) {
-        RNNativeStackScene *scene = insertedScenes[index];
+        RNNativeScene *scene = insertedScenes[index];
         NSInteger willShowIndex = [nextScenes indexOfObject:scene];
         if (willShowIndex == 0 || self.currentScenes.count == 0) {
             [self.controller addChildViewController:scene.controller];
             [self.controller.view addSubview:scene.controller.view];
         } else {
             UIViewController *parentController = nextScenes[willShowIndex - 1].controller;
-            BOOL animated = action == RNNativeStackNavigatorActionShow && index == size - 1 && transition != RNNativeStackSceneTransitionNone;
+            BOOL animated = action == RNNativeStackNavigatorActionShow && index == size - 1 && transition != RNNativeSceneTransitionNone;
             if (parentController.presentedViewController) {
                 UIViewController *presentedViewController = parentController.presentedViewController;
                 [transitionManager dismissViewController: parentController animated:NO completion:^{
@@ -86,8 +86,8 @@
     
     // hide
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
-        RNNativeStackScene *scene = removedScenes[index];
-        BOOL animated = action == RNNativeStackNavigatorActionHide && index == size - 1 && transition != RNNativeStackSceneTransitionNone;
+        RNNativeScene *scene = removedScenes[index];
+        BOOL animated = action == RNNativeStackNavigatorActionHide && index == size - 1 && transition != RNNativeSceneTransitionNone;
         UIViewController *parentViewController = scene.controller.presentingViewController;
         if (parentViewController) {
             [transitionManager dismissViewController:parentViewController animated:animated completion:^{
@@ -110,8 +110,8 @@
             transitionManager:(RNNativeModalNavigatorTransitionManager *)transitionManager
                      animated:(BOOL)animated
                    completion:(void (^ __nullable)(void))completion {
-    if ([viewController.view isKindOfClass:[RNNativeStackScene class]]) {
-        RNNativeStackScene *scene = (RNNativeStackScene *)viewController.view;
+    if ([viewController.view isKindOfClass:[RNNativeScene class]]) {
+        RNNativeScene *scene = (RNNativeScene *)viewController.view;
         RNNativePopoverParams *popoverParams = scene.popoverParams;
         if (popoverParams) { // popover
             viewController.modalPresentationStyle = UIModalPresentationPopover;
@@ -130,7 +130,7 @@
             return;
         } else {
             parentViewController.definesPresentationContext = !scene.transparent;
-            if (scene.transition == RNNativeStackSceneTransitionNone || scene.transition == RNNativeStackSceneTransitionDefault) { // system modal style
+            if (scene.transition == RNNativeSceneTransitionNone || scene.transition == RNNativeSceneTransitionDefault) { // system modal style
                 viewController.modalPresentationStyle = scene.transparent ? UIModalPresentationOverCurrentContext : UIModalPresentationCurrentContext;
             } else { // custom modal style
                 viewController.modalPresentationStyle = UIModalPresentationCustom;
@@ -142,7 +142,7 @@
     }
 }
 
-- (void)getSourceView:(RNNativeStackScene *)screenView completion:(void (^)(UIView *view))completion {
+- (void)getSourceView:(RNNativeScene *)screenView completion:(void (^)(UIView *view))completion {
     RNNativePopoverParams *popoverParams = screenView.popoverParams;
     if (popoverParams.sourceViewNativeID) {
         RCTUIManager *uiManager = self.bridge.uiManager;

@@ -10,7 +10,7 @@
 
 @implementation RNNativePushAnimatedTransition
 
-- (instancetype)initWithTransition:(RNNativeStackSceneTransition)transition
+- (instancetype)initWithTransition:(RNNativeSceneTransition)transition
 {
     self = [super init];
     if (self) {
@@ -26,7 +26,7 @@
 // container controllers that have companion animations that might need to
 // synchronize with the main animation.
 - (NSTimeInterval)transitionDuration:(nullable id <UIViewControllerContextTransitioning>)transitionContext {
-    return [transitionContext isAnimated] && _transition != RNNativeStackSceneTransitionNone ? 0.35 : 0;
+    return [transitionContext isAnimated] && _transition != RNNativeSceneTransitionNone ? 0.35 : 0;
 }
 
 // This method can only  be a nop if the transition is interactive and not a percentDriven interactive transition.
@@ -48,23 +48,23 @@
     [containerView addSubview:toView];
     
     switch (_transition) {
-        case RNNativeStackSceneTransitionSlideFormLeft:
+        case RNNativeSceneTransitionSlideFormLeft:
             toViewInitialFrame.origin = CGPointMake(-CGRectGetMaxX(containerView.bounds), CGRectGetMinY(toViewFinalFrame));
             fromViewFinalFrame = CGRectOffset(fromView.frame, CGRectGetWidth(fromView.frame)/3.0, 0);
             toViewFromShadowOffset = CGSizeMake(3, 0);
             break;
-        case RNNativeStackSceneTransitionSlideFormRight:
-        case RNNativeStackSceneTransitionDefault:
+        case RNNativeSceneTransitionSlideFormRight:
+        case RNNativeSceneTransitionDefault:
             toViewInitialFrame.origin = CGPointMake(CGRectGetMaxX(containerView.bounds), CGRectGetMinY(toViewFinalFrame));
             fromViewFinalFrame = CGRectOffset(fromView.frame, -CGRectGetWidth(fromView.frame)/3.0, 0);
             toViewFromShadowOffset = CGSizeMake(-3, 0);
             break;
-        case RNNativeStackSceneTransitionSlideFormTop:
+        case RNNativeSceneTransitionSlideFormTop:
             toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(toViewFinalFrame), -CGRectGetMaxY(containerView.bounds));
             fromViewFinalFrame = fromViewInitialFrame;
             toViewFromShadowOffset = CGSizeMake(0, 3);
             break;
-        case RNNativeStackSceneTransitionSlideFormBottom:
+        case RNNativeSceneTransitionSlideFormBottom:
             toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(toViewFinalFrame), CGRectGetMaxY(containerView.bounds));
             fromViewFinalFrame = fromViewInitialFrame;
             toViewFromShadowOffset = CGSizeMake(0, -3);

@@ -8,14 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <React/RCTViewManager.h>
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, RNNativeStackSceneMode) {
-    RNNativeStackSceneModeStack,
-    RNNativeStackSceneModePopover,
-    RNNativeStackSceneModeModal,
+typedef NS_ENUM(NSInteger, RNNativeSceneMode) {
+    RNNativeSceneModeStack,
+    RNNativeSceneModePopover,
+    RNNativeSceneModeModal,
 };
 
 typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
 
 @interface RNNativeBaseNavigator : UIView <RCTInvalidating>
 
-@property (nonatomic, strong, readonly) NSMutableArray<RNNativeStackScene *> *currentScenes;
+@property (nonatomic, strong, readonly) NSMutableArray<RNNativeScene *> *currentScenes;
 @property (nonatomic, weak, readonly) RCTBridge *bridge;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(UIViewController *)viewController;
@@ -37,11 +37,11 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
 /**
  子类必须实现
  */
-- (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
+- (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                       nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                    removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition;
 

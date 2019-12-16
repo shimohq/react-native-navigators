@@ -8,7 +8,7 @@
 
 #import "RNNativeStackNavigator.h"
 #import "RNNativeStackNavigatorController.h"
-#import "RNNativeStackController.h"
+#import "RNNativeSceneController.h"
 #import "RNNativePushAnimatedTransition.h"
 #import "RNNativePopAnimatedTransition.h"
 
@@ -39,10 +39,10 @@
                                                            toViewController:(UIViewController *)toVC {
     if (operation != UINavigationControllerOperationNone) {
         UIViewController *targetController = operation == UINavigationControllerOperationPush ? toVC : fromVC;
-        if ([targetController isKindOfClass:[RNNativeStackController class]]) {
-            RNNativeStackController *controller = (RNNativeStackController *)targetController;
-            RNNativeStackSceneTransition transition = controller.scene.transition;
-            if (transition != RNNativeStackSceneTransitionDefault && transition != RNNativeStackSceneTransitionNone) {
+        if ([targetController isKindOfClass:[RNNativeSceneController class]]) {
+            RNNativeSceneController *controller = (RNNativeSceneController *)targetController;
+            RNNativeSceneTransition transition = controller.scene.transition;
+            if (transition != RNNativeSceneTransitionDefault && transition != RNNativeSceneTransitionNone) {
                 if (operation == UINavigationControllerOperationPush) {
                     return [[RNNativePushAnimatedTransition alloc] initWithTransition:transition];
                 } else {
@@ -63,22 +63,22 @@
 /**
  push or pop
  
- 不调用  beginTransition 和 endTransition，使用 viewXXXAppear 管理 RNNativeStackSceneStatus
+ 不调用  beginTransition 和 endTransition，使用 viewXXXAppear 管理 RNNativeSceneStatus
  */
-- (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
+- (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                       nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                    removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(NO);
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
-    for (RNNativeStackScene *scene in nextScenes) {
+    for (RNNativeScene *scene in nextScenes) {
         [willShowViewControllers addObject:scene.controller];
     }
     
-    if (transition == RNNativeStackSceneTransitionNone || action == RNNativeStackNavigatorActionNone) { // 无动画
+    if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) { // 无动画
         [_controller setViewControllers:willShowViewControllers animated:NO];
     } else { // 有动画
         if (action == RNNativeStackNavigatorActionShow) { // 显示

@@ -23,7 +23,7 @@ import im.shimo.navigators.event.WillFocusEvent;
 @ReactModule(name = SceneManager.REACT_CLASS)
 public class SceneManager extends ViewGroupManager<Scene> {
 
-    protected static final String REACT_CLASS = "RNNativeStackScene";
+    protected static final String REACT_CLASS = "RNNativeScene";
     private static final String TAG = "SceneManager";
 
     @NonNull

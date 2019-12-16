@@ -4,7 +4,7 @@
 
 @end
 
-@implementation RCTConvert (RNNativeStackScene)
+@implementation RCTConvert (RNNativeScene)
 
 RCT_ENUM_CONVERTER(RNNativeStackHeaderType, (@{
                     @"center": @(RNNativeStackHeaderTypeCenter),

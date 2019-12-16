@@ -6,7 +6,7 @@
 //
 
 #import "RNNativeCardNavigatorController.h"
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 
 @interface RNNativeCardNavigatorController ()
 
@@ -25,7 +25,7 @@
     // INFO: 切换 viewController 的同时旋转屏幕，新的 viewController 可能也会保持屏幕旋转之前的 frame。
     // 为了修复这个问题，重新布局的时候重新设置 frame。
     for (UIView *view in self.view.subviews) {
-        if ([view isKindOfClass:[RNNativeStackScene class]]) {
+        if ([view isKindOfClass:[RNNativeScene class]]) {
             [self updateFrameWithView:view parentView:self.view];
         }
     }
