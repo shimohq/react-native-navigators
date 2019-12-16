@@ -1,1 +1,1 @@
-export {  SceneView as default } from 'react-navigation';
+export { SceneView as default } from 'react-navigation';

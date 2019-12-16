@@ -36,6 +36,7 @@
         _controller = [[RNNativeStackController alloc] initWithScene:self];
         _controller.transitioningDelegate = self;
         _listeners = [NSPointerArray weakObjectsPointerArray];
+        _statusBarHidden = -1;
     }
     return self;
 }
@@ -238,6 +239,11 @@
 - (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {
     _statusBarStyle = statusBarStyle;
     [_controller setStatusBarStyle:statusBarStyle];
+}
+
+- (void)setStatusBarHidden:(NSInteger)statusBarHidden {
+    _statusBarHidden = statusBarHidden;
+    [_controller setStatusBarHidden:statusBarHidden];
 }
 
 #pragma mark - Private

@@ -83,7 +83,21 @@
 @property (nonatomic, copy) RCTDirectEventBlock onWillBlur;
 @property (nonatomic, copy) RCTDirectEventBlock onDidBlur;
 
+/**
+ status bar 样式
+ -1: 取系统的，默认值
+ 。。。
+ */
 @property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
+
+/**
+ 是否隐藏 status bar
+ -1: 取系统的，默认值
+ 0:  显示
+ 1: 隐藏
+ */
+@property (nonatomic, assign) NSInteger statusBarHidden;
+
 @property (nonatomic, assign) RNNativeStackSceneStatus status;
 @property (nonatomic, assign) BOOL dismissed;
 @property (nonatomic, weak) id<RNNativeStackSceneDelegate> delegate;

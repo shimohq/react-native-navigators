@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import {  SceneView, SceneViewProps } from 'react-navigation';
+import { SceneView, SceneViewProps } from 'react-navigation';
 
 const styles = StyleSheet.create({
   container: {
@@ -13,5 +13,5 @@ export default function(props: SceneViewProps) {
     <View style={styles.container}>
       <SceneView {...props} />
     </View>
-  )
+  );
 }

@@ -13,6 +13,7 @@
     if (self) {
         self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
         _statusBarStyle = -1;
+        _statusBarHidden = -1;
     }
     return self;
 }
@@ -38,10 +39,18 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle > 0) {
+    if (_statusBarStyle >= 0) {
         return _statusBarStyle;
     } else {
         return [super preferredStatusBarStyle];
+    }
+}
+
+- (BOOL)prefersStatusBarHidden {
+    if (_statusBarHidden >= 0) {
+        return _statusBarHidden > 0;
+    } else {
+        return [super prefersStatusBarHidden];
     }
 }
 
@@ -96,6 +105,14 @@
         return;
     }
     _statusBarStyle = statusBarStyle;
+    [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (void)setStatusBarHidden:(NSInteger)statusBarHidden {
+    if (_statusBarHidden == statusBarHidden) {
+        return;
+    }
+    _statusBarHidden = statusBarHidden;
     [self setNeedsStatusBarAppearanceUpdate];
 }
 

@@ -20,6 +20,8 @@ interface NativeStackNavigatorProps {
   onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
   route: NavigationRoute;
   style?: StyleProp<ViewStyle>;
+  statusBarStyle?: number;
+  statusBarHidden?: number | boolean;
 }
 
 export default class NativeStackNavigator extends PureComponent<
@@ -51,8 +53,17 @@ export default class NativeStackNavigator extends PureComponent<
       transition,
       gestureEnabled,
       popover,
-      style
+      style,
+      statusBarStyle,
+      statusBarHidden
     } = this.props;
+
+    let statusBarHiddenValue = -1;
+    if (typeof statusBarHidden === 'number') {
+      statusBarHiddenValue = statusBarHidden;
+    } else if (typeof statusBarHidden === 'boolean') {
+      statusBarHiddenValue = statusBarHidden ? 1 : 0;
+    }
 
     return (
       <RNNativeStackScene
@@ -64,7 +75,13 @@ export default class NativeStackNavigator extends PureComponent<
         popover={popover}
         onDidFocus={this.onDidFocus}
         onDidBlur={this.onDidBlur}
-        style={style ? [style, StyleSheet.absoluteFill] : StyleSheet.absoluteFill}
+        style={
+          style ? [style, StyleSheet.absoluteFill] : StyleSheet.absoluteFill
+        }
+        statusBarStyle={
+          typeof statusBarStyle === 'number' ? statusBarStyle : -1
+        }
+        statusBarHidden={statusBarHiddenValue}
       >
         {this.props.children}
       </RNNativeStackScene>
