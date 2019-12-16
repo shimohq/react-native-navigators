@@ -19,11 +19,11 @@
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {
-    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : nil;
+    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : self.presentedViewController;
 }
 
 -(UIViewController *)childViewControllerForStatusBarHidden {
-    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : nil;
+    return self.childViewControllers.count > 0 ? self.childViewControllers.lastObject : self.presentedViewController;
 }
 
 @end
