@@ -7,7 +7,7 @@
 //
 
 #import "RNNativeStackNavigatorController.h"
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 #import <React/RCTRootContentView.h>
 #import <React/RCTTouchHandler.h>
 
@@ -39,9 +39,17 @@
         UIView *viewControllerWrapperView = [self findAndUpdateSubviewWithView:navigationTransitionView className:@"UIViewControllerWrapperView"];
     }
     UIView *view = self.topViewController.view;
-    if ([view isKindOfClass:[RNNativeStackScene class]]) {
+    if ([view isKindOfClass:[RNNativeScene class]]) {
         [self updateFrameWithView:view parentView:self.view];
     }
+}
+
+-(UIViewController *)childViewControllerForStatusBarStyle {
+    return self.topViewController;
+}
+
+-(UIViewController *)childViewControllerForStatusBarHidden {
+    return self.topViewController;
 }
 
 #pragma mark - UIGestureRecognizerDelegate
@@ -64,8 +72,8 @@
     UINavigationController *navigationController = [self getTargetNavigationController:self];
     if (navigationController.viewControllers.count > 1) {
         UIView *view = navigationController.topViewController.view;
-        if ([view isKindOfClass:[RNNativeStackScene class]]) {
-            RNNativeStackScene *scene = (RNNativeStackScene *)view;
+        if ([view isKindOfClass:[RNNativeScene class]]) {
+            RNNativeScene *scene = (RNNativeScene *)view;
             return scene.gestureEnabled;
         }
     }

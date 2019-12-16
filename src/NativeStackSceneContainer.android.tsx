@@ -8,6 +8,12 @@ const styles = StyleSheet.create({
   }
 });
 
-export default function NativeStackSceneContainer(props: { children: ReactNode }) {
-  return <View style={styles.container} collapsable={false}>{props.children}</View>
+export default function NativeStackSceneContainer(props: {
+  children: ReactNode;
+}) {
+  return (
+    <View style={styles.container} collapsable={false}>
+      {props.children}
+    </View>
+  );
 }

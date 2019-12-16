@@ -25,15 +25,16 @@ const styles = StyleSheet.create({
 });
 
 export default function NativeStackHeader(props: NativeStackHeaderProps) {
-  const style = useMemo(() => [
-    styles.container,
-    { backgroundColor: props.headerBackgroundColor, borderBottomColor: props.headerBorderColor }
-  ], [props.headerBackgroundColor, props.headerBorderColor]);
-
-  return (
-    <View style={style}>
-      {props.children}
-    </View>
+  const style = useMemo(
+    () => [
+      styles.container,
+      {
+        backgroundColor: props.headerBackgroundColor,
+        borderBottomColor: props.headerBorderColor
+      }
+    ],
+    [props.headerBackgroundColor, props.headerBorderColor]
   );
-}
 
+  return <View style={style}>{props.children}</View>;
+}

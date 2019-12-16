@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RNNativeStackConst.h"
+#import "RNNativeConst.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,10 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RNNativeModalAnimatedTransition : NSObject <UIViewControllerAnimatedTransitioning>
 
-@property (nonatomic, assign) RNNativeStackSceneTransition transition;
+@property (nonatomic, assign) RNNativeSceneTransition transition;
 @property (nonatomic, assign) BOOL presenting;
 
-- (instancetype)initWithTransition:(RNNativeStackSceneTransition)transition presenting:(BOOL)presenting;
+- (instancetype)initWithTransition:(RNNativeSceneTransition)transition presenting:(BOOL)presenting;
 
 @end
 

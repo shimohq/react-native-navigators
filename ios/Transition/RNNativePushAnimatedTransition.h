@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RNNativeStackConst.h"
+#import "RNNativeConst.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RNNativePushAnimatedTransition : NSObject <UIViewControllerAnimatedTransitioning>
 
-@property (nonatomic, assign) RNNativeStackSceneTransition transition;
+@property (nonatomic, assign) RNNativeSceneTransition transition;
 
-- (instancetype)initWithTransition:(RNNativeStackSceneTransition)transition;
+- (instancetype)initWithTransition:(RNNativeSceneTransition)transition;
 
 @end
 

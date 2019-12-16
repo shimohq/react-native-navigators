@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RNNativeStackConst.h"
+#import "RNNativeConst.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

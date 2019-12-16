@@ -1,26 +1,26 @@
 #import <React/RCTViewManager.h>
 #import <React/RCTView.h>
 
-#import "RNNativeStackConst.h"
-#import "RNNativeStackController.h"
+#import "RNNativeConst.h"
+#import "RNNativeSceneController.h"
 #import "RNNativePopoverParams.h"
 
-@class RNNativeStackScene;
+@class RNNativeScene;
 
-@protocol RNNativeStackSceneListener <NSObject>
+@protocol RNNativeSceneListener <NSObject>
 
-- (void)scene:(RNNativeStackScene *)scene didUpdateStatus:(RNNativeStackSceneStatus) status;
-
-@end
-
-@protocol RNNativeStackSceneDelegate <NSObject>
-
-- (void)needUpdateForScene:(RNNativeStackScene *)scene;
-- (BOOL)isDismissedForScene:(RNNativeStackScene *)scene;
+- (void)scene:(RNNativeScene *)scene didUpdateStatus:(RNNativeSceneStatus) status;
 
 @end
 
-@interface RNNativeStackScene : RCTView <RCTInvalidating>
+@protocol RNNativeSceneDelegate <NSObject>
+
+- (void)needUpdateForScene:(RNNativeScene *)scene;
+- (BOOL)isDismissedForScene:(RNNativeScene *)scene;
+
+@end
+
+@interface RNNativeScene : RCTView <RCTInvalidating>
 
 /**
  切换 scene 的动画
@@ -34,7 +34,7 @@
  
  默认：default
  */
-@property (nonatomic, assign) RNNativeStackSceneTransition transition;
+@property (nonatomic, assign) RNNativeSceneTransition transition;
 
 /**
  是否开启手势返回
@@ -98,16 +98,16 @@
  */
 @property (nonatomic, assign) NSInteger statusBarHidden;
 
-@property (nonatomic, assign) RNNativeStackSceneStatus status;
+@property (nonatomic, assign) RNNativeSceneStatus status;
 @property (nonatomic, assign) BOOL dismissed;
-@property (nonatomic, weak) id<RNNativeStackSceneDelegate> delegate;
-@property (nonatomic, strong, readonly) RNNativeStackController *controller;
+@property (nonatomic, weak) id<RNNativeSceneDelegate> delegate;
+@property (nonatomic, strong, readonly) RNNativeSceneController *controller;
 @property (nonatomic, strong, readonly) RNNativePopoverParams *popoverParams;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 - (void)updateBounds;
-- (void)registerListener:(id<RNNativeStackSceneListener>)listener;
-- (void)unregisterListener:(id<RNNativeStackSceneListener>)listener;
+- (void)registerListener:(id<RNNativeSceneListener>)listener;
+- (void)unregisterListener:(id<RNNativeSceneListener>)listener;
 
 @end
 

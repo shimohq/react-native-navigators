@@ -7,11 +7,11 @@
 //
 
 #import "RNNativeModalAnimatedTransition.h"
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 
 @implementation RNNativeModalAnimatedTransition
 
-- (instancetype)initWithTransition:(RNNativeStackSceneTransition)transition presenting:(BOOL)presenting
+- (instancetype)initWithTransition:(RNNativeSceneTransition)transition presenting:(BOOL)presenting
 {
     self = [super init];
     if (self) {
@@ -28,7 +28,7 @@
 // container controllers that have companion animations that might need to
 // synchronize with the main animation.
 - (NSTimeInterval)transitionDuration:(nullable id <UIViewControllerContextTransitioning>)transitionContext {
-    return [transitionContext isAnimated] && _transition != RNNativeStackSceneTransitionNone ? 0.35 : 0;
+    return [transitionContext isAnimated] && _transition != RNNativeSceneTransitionNone ? 0.35 : 0;
 }
 
 // This method can only  be a nop if the transition is interactive and not a percentDriven interactive transition.
@@ -82,17 +82,17 @@
     
     if (isPresenting) {
         switch (_transition) {
-            case RNNativeStackSceneTransitionSlideFormLeft:
+            case RNNativeSceneTransitionSlideFormLeft:
                 toViewInitialFrame.origin = CGPointMake(-CGRectGetMaxX(containerView.bounds), CGRectGetMinY(containerView.bounds));
                 break;
-            case RNNativeStackSceneTransitionSlideFormRight:
+            case RNNativeSceneTransitionSlideFormRight:
                 toViewInitialFrame.origin = CGPointMake(CGRectGetMaxX(containerView.bounds), CGRectGetMinY(containerView.bounds));
                 break;
-            case RNNativeStackSceneTransitionSlideFormTop:
+            case RNNativeSceneTransitionSlideFormTop:
                 toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(containerView.bounds), -CGRectGetMaxY(containerView.bounds));
                 break;
-            case RNNativeStackSceneTransitionSlideFormBottom:
-            case RNNativeStackSceneTransitionDefault:
+            case RNNativeSceneTransitionSlideFormBottom:
+            case RNNativeSceneTransitionDefault:
                 toViewInitialFrame.origin = CGPointMake(CGRectGetMinX(containerView.bounds), CGRectGetMaxY(containerView.bounds));
                 break;
             default:
@@ -106,17 +106,17 @@
         // on the current frame of fromView than fromViewInitialFrame as the
         // initial frame (though in this example they will be the same).
         switch (_transition) {
-            case RNNativeStackSceneTransitionSlideFormLeft:
+            case RNNativeSceneTransitionSlideFormLeft:
                 fromViewFinalFrame = CGRectOffset(fromView.frame, -CGRectGetWidth(fromView.frame), 0);
                 break;
-            case RNNativeStackSceneTransitionSlideFormRight:
+            case RNNativeSceneTransitionSlideFormRight:
                 fromViewFinalFrame = CGRectOffset(fromView.frame, CGRectGetWidth(fromView.frame), 0);
                 break;
-            case RNNativeStackSceneTransitionSlideFormTop:
+            case RNNativeSceneTransitionSlideFormTop:
                 fromViewFinalFrame = CGRectOffset(fromView.frame, 0, -CGRectGetHeight(fromView.frame));
                 break;
-            case RNNativeStackSceneTransitionSlideFormBottom:
-            case RNNativeStackSceneTransitionDefault:
+            case RNNativeSceneTransitionSlideFormBottom:
+            case RNNativeSceneTransitionDefault:
                 fromViewFinalFrame = CGRectOffset(fromView.frame, 0, CGRectGetHeight(fromView.frame));
                 break;
             default:

@@ -7,7 +7,7 @@
 
 #import "RNNativeCardNavigator.h"
 #import "RNNativeCardNavigatorController.h"
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 #import <React/RCTUIManager.h>
 
 @interface RNNativeCardNavigator()
@@ -36,34 +36,34 @@
 /**
  addChildViewController removeFromParentViewController
  */
-- (void)updateSceneWithTransition:(RNNativeStackSceneTransition)transition
+- (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
-                       nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes
-                    removedScenes:(NSArray<RNNativeStackScene *> *)removedScenes
-                   insertedScenes:(NSArray<RNNativeStackScene *> *)insertedScenes
+                       nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                    removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
     // viewControllers
     NSMutableArray *viewControllers = [NSMutableArray array];
-    for (RNNativeStackScene *scene in nextScenes) {
+    for (RNNativeScene *scene in nextScenes) {
         [viewControllers addObject:scene.controller];
     }
     [_viewControllers setArray:viewControllers];
 
     // update will show view frame
-    RNNativeStackScene *currentTopScene = self.currentScenes.lastObject;
-    RNNativeStackScene *nextTopScene = nextScenes.lastObject;
-    if (action == RNNativeStackNavigatorActionShow && transition != RNNativeStackSceneTransitionNone) {
+    RNNativeScene *currentTopScene = self.currentScenes.lastObject;
+    RNNativeScene *nextTopScene = nextScenes.lastObject;
+    if (action == RNNativeStackNavigatorActionShow && transition != RNNativeSceneTransitionNone) {
         nextTopScene.frame = [self getFrameWithContainerView:_controller.view transition:transition];
     }
     
     // add scene
     for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
-        RNNativeStackScene *scene = nextScenes[index];
+        RNNativeScene *scene = nextScenes[index];
         if (index + 1 < size) { // 顶层 scene 必须显示
-            RNNativeStackScene *nextScene = nextScenes[index + 1];
+            RNNativeScene *nextScene = nextScenes[index + 1];
             if (!nextScene.transparent) { // 非顶层 scene，上层 scene 透明才显示
                 continue;
             }
@@ -71,7 +71,7 @@
         [self addScene:scene];
     }
     // transition
-    if (transition == RNNativeStackSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
+    if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
         nextTopScene.frame = self.controller.view.bounds;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES);
@@ -103,7 +103,7 @@
 
 #pragma mark - Layout
 
-- (void)addScene:(RNNativeStackScene *)scene {
+- (void)addScene:(RNNativeScene *)scene {
     UIView *superView = [scene superview];
     if (superView && superView != _controller.view) {
         [scene removeFromSuperview];
@@ -131,45 +131,45 @@
     }
 }
 
-- (void)removeScene:(RNNativeStackScene *)scene {
+- (void)removeScene:(RNNativeScene *)scene {
     [scene removeFromSuperview];
     [scene.controller removeFromParentViewController];
 }
 
-- (void)removeScenes:(NSArray<RNNativeStackScene *> *)scenes {
-    for (RNNativeStackScene *scene in scenes) {
+- (void)removeScenes:(NSArray<RNNativeScene *> *)scenes {
+    for (RNNativeScene *scene in scenes) {
         [self removeScene:scene];
     }
 }
 
-- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeStackScene *> *)removedScenes nextScenes:(NSArray<RNNativeStackScene *> *)nextScenes {
-    for (RNNativeStackScene *scene in removedScenes) {
+- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes {
+    for (RNNativeScene *scene in removedScenes) {
         [self removeScene:scene];
     }
     for (NSInteger index = 0, size = nextScenes.count - 1; index < size; index++) {
-        RNNativeStackScene *scene = nextScenes[index];
-        RNNativeStackScene *nextScene = nextScenes[index + 1];
+        RNNativeScene *scene = nextScenes[index];
+        RNNativeScene *nextScene = nextScenes[index + 1];
         if (!nextScene.transparent) { // 非顶层 scene，且上层 scene 不透明
             [self removeScene:scene];
         }
     }
 }
 
-- (CGRect)getFrameWithContainerView:(UIView *)containerView transition:(RNNativeStackSceneTransition)transition {
+- (CGRect)getFrameWithContainerView:(UIView *)containerView transition:(RNNativeSceneTransition)transition {
     CGRect containerBounds = containerView.bounds;
     CGRect frame;
     switch (transition) {
-        case RNNativeStackSceneTransitionSlideFormRight:
+        case RNNativeSceneTransitionSlideFormRight:
             frame = CGRectMake(CGRectGetMaxX(containerBounds), CGRectGetMinY(containerBounds), CGRectGetWidth(containerBounds), CGRectGetHeight(containerBounds));
             break;
-        case RNNativeStackSceneTransitionSlideFormLeft:
+        case RNNativeSceneTransitionSlideFormLeft:
             frame = CGRectMake(-CGRectGetMaxX(containerBounds), CGRectGetMinY(containerBounds), CGRectGetWidth(containerBounds), CGRectGetHeight(containerBounds));
             break;
-        case RNNativeStackSceneTransitionSlideFormTop:
+        case RNNativeSceneTransitionSlideFormTop:
             frame = CGRectMake(CGRectGetMinX(containerBounds), -CGRectGetMaxY(containerBounds), CGRectGetWidth(containerBounds), CGRectGetHeight(containerBounds));
             break;
-        case RNNativeStackSceneTransitionSlideFormBottom:
-        case RNNativeStackSceneTransitionDefault:
+        case RNNativeSceneTransitionSlideFormBottom:
+        case RNNativeSceneTransitionDefault:
             frame = CGRectMake(CGRectGetMinX(containerBounds), CGRectGetMaxY(containerBounds), CGRectGetWidth(containerBounds), CGRectGetHeight(containerBounds));
             break;
         default:

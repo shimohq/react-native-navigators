@@ -1,12 +1,12 @@
-#import "RNNativeStackController.h"
-#import "RNNativeStackScene.h"
+#import "RNNativeSceneController.h"
+#import "RNNativeScene.h"
 #import "RNNativeStackHeader.h"
 
-@interface RNNativeStackController ()
+@interface RNNativeSceneController ()
 
 @end
 
-@implementation RNNativeStackController
+@implementation RNNativeSceneController
 
 - (instancetype)init {
     self = [super init];
@@ -18,16 +18,16 @@
     return self;
 }
 
-- (instancetype)initWithScene:(RNNativeStackScene *)scene {
+- (instancetype)initWithScene:(RNNativeScene *)scene {
     if (self = [self init]) {
         _scene = scene;
     }
     return self;
 }
 
-- (void)updateForStatus:(RNNativeStackSceneStatus)status {
+- (void)updateForStatus:(RNNativeSceneStatus)status {
     switch (status) {
-        case RNNativeStackSceneStatusWillFocus:
+        case RNNativeSceneStatusWillFocus:
             // attach header
             [self updateHeader];
             break;
@@ -70,32 +70,32 @@
 
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [super willMoveToParentViewController:parent];
-    [_scene setStatus:parent ? RNNativeStackSceneStatusWillFocus : RNNativeStackSceneStatusWillBlur];
+    [_scene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [super didMoveToParentViewController:parent];
-    [_scene setStatus:parent ? RNNativeStackSceneStatusDidFocus : RNNativeStackSceneStatusDidBlur];
+    [_scene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [_scene setStatus:RNNativeStackSceneStatusWillFocus];
+    [_scene setStatus:RNNativeSceneStatusWillFocus];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [_scene setStatus:RNNativeStackSceneStatusDidFocus];
+    [_scene setStatus:RNNativeSceneStatusDidFocus];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_scene setStatus:RNNativeStackSceneStatusWillBlur];
+    [_scene setStatus:RNNativeSceneStatusWillBlur];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    [_scene setStatus:RNNativeStackSceneStatusDidBlur];
+    [_scene setStatus:RNNativeSceneStatusDidBlur];
 }
 
 #pragma mark - Setter

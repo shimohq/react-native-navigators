@@ -29,6 +29,8 @@ export interface NativeNavigationOptions {
   headerTitle?: string;
   headerTitleStyle?: StyleProp<TextStyle>;
   popover?: NativeNavigationPopover;
+  statusBarStyle?: number;
+  statusBarHidden?: number | boolean;
 }
 
 export interface NavigationNativeRouterConfig {

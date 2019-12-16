@@ -1,6 +1,6 @@
-#import "RNNativeStackScene.h"
+#import "RNNativeScene.h"
 #import "RNNativeModalAnimatedTransition.h"
-#import "RNNativeStackController.h"
+#import "RNNativeSceneController.h"
 #import "RNNativeNavigatorInsetsData.h"
 #import "RNNativeNavigatorFrameData.h"
 #import "RNNativeStackHeader.h"
@@ -10,14 +10,14 @@
 #import <React/RCTUIManagerUtils.h>
 #import <React/RCTTouchHandler.h>
 
-@interface RNNativeStackScene() <UIViewControllerTransitioningDelegate>
+@interface RNNativeScene() <UIViewControllerTransitioningDelegate>
 
-@property (nonatomic, strong) RNNativeStackController *controller;
+@property (nonatomic, strong) RNNativeSceneController *controller;
 @property (nonatomic, strong) NSPointerArray *listeners;
 
 @end
 
-@implementation RNNativeStackScene
+@implementation RNNativeScene
 {
     __weak RCTBridge *_bridge;
     RCTTouchHandler *_touchHandler;
@@ -28,12 +28,12 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge
 {
     if (self = [super init]) {
-        _transition = RNNativeStackSceneTransitionDefault;
+        _transition = RNNativeSceneTransitionDefault;
         _closing = NO;
         _translucent = NO;
         _bridge = bridge;
         _dismissed = NO;
-        _controller = [[RNNativeStackController alloc] initWithScene:self];
+        _controller = [[RNNativeSceneController alloc] initWithScene:self];
         _controller.transitioningDelegate = self;
         _listeners = [NSPointerArray weakObjectsPointerArray];
         _statusBarHidden = -1;
@@ -41,12 +41,12 @@
     return self;
 }
 
-- (void)registerListener:(id<RNNativeStackSceneListener>)listener {
+- (void)registerListener:(id<RNNativeSceneListener>)listener {
     [_listeners addPointer:(__bridge void *)(listener)];
     [listener scene:self didUpdateStatus:_status];
 }
 
-- (void)unregisterListener:(id<RNNativeStackSceneListener>)listener {
+- (void)unregisterListener:(id<RNNativeSceneListener>)listener {
     NSInteger index = [_listeners indexOfAccessibilityElement:listener];
     if (index != NSNotFound) {
         [_listeners removePointerAtIndex:index];
@@ -60,7 +60,7 @@
     [super insertReactSubview:subview atIndex:atIndex];
     if ([subview isKindOfClass:[RNNativeStackHeader class]]
         && _controller.navigationController != nil
-        && (_status == RNNativeStackSceneStatusWillFocus || _status == RNNativeStackSceneStatusDidFocus)) {
+        && (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus)) {
         [_controller.navigationController setNavigationBarHidden:NO];
         [(RNNativeStackHeader *)subview attachViewController:_controller];
         [self updateBounds];
@@ -72,7 +72,7 @@
     [super removeReactSubview:subview];
     if ([subview isKindOfClass:[RNNativeStackHeader class]]
         && _controller.navigationController != nil
-        && (_status == RNNativeStackSceneStatusWillFocus || _status == RNNativeStackSceneStatusDidFocus)) {
+        && (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus)) {
         [_controller.navigationController setNavigationBarHidden:YES];
         [(RNNativeStackHeader *)subview detachViewController];
         [self updateBounds];
@@ -140,7 +140,7 @@
  present 动画
  */
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    if (_transition == RNNativeStackSceneTransitionDefault || _transition == RNNativeStackSceneTransitionNone) {
+    if (_transition == RNNativeSceneTransitionDefault || _transition == RNNativeSceneTransitionNone) {
         return nil;
     }
     return [[RNNativeModalAnimatedTransition alloc] initWithTransition:_transition presenting:YES];
@@ -150,7 +150,7 @@
  dismiss 动画
  */
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
-    if (_transition == RNNativeStackSceneTransitionDefault || _transition == RNNativeStackSceneTransitionNone) {
+    if (_transition == RNNativeSceneTransitionDefault || _transition == RNNativeSceneTransitionNone) {
         return nil;
     }
     return [[RNNativeModalAnimatedTransition alloc] initWithTransition:_transition presenting:NO];
@@ -175,8 +175,8 @@
 - (nullable UIPresentationController *)presentationControllerForPresentedViewController:(UIViewController *)presented presentingViewController:(nullable UIViewController *)presenting sourceViewController:(UIViewController *)source {
     if (presented.modalPresentationStyle == UIModalPresentationCustom) {
         RNNativeModalPresentationController *presentationController = [[RNNativeModalPresentationController alloc] initWithPresentedViewController:presented presentingViewController:source];
-        if ([presented.view isKindOfClass:[RNNativeStackScene class]]) {
-            RNNativeStackScene *scene = (RNNativeStackScene *)presented.view;
+        if ([presented.view isKindOfClass:[RNNativeScene class]]) {
+            RNNativeScene *scene = (RNNativeScene *)presented.view;
             presentationController.transparent  = scene.transparent;
         }
         return presentationController;
@@ -213,21 +213,21 @@
     _popoverParams = [[RNNativePopoverParams alloc] initWithParams:popover];
 }
 
-- (void)setStatus:(RNNativeStackSceneStatus)status {
+- (void)setStatus:(RNNativeSceneStatus)status {
     BOOL dismissed = false;
-    if (status == RNNativeStackSceneStatusDidBlur && !_dismissed) {
+    if (status == RNNativeSceneStatusDidBlur && !_dismissed) {
         dismissed = [_delegate isDismissedForScene:self];
         _dismissed = dismissed;
     }
     BOOL statusChanged = _status != status
-    && !(_status == RNNativeStackSceneStatusDidBlur && status == RNNativeStackSceneStatusWillBlur)
-    && !(_status == RNNativeStackSceneStatusDidFocus && status == RNNativeStackSceneStatusWillFocus);
+    && !(_status == RNNativeSceneStatusDidBlur && status == RNNativeSceneStatusWillBlur)
+    && !(_status == RNNativeSceneStatusDidFocus && status == RNNativeSceneStatusWillFocus);
     if (statusChanged) {
         _status = status;
         [_controller updateForStatus:status];
         
         // send status to all listeners
-        for (id<RNNativeStackSceneListener> listener in _listeners) {
+        for (id<RNNativeSceneListener> listener in _listeners) {
             [listener scene:self didUpdateStatus:status];
         }
     }
@@ -248,24 +248,24 @@
 
 #pragma mark - Private
 
-- (void)sendStatus:(RNNativeStackSceneStatus)status andDismissed:(BOOL)dismissed {
+- (void)sendStatus:(RNNativeSceneStatus)status andDismissed:(BOOL)dismissed {
     switch (status) {
-        case RNNativeStackSceneStatusWillFocus:
+        case RNNativeSceneStatusWillFocus:
             if (_onWillFocus) {
                 _onWillFocus(nil);
             }
             break;
-        case RNNativeStackSceneStatusDidFocus:
+        case RNNativeSceneStatusDidFocus:
             if (_onDidFocus) {
                 _onDidFocus(nil);
             }
             break;
-        case RNNativeStackSceneStatusWillBlur:
+        case RNNativeSceneStatusWillBlur:
             if (_onWillBlur) {
                 _onWillBlur(nil);
             }
             break;
-        case RNNativeStackSceneStatusDidBlur:
+        case RNNativeSceneStatusDidBlur:
             if (_onDidBlur) {
                 _onDidBlur(@{
                     @"dismissed": @(dismissed)
@@ -280,7 +280,7 @@
 - (BOOL)isMountedUnderScreenOrReactRoot
 {
     for (UIView *parent = self.superview; parent != nil; parent = parent.superview) {
-        if ([parent isKindOfClass:[RCTRootView class]] || [parent isKindOfClass:[RNNativeStackScene class]]) {
+        if ([parent isKindOfClass:[RCTRootView class]] || [parent isKindOfClass:[RNNativeScene class]]) {
             return YES;
         }
     }
@@ -314,15 +314,15 @@
 
 @end
 
-@implementation RCTConvert (RNNativeStackScene)
+@implementation RCTConvert (RNNativeScene)
 
-RCT_ENUM_CONVERTER(RNNativeStackSceneTransition, (@{
-    @"default": @(RNNativeStackSceneTransitionDefault),
-    @"none": @(RNNativeStackSceneTransitionNone),
-    @"slideFromTop": @(RNNativeStackSceneTransitionSlideFormTop),
-    @"slideFromRight": @(RNNativeStackSceneTransitionSlideFormRight),
-    @"slideFromBottom": @(RNNativeStackSceneTransitionSlideFormBottom),
-    @"slideFromLeft": @(RNNativeStackSceneTransitionSlideFormLeft)
-}), RNNativeStackSceneTransitionNone, integerValue)
+RCT_ENUM_CONVERTER(RNNativeSceneTransition, (@{
+    @"default": @(RNNativeSceneTransitionDefault),
+    @"none": @(RNNativeSceneTransitionNone),
+    @"slideFromTop": @(RNNativeSceneTransitionSlideFormTop),
+    @"slideFromRight": @(RNNativeSceneTransitionSlideFormRight),
+    @"slideFromBottom": @(RNNativeSceneTransitionSlideFormBottom),
+    @"slideFromLeft": @(RNNativeSceneTransitionSlideFormLeft)
+}), RNNativeSceneTransitionNone, integerValue)
 
 @end

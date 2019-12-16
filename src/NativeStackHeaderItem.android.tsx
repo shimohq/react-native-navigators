@@ -7,7 +7,6 @@ export interface NativeStackHeaderItemProps {
   type: NativeNavigationHeaderTypes;
 }
 
-
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
@@ -34,15 +33,17 @@ const styles = StyleSheet.create({
 export default function NativeStackHeaderItem(
   props: PropsWithChildren<NativeStackHeaderItemProps>
 ) {
-  const style = useMemo(() => [
-    styles.container,
-    props.type === NativeNavigationHeaderTypes.Center ?
-      styles.center : (props.type === NativeNavigationHeaderTypes.Left ? styles.left : styles.right)
-  ], [props.type]);
-
-  return (
-    <View style={style}>
-      {props.children}
-    </View>
+  const style = useMemo(
+    () => [
+      styles.container,
+      props.type === NativeNavigationHeaderTypes.Center
+        ? styles.center
+        : props.type === NativeNavigationHeaderTypes.Left
+        ? styles.left
+        : styles.right
+    ],
+    [props.type]
   );
+
+  return <View style={style}>{props.children}</View>;
 }
