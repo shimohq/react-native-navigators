@@ -7,7 +7,11 @@ import {
 } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 
-import { NativeNavigatorTransitions, NativeNavigationPopover } from './types';
+import {
+  NativeNavigatorTransitions,
+  NativeNavigationPopover,
+  NativeNavigationStatusBarStyle
+} from './types';
 
 interface NativeStackNavigatorProps {
   closing: boolean;
@@ -20,8 +24,8 @@ interface NativeStackNavigatorProps {
   onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
   route: NavigationRoute;
   style?: StyleProp<ViewStyle>;
-  statusBarStyle?: number;
-  statusBarHidden?: number | boolean;
+  statusBarStyle?: NativeNavigationStatusBarStyle;
+  statusBarHidden?: boolean;
 }
 
 export default class NativeStackNavigator extends PureComponent<
@@ -58,13 +62,6 @@ export default class NativeStackNavigator extends PureComponent<
       statusBarHidden
     } = this.props;
 
-    let statusBarHiddenValue = -1;
-    if (typeof statusBarHidden === 'number') {
-      statusBarHiddenValue = statusBarHidden;
-    } else if (typeof statusBarHidden === 'boolean') {
-      statusBarHiddenValue = statusBarHidden ? 1 : 0;
-    }
-
     return (
       <RNNativeStackScene
         closing={closing}
@@ -78,10 +75,8 @@ export default class NativeStackNavigator extends PureComponent<
         style={
           style ? [style, StyleSheet.absoluteFill] : StyleSheet.absoluteFill
         }
-        statusBarStyle={
-          typeof statusBarStyle === 'number' ? statusBarStyle : -1
-        }
-        statusBarHidden={statusBarHiddenValue}
+        statusBarStyle={statusBarStyle}
+        statusBarHidden={statusBarHidden}
       >
         {this.props.children}
       </RNNativeStackScene>

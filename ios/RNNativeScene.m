@@ -36,7 +36,6 @@
         _controller = [[RNNativeSceneController alloc] initWithScene:self];
         _controller.transitioningDelegate = self;
         _listeners = [NSPointerArray weakObjectsPointerArray];
-        _statusBarHidden = -1;
     }
     return self;
 }
@@ -185,6 +184,16 @@
     }
 }
 
+#pragma mark - Getter
+
+- (BOOL)statusBarHidden {
+    return _controller.statusBarHidden;
+}
+
+- (UIStatusBarStyle)statusBarStyle {
+    return _controller.statusBarStyle;
+}
+
 #pragma mark - Setter
 
 - (void)setClosing:(BOOL)closing
@@ -241,7 +250,7 @@
     [_controller setStatusBarStyle:statusBarStyle];
 }
 
-- (void)setStatusBarHidden:(NSInteger)statusBarHidden {
+- (void)setStatusBarHidden:(BOOL)statusBarHidden {
     _statusBarHidden = statusBarHidden;
     [_controller setStatusBarHidden:statusBarHidden];
 }
@@ -311,18 +320,5 @@
     }
     return nil;
 }
-
-@end
-
-@implementation RCTConvert (RNNativeScene)
-
-RCT_ENUM_CONVERTER(RNNativeSceneTransition, (@{
-    @"default": @(RNNativeSceneTransitionDefault),
-    @"none": @(RNNativeSceneTransitionNone),
-    @"slideFromTop": @(RNNativeSceneTransitionSlideFormTop),
-    @"slideFromRight": @(RNNativeSceneTransitionSlideFormRight),
-    @"slideFromBottom": @(RNNativeSceneTransitionSlideFormBottom),
-    @"slideFromLeft": @(RNNativeSceneTransitionSlideFormLeft)
-}), RNNativeSceneTransitionNone, integerValue)
 
 @end

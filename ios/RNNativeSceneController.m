@@ -12,8 +12,8 @@
     self = [super init];
     if (self) {
         self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-        _statusBarStyle = -1;
-        _statusBarHidden = -1;
+        _statusBarStyle = UIStatusBarStyleDefault;
+        _statusBarHidden = NO;
     }
     return self;
 }
@@ -39,19 +39,11 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle >= 0) {
-        return _statusBarStyle;
-    } else {
-        return [super preferredStatusBarStyle];
-    }
+    return _statusBarStyle;
 }
 
 - (BOOL)prefersStatusBarHidden {
-    if (_statusBarHidden >= 0) {
-        return _statusBarHidden > 0;
-    } else {
-        return [super prefersStatusBarHidden];
-    }
+    return _statusBarHidden;
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {

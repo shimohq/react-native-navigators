@@ -28,7 +28,26 @@ RCT_EXPORT_VIEW_PROPERTY(closing, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(translucent, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(transparent, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(popover, NSDictionary)
-RCT_EXPORT_VIEW_PROPERTY(statusBarStyle, NSInteger)
-RCT_EXPORT_VIEW_PROPERTY(statusBarHidden, NSInteger)
+RCT_EXPORT_VIEW_PROPERTY(statusBarStyle, UIStatusBarStyle)
+RCT_EXPORT_VIEW_PROPERTY(statusBarHidden, BOOL)
+
+@end
+
+@implementation RCTConvert (RNNativeSceneManager)
+
+RCT_ENUM_CONVERTER(RNNativeSceneTransition, (@{
+    @"default": @(RNNativeSceneTransitionDefault),
+    @"none": @(RNNativeSceneTransitionNone),
+    @"slideFromTop": @(RNNativeSceneTransitionSlideFormTop),
+    @"slideFromRight": @(RNNativeSceneTransitionSlideFormRight),
+    @"slideFromBottom": @(RNNativeSceneTransitionSlideFormBottom),
+    @"slideFromLeft": @(RNNativeSceneTransitionSlideFormLeft)
+}), RNNativeSceneTransitionNone, integerValue)
+
+RCT_ENUM_CONVERTER(UIStatusBarStyle, (@{
+    @"default": @(UIStatusBarStyleDefault),
+    @"dark": @(UIStatusBarStyleDarkContent),
+    @"light": @(UIStatusBarStyleLightContent)
+        }), UIStatusBarStyleDefault, integerValue)
 
 @end

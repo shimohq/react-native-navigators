@@ -29,8 +29,8 @@ export interface NativeNavigationOptions {
   headerTitle?: string;
   headerTitleStyle?: StyleProp<TextStyle>;
   popover?: NativeNavigationPopover;
-  statusBarStyle?: number;
-  statusBarHidden?: number | boolean;
+  statusBarStyle?: NativeNavigationStatusBarStyle;
+  statusBarHidden?: boolean;
 }
 
 export interface NavigationNativeRouterConfig {
@@ -41,6 +41,12 @@ export interface NavigationNativeRouterConfig {
     NativeNavigationOptions,
     any
   >;
+}
+
+export enum NativeNavigationStatusBarStyle {
+  Default = 'default',
+  Dark = 'dark',
+  Light = 'light'
 }
 
 export enum NativeNavigatorTransitions {

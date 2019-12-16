@@ -85,18 +85,13 @@
 
 /**
  status bar 样式
- -1: 取系统的，默认值
- 。。。
  */
 @property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
 
 /**
  是否隐藏 status bar
- -1: 取系统的，默认值
- 0:  显示
- 1: 隐藏
  */
-@property (nonatomic, assign) NSInteger statusBarHidden;
+@property (nonatomic, assign) BOOL statusBarHidden;
 
 @property (nonatomic, assign) RNNativeSceneStatus status;
 @property (nonatomic, assign) BOOL dismissed;
