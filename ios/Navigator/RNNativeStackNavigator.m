@@ -72,15 +72,15 @@
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    beginTransition(NO);
+    BOOL hasAnimation = transition != RNNativeSceneTransitionNone && action != RNNativeStackNavigatorActionNone;
+    beginTransition(!hasAnimation);
+    
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeScene *scene in nextScenes) {
         [willShowViewControllers addObject:scene.controller];
     }
     
-    if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) { // 无动画
-        [_controller setViewControllers:willShowViewControllers animated:NO];
-    } else { // 有动画
+    if (hasAnimation) { // 有动画
         if (action == RNNativeStackNavigatorActionShow) { // 显示
             NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
             [newControllers removeLastObject];
@@ -92,8 +92,10 @@
             [_controller setViewControllers:newControllers animated:NO];
             [_controller popViewControllerAnimated:YES];
         }
+    } else { // 无动画
+        [_controller setViewControllers:willShowViewControllers animated:NO];
     }
-    endTransition(NO);
+    endTransition(!hasAnimation);
 }
 
 @end
