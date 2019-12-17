@@ -29,10 +29,12 @@
 - (void)updateForStatus:(RNNativeSceneStatus)status {
     switch (status) {
         case RNNativeSceneStatusWillFocus:
-            // attach header
+            // attach header, self.navigationController may be nil
             [self updateHeader];
             break;
         case RNNativeSceneStatusDidFocus:
+            // attach header
+            [self updateHeader];
             [self setNeedsStatusBarAppearanceUpdate];
             break;
         default:
