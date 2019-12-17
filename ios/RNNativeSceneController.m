@@ -31,6 +31,9 @@
             // attach header
             [self updateHeader];
             break;
+        case RNNativeSceneStatusDidFocus:
+            [self setNeedsStatusBarAppearanceUpdate];
+            break;
         default:
             break;
     }
