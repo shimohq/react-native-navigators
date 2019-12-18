@@ -15,6 +15,9 @@ function ModalTransitionModes(props: NavigationInjectedProps) {
     props.navigation.push('modalTransitionModes', {
       transition
     });
+    props.navigation.push('modalTransitionModes', {
+      transition
+    });
   };
 
   return (

@@ -114,7 +114,8 @@ public abstract class SceneContainer extends ViewGroup {
 
 
     protected void addScene(Scene scene, int index) {
-//        addView(scene, index);
+        scene.setVisibility(INVISIBLE);
+        addView(scene, index);
         mSceneFragments.add(index, scene);
         scene.setContainer(this);
         markUpdated();
@@ -204,7 +205,7 @@ public abstract class SceneContainer extends ViewGroup {
         mIsAttached = false;
     }
 
-    private void updateIfNeeded() {
+    public void updateIfNeeded() {
         if (!mIsAttached) return;
         if (mNeedUpdate) {
             onUpdate();
@@ -229,8 +230,6 @@ public abstract class SceneContainer extends ViewGroup {
     }
 
     protected void onUpdate() {
-        // 看能不能用task在 阻塞,
-        // 貌似可以用信号量?
         mNeedUpdate = false;
         final ArrayList<Scene> nextFragments = new ArrayList<>();
         for (Scene scene : mSceneFragments) {
@@ -346,7 +345,7 @@ public abstract class SceneContainer extends ViewGroup {
         }
 
         // add
-        addFragments(insertedFragments);
+//        addFragments(insertedFragments);
 
         // remove
         removeFragments(removedFragments);
