@@ -5,7 +5,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -28,10 +27,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
     private static final String TAG = "SceneManager";
     private StatusBarManager mStatusBarManager;
 
-    public SceneManager(ReactContext reactContext) {
-        mStatusBarManager = new StatusBarManager(reactContext);
-    }
-
     @NonNull
     @Override
     public String getName() {
@@ -42,6 +37,9 @@ public class SceneManager extends ViewGroupManager<Scene> {
     @Override
     protected Scene createViewInstance(@NonNull ThemedReactContext reactContext) {
         Scene scene = new Scene(reactContext);
+        if (mStatusBarManager == null) {
+            mStatusBarManager = new StatusBarManager(reactContext);
+        }
         scene.setStatusBarManager(mStatusBarManager);
         return scene;
     }
