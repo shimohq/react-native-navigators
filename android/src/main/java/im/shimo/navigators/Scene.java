@@ -22,6 +22,9 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ReactEditText;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import im.shimo.navigators.event.DidBlurEvent;
 import im.shimo.navigators.event.DidFocusEvent;
 import im.shimo.navigators.event.WillBlurEvent;
@@ -59,12 +62,12 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     private StackAnimation mStackAnimation = StackAnimation.DEFAULT;
 
     private boolean mDismissed = false;
+    private List<OnSceneStatusChangeListener> mOnSceneStatusChangeListeners;
 
 
     public Scene(ReactContext context) {
         super(context);
     }
-
 
 
     @Override
@@ -244,6 +247,21 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         return mClosing;
     }
 
+
+    public void addOnSceneStatusChangeListener(OnSceneStatusChangeListener listener) {
+        if (mOnSceneStatusChangeListeners == null)
+            mOnSceneStatusChangeListeners = new ArrayList<>();
+        mOnSceneStatusChangeListeners.add(listener);
+    }
+
+    public void removeOnSceneStatusChangeListener(OnSceneStatusChangeListener listener) {
+        if (mOnSceneStatusChangeListeners == null) {
+            // log.w
+            return;
+        }
+        mOnSceneStatusChangeListeners.remove(listener);
+    }
+
     private void sendEvent(SceneStatus status, boolean isDismissed) {
         final EventDispatcher eventDispatcher = ((ReactContext) getContext())
                 .getNativeModule(UIManagerModule.class)
@@ -265,6 +283,12 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
             default:
                 break;
         }
+        if (mOnSceneStatusChangeListeners != null) {
+            for (OnSceneStatusChangeListener l : mOnSceneStatusChangeListeners) {
+                l.onSceneStatusChanged(status);
+            }
+        }
+
     }
 
 
@@ -282,6 +306,12 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         SLIDE_FROM_RIGHT,
         SLIDE_FROM_BOTTOM,
         SLIDE_FROM_LEFT
+    }
+
+    public interface OnSceneStatusChangeListener {
+
+        void onSceneStatusChanged(SceneStatus status);
+
     }
 
 
