@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -25,6 +26,11 @@ public class SceneManager extends ViewGroupManager<Scene> {
 
     protected static final String REACT_CLASS = "RNNativeScene";
     private static final String TAG = "SceneManager";
+    private StatusBarManager mStatusBarManager;
+
+    public SceneManager(ReactContext reactContext) {
+        mStatusBarManager = new StatusBarManager(reactContext);
+    }
 
     @NonNull
     @Override
@@ -35,7 +41,9 @@ public class SceneManager extends ViewGroupManager<Scene> {
     @NonNull
     @Override
     protected Scene createViewInstance(@NonNull ThemedReactContext reactContext) {
-        return new Scene(reactContext);
+        Scene scene = new Scene(reactContext);
+        scene.setStatusBarManager(mStatusBarManager);
+        return scene;
     }
 
     /**
@@ -109,6 +117,15 @@ public class SceneManager extends ViewGroupManager<Scene> {
         view.setTransparent(isTransparent);
     }
 
+    @ReactProp(name = "statusBarHidden")
+    public void setStatusBarHidden(Scene view, boolean statusBarHidden) {
+        view.setStatusBarHidden(statusBarHidden);
+    }
+
+    @ReactProp(name = "statusBarStyle")
+    public void setStatusBarStyle(Scene view, String statusBarStyle) {
+        view.setStatusBarStyle(statusBarStyle);
+    }
 
     @Nullable
     @Override

@@ -56,7 +56,7 @@ function StatusBar(props: NavigationInjectedProps) {
           })
         }
       />
-      <Text style={{marginTop: 100}}>statusBarStyle:{statusBarStyle}</Text>
+      <Text style={{marginTop: 100}}>statusBarStyle:{statusBarStyle || NativeNavigationStatusBarStyle.Default}</Text>
       <Picker style={{width: 200}}
         selectedValue={statusBarStyle || NativeNavigationStatusBarStyle.Default}
         onValueChange={(value) => setParams({
