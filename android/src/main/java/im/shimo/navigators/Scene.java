@@ -222,14 +222,16 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     public void setStatusBarHidden(boolean statusBarHidden) {
         mStatusBarHidden = statusBarHidden;
-        if (mStatusBarManager != null) {
+        if ((mStatus == SceneStatus.WILL_FOCUS || mStatus == SceneStatus.DID_FOCUS)
+                && mStatusBarManager != null) {
             mStatusBarManager.setStatusBarHidden(statusBarHidden);
         }
     }
 
     public void setStatusBarStyle(String statusBarStyle) {
         mStatusBarStyle = statusBarStyle;
-        if (mStatusBarManager != null) {
+        if ((mStatus == SceneStatus.WILL_FOCUS || mStatus == SceneStatus.DID_FOCUS)
+                && mStatusBarManager != null){
             mStatusBarManager.setStatusBarStyle(statusBarStyle);
         }
     }
