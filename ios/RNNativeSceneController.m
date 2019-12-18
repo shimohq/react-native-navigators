@@ -15,6 +15,7 @@
         self.automaticallyAdjustsScrollViewInsets = NO;
         _statusBarStyle = UIStatusBarStyleDefault;
         _statusBarHidden = NO;
+        _status = RNNativeSceneStatusDidBlur;
     }
     return self;
 }
@@ -24,22 +25,6 @@
         _scene = scene;
     }
     return self;
-}
-
-- (void)updateForStatus:(RNNativeSceneStatus)status {
-    switch (status) {
-        case RNNativeSceneStatusWillFocus:
-            // attach header, self.navigationController may be nil
-            [self updateHeader];
-            break;
-        case RNNativeSceneStatusDidFocus:
-            // attach header
-            [self updateHeader];
-            [self setNeedsStatusBarAppearanceUpdate];
-            break;
-        default:
-            break;
-    }
 }
 
 #pragma mark - UIViewController
@@ -98,20 +83,32 @@
 
 #pragma mark - Setter
 
+- (void)setStatus:(RNNativeSceneStatus)status {
+    if (_status == status) {
+        return;
+    }
+    _status = status;
+    [self updateForStatus:status];
+}
+
 - (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {
     if (_statusBarStyle == statusBarStyle) {
         return;
     }
     _statusBarStyle = statusBarStyle;
-    [self setNeedsStatusBarAppearanceUpdate];
+    if (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus) {
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
-- (void)setStatusBarHidden:(NSInteger)statusBarHidden {
+- (void)setStatusBarHidden:(BOOL)statusBarHidden {
     if (_statusBarHidden == statusBarHidden) {
         return;
     }
     _statusBarHidden = statusBarHidden;
-    [self setNeedsStatusBarAppearanceUpdate];
+    if (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus) {
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
 #pragma mark - Header
@@ -138,6 +135,24 @@
         }
     }
     return nil;
+}
+
+#pragma mark - Private
+
+- (void)updateForStatus:(RNNativeSceneStatus)status {
+    switch (status) {
+        case RNNativeSceneStatusWillFocus:
+            // attach header, self.navigationController may be nil
+            [self updateHeader];
+            break;
+        case RNNativeSceneStatusDidFocus:
+            // attach header
+            [self updateHeader];
+            [self setNeedsStatusBarAppearanceUpdate];
+            break;
+        default:
+            break;
+    }
 }
 
 @end

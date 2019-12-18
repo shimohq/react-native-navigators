@@ -233,7 +233,7 @@
     && !(_status == RNNativeSceneStatusDidFocus && status == RNNativeSceneStatusWillFocus);
     if (statusChanged) {
         _status = status;
-        [_controller updateForStatus:status];
+        [_controller setStatus:status];
         
         // send status to all listeners
         for (id<RNNativeSceneListener> listener in _listeners) {

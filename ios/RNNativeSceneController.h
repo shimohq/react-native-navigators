@@ -8,6 +8,7 @@
 @interface RNNativeSceneController : UIViewController
 
 @property (nonatomic, weak) RNNativeScene *scene;
+@property (nonatomic, assign) RNNativeSceneStatus status;
 
 /**
  status bar 样式
@@ -20,7 +21,5 @@
 @property (nonatomic, assign) BOOL statusBarHidden;
 
 - (instancetype)initWithScene:(RNNativeScene *)scene;
-
-- (void)updateForStatus:(RNNativeSceneStatus)status;
 
 @end
