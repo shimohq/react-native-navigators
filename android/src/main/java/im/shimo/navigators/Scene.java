@@ -35,6 +35,8 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     static final String TAG = "Scene";
     private TextView mFocusedView;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
+    private boolean mStatusBarHidden;
+    private String mStatusBarStyle;
 
     private static OnAttachStateChangeListener sShowSoftKeyboardOnAttach = new OnAttachStateChangeListener() {
 
@@ -63,12 +65,11 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     private boolean mDismissed = false;
     private List<OnSceneStatusChangeListener> mOnSceneStatusChangeListeners;
-
+    private StatusBarManager mStatusBarManager;
 
     public Scene(ReactContext context) {
         super(context);
     }
-
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -211,6 +212,31 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         }
         mStatus = status;
         sendEvent(status, dismissed);
+
+        if (mStatus == SceneStatus.WILL_FOCUS && mStatusBarManager != null) {
+            mStatusBarManager.setStatusBarHidden(mStatusBarHidden);
+            mStatusBarManager.setStatusBarStyle(mStatusBarStyle);
+        }
+    }
+
+    public void setStatusBarHidden(boolean statusBarHidden) {
+        mStatusBarHidden = statusBarHidden;
+        if ((mStatus == SceneStatus.WILL_FOCUS || mStatus == SceneStatus.DID_FOCUS)
+                && mStatusBarManager != null) {
+            mStatusBarManager.setStatusBarHidden(statusBarHidden);
+        }
+    }
+
+    public void setStatusBarStyle(String statusBarStyle) {
+        mStatusBarStyle = statusBarStyle;
+        if ((mStatus == SceneStatus.WILL_FOCUS || mStatus == SceneStatus.DID_FOCUS)
+                && mStatusBarManager != null){
+            mStatusBarManager.setStatusBarStyle(statusBarStyle);
+        }
+    }
+
+    public void setStatusBarManager(StatusBarManager statusBarManager) {
+        mStatusBarManager = statusBarManager;
     }
 
     @Override
@@ -227,7 +253,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     protected void setContainer(@Nullable SceneContainer container) {
         mContainer = container;
     }
-
 
     @Nullable
     protected SceneContainer getSceneContainer() {
@@ -246,7 +271,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     public boolean isClosing() {
         return mClosing;
     }
-
 
     public void addOnSceneStatusChangeListener(OnSceneStatusChangeListener listener) {
         if (mOnSceneStatusChangeListeners == null)
@@ -288,9 +312,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                 l.onSceneStatusChanged(status);
             }
         }
-
     }
-
 
     public enum SceneStatus {
         DID_BLUR,
@@ -313,6 +335,5 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         void onSceneStatusChanged(SceneStatus status);
 
     }
-
 
 }

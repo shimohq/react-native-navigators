@@ -25,6 +25,7 @@ public class SceneManager extends ViewGroupManager<Scene> {
 
     protected static final String REACT_CLASS = "RNNativeScene";
     private static final String TAG = "SceneManager";
+    private StatusBarManager mStatusBarManager;
 
     @NonNull
     @Override
@@ -35,7 +36,12 @@ public class SceneManager extends ViewGroupManager<Scene> {
     @NonNull
     @Override
     protected Scene createViewInstance(@NonNull ThemedReactContext reactContext) {
-        return new Scene(reactContext);
+        Scene scene = new Scene(reactContext);
+        if (mStatusBarManager == null) {
+            mStatusBarManager = new StatusBarManager(reactContext);
+        }
+        scene.setStatusBarManager(mStatusBarManager);
+        return scene;
     }
 
     /**
@@ -109,6 +115,15 @@ public class SceneManager extends ViewGroupManager<Scene> {
         view.setTransparent(isTransparent);
     }
 
+    @ReactProp(name = "statusBarHidden")
+    public void setStatusBarHidden(Scene view, boolean statusBarHidden) {
+        view.setStatusBarHidden(statusBarHidden);
+    }
+
+    @ReactProp(name = "statusBarStyle")
+    public void setStatusBarStyle(Scene view, String statusBarStyle) {
+        view.setStatusBarStyle(statusBarStyle);
+    }
 
     @Nullable
     @Override
