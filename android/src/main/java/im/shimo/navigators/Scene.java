@@ -216,7 +216,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         if (mStatus == SceneStatus.WILL_FOCUS && mStatusBarManager != null) {
             mStatusBarManager.setStatusBarHidden(mStatusBarHidden);
             mStatusBarManager.setStatusBarStyle(mStatusBarStyle);
-
         }
     }
 
