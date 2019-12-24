@@ -12,7 +12,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RNNativeSceneListenerManager : NSObject
 
+/// 注册 listener
+///
+///  弱引用，所以可以不注销
+/// @param listener 监听器
 + (void)registerListener:(nonnull UIView<RNNativeSceneListener> *)listener;
+
+/// 注销 listener
+///
+/// @param listener 监听器
 + (void)unregisterListener:(nonnull UIView<RNNativeSceneListener> *)listener;
 
 @end
