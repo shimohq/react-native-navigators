@@ -58,8 +58,8 @@ typedef void (^RNNativeSceneListenerManagerCompleteBlock)( NSHashTable<RNNativeS
 
 #pragma mark - RNNativeSceneDelegate
 
-- (void)scene:(RNNativeScene *)scene didUpdateStatus:(RNNativeSceneStatus)status {
-    NSHashTable<UIView<RNNativeSceneListener> *> *listeners = [_sceneToListenersMap objectForKey:scene];
+- (void)scene:(RNNativeScene *)pScene didUpdateStatus:(RNNativeSceneStatus)status {
+    NSHashTable<UIView<RNNativeSceneListener> *> *listeners = [_sceneToListenersMap objectForKey:pScene];
     for (UIView<RNNativeSceneListener> * listener in listeners) {
         NSHashTable<RNNativeScene *> *parentScenes = [_listenerToParentScenesMap objectForKey:listener];
         BOOL parentSceneDidBlur = NO;
