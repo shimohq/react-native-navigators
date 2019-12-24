@@ -15,8 +15,6 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
 
     static final String REACT_CLASS = "RNNativeStackNavigator";
 
-    private int mInstanceCount = 0;
-
     @NonNull
     @Override
     public String getName() {
@@ -28,7 +26,6 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
     @NonNull
     @Override
     protected SceneStack createViewInstance(@NonNull ThemedReactContext reactContext) {
-        mInstanceCount++;
         return new SceneStack(reactContext);
     }
 
@@ -38,10 +35,6 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
             throw new IllegalArgumentException("Attempt attach child that is not of type RNScenes");
         }
         parent.addScene((Scene) child, index);
-        mInstanceCount--;
-        if (mInstanceCount == 0) {
-            parent.updateIfNeeded();
-        }
     }
 
     @Override

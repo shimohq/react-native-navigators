@@ -1,6 +1,5 @@
 package im.shimo.navigators;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -18,8 +17,6 @@ public class SceneModalManager extends ViewGroupManager<SceneModal> {
     private static final String TAG = "SceneModalManager";
 
 
-    private int mInstanceCount = 0;
-
     @NonNull
     @Override
     public String getName() {
@@ -29,7 +26,6 @@ public class SceneModalManager extends ViewGroupManager<SceneModal> {
     @NonNull
     @Override
     protected SceneModal createViewInstance(@NonNull ThemedReactContext reactContext) {
-        mInstanceCount++;
         return new SceneModal(reactContext);
     }
 
@@ -39,10 +35,6 @@ public class SceneModalManager extends ViewGroupManager<SceneModal> {
             throw new IllegalArgumentException("Attempt attach child that is not of type RNScenes");
         }
         parent.addScene((Scene) child, index);
-        mInstanceCount--;
-        if (mInstanceCount == 0) {
-            parent.updateIfNeeded();
-        }
     }
 
     @Override
