@@ -12,11 +12,12 @@ typedef void (^RNNativeSceneListenerManagerCompleteBlock)( NSHashTable<RNNativeS
 @interface RNNativeSceneListenerManager()
 
 @property (nonatomic, strong) NSHashTable<RNNativeScene *> *listenedScenes;
+@property (nonatomic, strong) NSMapTable<RNNativeScene *, NSNumber *> *sceneRealStatusMap;
+
 @property (nonatomic, strong) NSMapTable<UIView<RNNativeSceneListener> *, RNNativeScene *> *listenerToSceneMap;
 @property (nonatomic, strong) NSMapTable<UIView<RNNativeSceneListener> *, NSHashTable<RNNativeScene *> *> *listenerToParentScenesMap;
 
 @property (nonatomic, strong) NSMapTable<RNNativeScene *, NSHashTable<UIView<RNNativeSceneListener> *> *> *sceneToListenersMap;
-@property (nonatomic, strong) NSMapTable<RNNativeScene *, NSNumber *> *sceneRealStatusMap;
 
 @end
 
@@ -35,13 +36,12 @@ typedef void (^RNNativeSceneListenerManagerCompleteBlock)( NSHashTable<RNNativeS
     self = [super init];
     if (self) {
         _listenedScenes = [NSHashTable weakObjectsHashTable];
+        _sceneRealStatusMap = [NSMapTable weakToStrongObjectsMapTable];
         
         _listenerToSceneMap = [NSMapTable weakToWeakObjectsMapTable];
         _sceneToListenersMap = [NSMapTable weakToStrongObjectsMapTable];
         
         _listenerToParentScenesMap = [NSMapTable weakToStrongObjectsMapTable];
-        
-        _sceneRealStatusMap = [NSMapTable weakToStrongObjectsMapTable];
     }
     return self;
 }
@@ -186,6 +186,7 @@ typedef void (^RNNativeSceneListenerManagerCompleteBlock)( NSHashTable<RNNativeS
         if (![listenedScenes containsObject:scene]) { // removed
             [_listenedScenes removeObject:scene];
             [scene unregisterListener:self];
+            [_sceneRealStatusMap removeObjectForKey:scene];
         }
     }
 }
