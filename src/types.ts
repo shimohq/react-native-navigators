@@ -45,8 +45,8 @@ export interface NavigationNativeRouterConfig {
 
 export enum NativeNavigationStatusBarStyle {
   Default = 'default',
-  Dark = 'dark',
-  Light = 'light'
+  DarkContent = 'darkContent',
+  LightContent = 'lightContent'
 }
 
 export enum NativeNavigatorTransitions {

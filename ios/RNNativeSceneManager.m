@@ -46,8 +46,8 @@ RCT_ENUM_CONVERTER(RNNativeSceneTransition, (@{
 
 RCT_ENUM_CONVERTER(UIStatusBarStyle, (@{
     @"default": @(UIStatusBarStyleDefault),
-    @"dark": @(UIStatusBarStyleDarkContent),
-    @"light": @(UIStatusBarStyleLightContent)
+    @"darkContent": @(UIStatusBarStyleDarkContent),
+    @"lightContent": @(UIStatusBarStyleLightContent)
         }), UIStatusBarStyleDefault, integerValue)
 
 @end

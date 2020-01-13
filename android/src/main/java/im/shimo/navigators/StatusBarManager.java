@@ -75,7 +75,7 @@ public class StatusBarManager {
 
   public interface StatusBarStyle {
     String Default = "default";
-    String DarkContent = "dark";
-    String LightContent = "light";
+    String DarkContent = "darkContent";
+    String LightContent = "lightContent";
   }
 }
