@@ -32,10 +32,10 @@ function FeaturesIndex(props: NavigationInjectedProps) {
       <TouchableOpacity onPress={() => props.navigation.navigate('statusBar', {statusBarStyle: NativeNavigationStatusBarStyle.Default})}>
         <Text style={styles.link}>Status bar style - Default</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => props.navigation.navigate('statusBar', {statusBarStyle: NativeNavigationStatusBarStyle.Dark})}>
+      <TouchableOpacity onPress={() => props.navigation.navigate('statusBar', {statusBarStyle: NativeNavigationStatusBarStyle.DarkContent})}>
         <Text style={styles.link}>Status bar style - Dark Content</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => props.navigation.navigate('statusBar', {statusBarStyle: NativeNavigationStatusBarStyle.Light})}>
+      <TouchableOpacity onPress={() => props.navigation.navigate('statusBar', {statusBarStyle: NativeNavigationStatusBarStyle.LightContent})}>
         <Text style={styles.link}>Status bar style - Light Content</Text>
       </TouchableOpacity>
     </View>
@@ -63,8 +63,8 @@ function StatusBar(props: NavigationInjectedProps) {
           statusBarStyle: value
         })}>
         <Picker.Item label="Default" value={NativeNavigationStatusBarStyle.Default} />
-        <Picker.Item label="Light Content" value={NativeNavigationStatusBarStyle.Light} />
-        <Picker.Item label="Dark Content" value={NativeNavigationStatusBarStyle.Dark} />
+        <Picker.Item label="Light Content" value={NativeNavigationStatusBarStyle.LightContent} />
+        <Picker.Item label="Dark Content" value={NativeNavigationStatusBarStyle.DarkContent} />
       </Picker>
     </View>
   );
