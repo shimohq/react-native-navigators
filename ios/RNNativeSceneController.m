@@ -30,7 +30,7 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle == UIStatusBarStyleDarkContent) {
+    if (_statusBarStyle == UIStatusBarStyleLightContent) {
         return UIStatusBarStyleLightContent;
     } else {
         if (@available(iOS 13.0, *)) {
