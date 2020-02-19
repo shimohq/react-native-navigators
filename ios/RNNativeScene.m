@@ -129,7 +129,7 @@
 #pragma mark - RCTInvalidating
 
 - (void)invalidate {
-    
+    _controller = nil;
 }
 
 #pragma mark - UIViewControllerTransitioningDelegate
