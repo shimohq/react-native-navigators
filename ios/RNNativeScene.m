@@ -132,11 +132,6 @@
     _controller = nil;
 }
 
-- (void)dealloc {
-    
-}
-
-
 #pragma mark - UIViewControllerTransitioningDelegate
 // 自定义 present dismiss 动画
 
