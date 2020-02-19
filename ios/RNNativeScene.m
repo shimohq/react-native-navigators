@@ -129,8 +129,13 @@
 #pragma mark - RCTInvalidating
 
 - (void)invalidate {
+    _controller = nil;
+}
+
+- (void)dealloc {
     
 }
+
 
 #pragma mark - UIViewControllerTransitioningDelegate
 // 自定义 present dismiss 动画

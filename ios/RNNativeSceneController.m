@@ -27,18 +27,14 @@
     return self;
 }
 
+- (void)dealloc {
+    
+}
+
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle == UIStatusBarStyleDarkContent) {
-        if (@available(iOS 13.0, *)) {
-            return UIStatusBarStyleDarkContent;
-        } else {
-            return UIStatusBarStyleDefault;
-        }
-    } else {
-        return _statusBarStyle;
-    }
+    return _statusBarStyle;
 }
 
 - (BOOL)prefersStatusBarHidden {
