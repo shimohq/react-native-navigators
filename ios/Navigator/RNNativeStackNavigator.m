@@ -87,10 +87,15 @@
             [_controller setViewControllers:newControllers animated:NO];
             [_controller pushViewController:[willShowViewControllers lastObject] animated:YES];
         } else { // 隐藏
-            NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
-            [newControllers addObject:[self.currentScenes lastObject].controller];
-            [_controller setViewControllers:newControllers animated:NO];
-            [_controller popViewControllerAnimated:YES];
+            if (self.currentScenes.count) {
+                // INFO: fix https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/9459c34c470c7aa1be4bab8c93777ea9
+                NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
+                [newControllers addObject:[self.currentScenes lastObject].controller];
+                [_controller setViewControllers:newControllers animated:NO];
+                [_controller popViewControllerAnimated:YES];
+            } else {
+                [_controller setViewControllers:willShowViewControllers animated:NO];
+            }
         }
     } else { // 无动画
         [_controller setViewControllers:willShowViewControllers animated:NO];
