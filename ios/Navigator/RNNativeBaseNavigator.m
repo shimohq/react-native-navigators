@@ -161,7 +161,7 @@
                 self->_needUpdate = NO;
                 NSMutableArray<RNNativeScene *> *nextScenes = [NSMutableArray new];
                 for (RNNativeScene *scene in self.nextScenes) {
-                    if (!scene.closing) {
+                    if (!scene.closing && ![nextScenes containsObject:scene]) {
                         [nextScenes addObject:scene];
                     }
                 }

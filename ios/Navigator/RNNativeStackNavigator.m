@@ -77,15 +77,20 @@
     
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeScene *scene in nextScenes) {
-        [willShowViewControllers addObject:scene.controller];
+        if (![willShowViewControllers containsObject:scene.controller]) {
+            [willShowViewControllers addObject:scene.controller];
+        }
     }
     
     if (hasAnimation) { // 有动画
         if (action == RNNativeStackNavigatorActionShow) { // 显示
-            NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
-            [newControllers removeLastObject];
-            [_controller setViewControllers:newControllers animated:NO];
-            [_controller pushViewController:[willShowViewControllers lastObject] animated:YES];
+            NSInteger willShowViewControllersCount = willShowViewControllers.count;
+            if (willShowViewControllersCount > 0) {
+                [_controller setViewControllers:[willShowViewControllers subarrayWithRange:NSMakeRange(0, willShowViewControllersCount - 1)] animated:NO];
+                [_controller pushViewController:[willShowViewControllers lastObject] animated:YES];
+            } else {
+                [_controller setViewControllers:willShowViewControllers animated:NO];
+            }
         } else { // 隐藏
             if (self.currentScenes.count) {
                 // INFO: fix https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/9459c34c470c7aa1be4bab8c93777ea9
