@@ -94,10 +94,17 @@
         } else { // 隐藏
             if (self.currentScenes.count) {
                 // INFO: fix https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/9459c34c470c7aa1be4bab8c93777ea9
-                NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
-                [newControllers addObject:[self.currentScenes lastObject].controller];
-                [_controller setViewControllers:newControllers animated:NO];
-                [_controller popViewControllerAnimated:YES];
+                // https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/24bb183291e800bef919893f22702bd5
+                // scene.controller 可能已经被释放。
+                UIViewController *lastController = [self.currentScenes lastObject].controller;
+                if (lastController) {
+                    NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
+                    [newControllers addObject:lastController];
+                    [_controller setViewControllers:newControllers animated:NO];
+                    [_controller popViewControllerAnimated:YES];
+                } else {
+                    [_controller setViewControllers:willShowViewControllers animated:NO];
+                }
             } else {
                 [_controller setViewControllers:willShowViewControllers animated:NO];
             }
