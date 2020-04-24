@@ -33,7 +33,7 @@ import im.shimo.navigators.event.WillFocusEvent;
 @SuppressLint("ViewConstructor")
 public class Scene extends ViewGroup implements ReactPointerEventsView {
     static final String TAG = "Scene";
-    private TextView mFocusedView;
+    private View mFocusedView;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
     private boolean mStatusBarHidden;
     private String mStatusBarStyle;
@@ -125,12 +125,12 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         View view = getFocusedChild();
         mFocusedView = null;
         if (view != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            while (view instanceof ViewGroup) {
+            while (view instanceof ViewGroup && ((ViewGroup) view).getFocusedChild() != null) {
                 view = ((ViewGroup) view).getFocusedChild();
             }
-            if (view instanceof TextView) {
-                mFocusedView = (TextView) view;
-            }
+
+            mFocusedView = view;
+            mFocusedView.clearFocus();
         }
 
     }
@@ -144,6 +144,8 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                 public void run() {
                     if (mFocusedView instanceof ReactEditText) {
                         ((ReactEditText) mFocusedView).requestFocusFromJS();
+                    } else {
+                        mFocusedView.requestFocus();
                     }
                     final InputMethodManager imm =
                             (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
