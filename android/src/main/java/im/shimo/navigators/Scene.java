@@ -147,18 +147,21 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                     } else {
                         mFocusedView.requestFocus();
                     }
-                    final InputMethodManager imm =
-                            (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
-                        @Override
-                        protected void onReceiveResult(int resultCode, Bundle resultData) {
-                            if (resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN
-                                    || resultCode == InputMethodManager.RESULT_HIDDEN) {
-                                imm.toggleSoftInput(0, 0);
+
+                    if (mFocusedView.isFocused()) {
+                        final InputMethodManager imm =
+                                (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
+                            @Override
+                            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                                if (resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN
+                                        || resultCode == InputMethodManager.RESULT_HIDDEN) {
+                                    imm.toggleSoftInput(0, 0);
+                                }
                             }
-                        }
-                    });
-                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                        });
+                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    }
                 }
             });
 
