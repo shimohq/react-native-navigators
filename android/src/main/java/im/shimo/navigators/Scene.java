@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.GuardedRunnable;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.uimanager.PointerEvents;
 import com.facebook.react.uimanager.ReactPointerEventsView;
 import com.facebook.react.uimanager.UIManagerModule;
@@ -137,35 +138,31 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
 
     public void restoreFocus() {
-        if (mFocusedView != null) {
-            final ReactContext reactContext = (ReactContext) getContext();
-            reactContext.runOnUiQueueThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mFocusedView instanceof ReactEditText) {
-                        ((ReactEditText) mFocusedView).requestFocusFromJS();
-                    } else {
-                        mFocusedView.requestFocus();
-                    }
-
-                    if (mFocusedView.isFocused()) {
-                        final InputMethodManager imm =
-                                (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
-                            @Override
-                            protected void onReceiveResult(int resultCode, Bundle resultData) {
-                                if (resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN
-                                        || resultCode == InputMethodManager.RESULT_HIDDEN) {
-                                    imm.toggleSoftInput(0, 0);
-                                }
-                            }
-                        });
-                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-                    }
+        UiThreadUtil.runOnUiThread(() -> {
+            if (mFocusedView != null) {
+                if (mFocusedView instanceof ReactEditText) {
+                    ((ReactEditText) mFocusedView).requestFocusFromJS();
+                } else {
+                    mFocusedView.requestFocus();
                 }
-            });
 
-        }
+                if (mFocusedView.isFocused()) {
+                    final InputMethodManager imm =
+                            (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
+                        @Override
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
+                            if (resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN
+                                    || resultCode == InputMethodManager.RESULT_HIDDEN) {
+                                imm.toggleSoftInput(0, 0);
+                            }
+                        }
+                    });
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                }
+
+            }
+        });
     }
 
     /**
@@ -235,7 +232,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     public void setStatusBarStyle(String statusBarStyle) {
         mStatusBarStyle = statusBarStyle;
         if ((mStatus == SceneStatus.WILL_FOCUS || mStatus == SceneStatus.DID_FOCUS)
-                && mStatusBarManager != null){
+                && mStatusBarManager != null) {
             mStatusBarManager.setStatusBarStyle(statusBarStyle);
         }
     }
