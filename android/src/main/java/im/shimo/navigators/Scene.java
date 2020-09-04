@@ -131,7 +131,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                 view = ((ViewGroup) view).getFocusedChild();
             }
 
-            mFocusedViewKeyboardShowing = SceneBridge.getInstance().getSceneBridgeDelegate().isKeyboardShowing();
+            mFocusedViewKeyboardShowing = NavigatorBridge.getInstance().getNavigatorBridgeDelegate().isKeyboardShowing();
             mFocusedView = view;
             mFocusedView.clearFocus();
         }
