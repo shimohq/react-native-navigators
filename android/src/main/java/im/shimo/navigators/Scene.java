@@ -35,6 +35,7 @@ import im.shimo.navigators.event.WillFocusEvent;
 public class Scene extends ViewGroup implements ReactPointerEventsView {
     static final String TAG = "Scene";
     private View mFocusedView;
+    private boolean mFocusedViewKeyboardShowing;
     private SceneStatus mStatus = SceneStatus.DID_BLUR;
     private boolean mStatusBarHidden;
     private String mStatusBarStyle;
@@ -91,7 +92,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
         }
     }
 
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -124,16 +124,17 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
     public void saveFocusedView() {
         View view = getFocusedChild();
+        mFocusedViewKeyboardShowing = false;
         mFocusedView = null;
         if (view != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             while (view instanceof ViewGroup && ((ViewGroup) view).getFocusedChild() != null) {
                 view = ((ViewGroup) view).getFocusedChild();
             }
 
+            mFocusedViewKeyboardShowing = NavigatorBridge.getInstance().getNavigatorBridgeDelegate().isKeyboardShowing();
             mFocusedView = view;
             mFocusedView.clearFocus();
         }
-
     }
 
 
@@ -146,7 +147,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
                     mFocusedView.requestFocus();
                 }
 
-                if (mFocusedView.isFocused()) {
+                if (mFocusedView.isFocused() && mFocusedViewKeyboardShowing) {
                     final InputMethodManager imm =
                             (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(mFocusedView, 0, new ResultReceiver(new Handler()) {
