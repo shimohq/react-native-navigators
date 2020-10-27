@@ -41,7 +41,7 @@
         UIViewController *targetController = operation == UINavigationControllerOperationPush ? toVC : fromVC;
         if ([targetController isKindOfClass:[RNNativeSceneController class]]) {
             RNNativeSceneController *controller = (RNNativeSceneController *)targetController;
-            RNNativeSceneTransition transition = controller.scene.transition;
+            RNNativeSceneTransition transition = controller.nativeScene.transition;
             if (transition != RNNativeSceneTransitionDefault && transition != RNNativeSceneTransitionNone) {
                 if (operation == UINavigationControllerOperationPush) {
                     return [[RNNativePushAnimatedTransition alloc] initWithTransition:transition];
@@ -116,3 +116,4 @@
 }
 
 @end
+

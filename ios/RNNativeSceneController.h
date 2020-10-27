@@ -7,7 +7,7 @@
 
 @interface RNNativeSceneController : UIViewController
 
-@property (nonatomic, weak) RNNativeScene *scene;
+@property (nonatomic, weak) RNNativeScene *nativeScene;
 @property (nonatomic, assign) RNNativeSceneStatus status;
 
 /**
@@ -20,6 +20,7 @@
  */
 @property (nonatomic, assign) BOOL statusBarHidden;
 
-- (instancetype)initWithScene:(RNNativeScene *)scene;
+- (instancetype)initWithNativeScene:(RNNativeScene *)nativeScene;
 
 @end
+
