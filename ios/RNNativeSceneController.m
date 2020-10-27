@@ -20,7 +20,7 @@
     return self;
 }
 
-- (instancetype)initWithScene:(RNNativeScene *)nativeScene {
+- (instancetype)initWithNativeScene:(RNNativeScene *)nativeScene {
     if (self = [self init]) {
         _nativeScene = nativeScene;
     }

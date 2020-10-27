@@ -33,7 +33,7 @@
         _translucent = NO;
         _bridge = bridge;
         _dismissed = NO;
-        _controller = [[RNNativeSceneController alloc] initWithScene:self];
+        _controller = [[RNNativeSceneController alloc] initWithNativeScene:self];
         _controller.transitioningDelegate = self;
         _listeners = [NSPointerArray weakObjectsPointerArray];
     }

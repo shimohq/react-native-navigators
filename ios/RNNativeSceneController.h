@@ -20,7 +20,7 @@
  */
 @property (nonatomic, assign) BOOL statusBarHidden;
 
-- (instancetype)initWithScene:(RNNativeScene *)nativeScene;
+- (instancetype)initWithNativeScene:(RNNativeScene *)nativeScene;
 
 @end
 
