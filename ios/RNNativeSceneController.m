@@ -30,7 +30,15 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return _statusBarStyle;
+    if (_statusBarStyle == UIStatusBarStyleDarkContent) {
+        if (@available(iOS 13.0, *)) {
+            return UIStatusBarStyleDarkContent;
+        } else {
+            return UIStatusBarStyleDefault;
+        }
+    } else {
+        return _statusBarStyle;
+    }
 }
 
 - (BOOL)prefersStatusBarHidden {
