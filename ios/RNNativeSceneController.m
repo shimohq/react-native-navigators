@@ -20,9 +20,9 @@
     return self;
 }
 
-- (instancetype)initWithScene:(RNNativeScene *)scene {
+- (instancetype)initWithScene:(RNNativeScene *)nativeScene {
     if (self = [self init]) {
-        _scene = scene;
+        _nativeScene = nativeScene;
     }
     return self;
 }
@@ -30,15 +30,7 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle == UIStatusBarStyleDarkContent) {
-        if (@available(iOS 13.0, *)) {
-            return UIStatusBarStyleDarkContent;
-        } else {
-            return UIStatusBarStyleDefault;
-        }
-    } else {
-        return _statusBarStyle;
-    }
+    return _statusBarStyle;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -54,39 +46,39 @@
 }
 
 - (void)loadView {
-    if (_scene != nil) {
-        self.view = _scene;
+    if (_nativeScene != nil) {
+        self.view = _nativeScene;
     }
 }
 
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [super willMoveToParentViewController:parent];
-    [_scene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
+    [_nativeScene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [super didMoveToParentViewController:parent];
-    [_scene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
+    [_nativeScene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [_scene setStatus:RNNativeSceneStatusWillFocus];
+    [_nativeScene setStatus:RNNativeSceneStatusWillFocus];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [_scene setStatus:RNNativeSceneStatusDidFocus];
+    [_nativeScene setStatus:RNNativeSceneStatusDidFocus];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_scene setStatus:RNNativeSceneStatusWillBlur];
+    [_nativeScene setStatus:RNNativeSceneStatusWillBlur];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    [_scene setStatus:RNNativeSceneStatusDidBlur];
+    [_nativeScene setStatus:RNNativeSceneStatusDidBlur];
 }
 
 #pragma mark - Setter
@@ -127,7 +119,7 @@
         if (self.navigationController.navigationBarHidden) {
             [self.navigationController setNavigationBarHidden:NO];
         }
-        self.navigationController.navigationBar.translucent = _scene.translucent;
+        self.navigationController.navigationBar.translucent = _nativeScene.translucent;
         [header attachViewController:self];
     } else {
         if (!self.navigationController.navigationBarHidden) {
@@ -137,7 +129,7 @@
 }
 
 - (RNNativeStackHeader *)findHeader {
-    for (UIView *subview in _scene.reactSubviews) {
+    for (UIView *subview in _nativeScene.reactSubviews) {
         if ([subview isKindOfClass:[RNNativeStackHeader class]]) {
             return (RNNativeStackHeader *)subview;
         }
@@ -164,3 +156,4 @@
 }
 
 @end
+

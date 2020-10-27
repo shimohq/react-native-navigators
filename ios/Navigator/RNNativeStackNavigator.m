@@ -41,7 +41,7 @@
         UIViewController *targetController = operation == UINavigationControllerOperationPush ? toVC : fromVC;
         if ([targetController isKindOfClass:[RNNativeSceneController class]]) {
             RNNativeSceneController *controller = (RNNativeSceneController *)targetController;
-            RNNativeSceneTransition transition = controller.scene.transition;
+            RNNativeSceneTransition transition = controller.nativeScene.transition;
             if (transition != RNNativeSceneTransitionDefault && transition != RNNativeSceneTransitionNone) {
                 if (operation == UINavigationControllerOperationPush) {
                     return [[RNNativePushAnimatedTransition alloc] initWithTransition:transition];
@@ -77,37 +77,20 @@
     
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeScene *scene in nextScenes) {
-        if (![willShowViewControllers containsObject:scene.controller]) {
-            [willShowViewControllers addObject:scene.controller];
-        }
+        [willShowViewControllers addObject:scene.controller];
     }
     
     if (hasAnimation) { // 有动画
         if (action == RNNativeStackNavigatorActionShow) { // 显示
-            NSInteger willShowViewControllersCount = willShowViewControllers.count;
-            if (willShowViewControllersCount > 0) {
-                [_controller setViewControllers:[willShowViewControllers subarrayWithRange:NSMakeRange(0, willShowViewControllersCount - 1)] animated:NO];
-                [_controller pushViewController:[willShowViewControllers lastObject] animated:YES];
-            } else {
-                [_controller setViewControllers:willShowViewControllers animated:NO];
-            }
+            NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
+            [newControllers removeLastObject];
+            [_controller setViewControllers:newControllers animated:NO];
+            [_controller pushViewController:[willShowViewControllers lastObject] animated:YES];
         } else { // 隐藏
-            if (self.currentScenes.count) {
-                // INFO: fix https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/9459c34c470c7aa1be4bab8c93777ea9
-                // https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/24bb183291e800bef919893f22702bd5
-                // scene.controller 可能已经被释放。
-                UIViewController *lastController = [self.currentScenes lastObject].controller;
-                if (lastController) {
-                    NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
-                    [newControllers addObject:lastController];
-                    [_controller setViewControllers:newControllers animated:NO];
-                    [_controller popViewControllerAnimated:YES];
-                } else {
-                    [_controller setViewControllers:willShowViewControllers animated:NO];
-                }
-            } else {
-                [_controller setViewControllers:willShowViewControllers animated:NO];
-            }
+            NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
+            [newControllers addObject:[self.currentScenes lastObject].controller];
+            [_controller setViewControllers:newControllers animated:NO];
+            [_controller popViewControllerAnimated:YES];
         }
     } else { // 无动画
         [_controller setViewControllers:willShowViewControllers animated:NO];
@@ -116,3 +99,4 @@
 }
 
 @end
+
