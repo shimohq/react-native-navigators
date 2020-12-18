@@ -28,9 +28,6 @@ export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
     case NativeNavigatorModes.Card:
       Navigator = RNNativeCardNavigator;
       break;
-    case NativeNavigatorModes.Modal:
-      Navigator = RNNativeModalNavigator;
-      break;
     default:
       Navigator = RNNativeStackNavigator;
       break;
@@ -39,5 +36,4 @@ export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
 }
 
 const RNNativeStackNavigator = requireNativeComponent('RNNativeStackNavigator');
-const RNNativeModalNavigator = requireNativeComponent('RNNativeModalNavigator');
 const RNNativeCardNavigator = requireNativeComponent('RNNativeCardNavigator');

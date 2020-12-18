@@ -11,7 +11,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
         self.automaticallyAdjustsScrollViewInsets = NO;
         _statusBarStyle = UIStatusBarStyleDefault;
         _statusBarHidden = NO;

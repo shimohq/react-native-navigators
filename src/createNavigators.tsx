@@ -30,17 +30,6 @@ export function createStackNavigator(
   });
 }
 
-export function createModalNavigator(
-  routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>
-) {
-  const router = StackRouter(routeConfigMap, stackConfig);
-  return createNavigator(NativeNavigators, router, {
-    ...stackConfig,
-    mode: NativeNavigatorModes.Modal
-  });
-}
-
 export function createCardNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>

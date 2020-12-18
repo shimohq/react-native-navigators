@@ -1,10 +1,8 @@
 #import "RNNativeScene.h"
-#import "RNNativeModalAnimatedTransition.h"
 #import "RNNativeSceneController.h"
 #import "RNNativeNavigatorInsetsData.h"
 #import "RNNativeNavigatorFrameData.h"
 #import "RNNativeStackHeader.h"
-#import "RNNativeModalPresentationController.h"
 
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
@@ -130,58 +128,6 @@
 
 - (void)invalidate {
     _controller = nil;
-}
-
-#pragma mark - UIViewControllerTransitioningDelegate
-// 自定义 present dismiss 动画
-
-/**
- present 动画
- */
-- (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    if (_transition == RNNativeSceneTransitionDefault || _transition == RNNativeSceneTransitionNone) {
-        return nil;
-    }
-    return [[RNNativeModalAnimatedTransition alloc] initWithTransition:_transition presenting:YES];
-}
-
-/**
- dismiss 动画
- */
-- (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
-    if (_transition == RNNativeSceneTransitionDefault || _transition == RNNativeSceneTransitionNone) {
-        return nil;
-    }
-    return [[RNNativeModalAnimatedTransition alloc] initWithTransition:_transition presenting:NO];
-}
-
-/**
- present 手势动画
- TODO: 未实现
- */
-- (nullable id <UIViewControllerInteractiveTransitioning>)interactionControllerForPresentation:(id <UIViewControllerAnimatedTransitioning>)animator {
-    return nil;
-}
-
-/**
- dismiss 手势动画
- TODO: 未实现
- */
-- (nullable id <UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id <UIViewControllerAnimatedTransitioning>)animator {
-    return nil;
-}
-
-- (nullable UIPresentationController *)presentationControllerForPresentedViewController:(UIViewController *)presented presentingViewController:(nullable UIViewController *)presenting sourceViewController:(UIViewController *)source {
-    if (presented.modalPresentationStyle == UIModalPresentationCustom) {
-        RNNativeModalPresentationController *presentationController = [[RNNativeModalPresentationController alloc] initWithPresentedViewController:presented presentingViewController:source];
-        if ([presented.view isKindOfClass:[RNNativeScene class]]) {
-            RNNativeScene *scene = (RNNativeScene *)presented.view;
-            presentationController.transparent  = scene.transparent;
-        }
-        return presentationController;
-    } else {
-        return nil;
-    }
 }
 
 #pragma mark - Getter

@@ -12,9 +12,7 @@ import {
 } from 'react-native-navigators';
 
 import Root from './root';
-import Modal from './modal';
 import CardScreen from './screens/card';
-import Popover from './popover';
 import Stack from './stack';
 import Features from './features';
 import { name as appName } from '../app.json';
@@ -22,8 +20,6 @@ import { name as appName } from '../app.json';
 const RootStack = createNativeNavigator(
   {
     root: Root,
-    modal: Modal,
-    popover: Popover,
     card: CardScreen,
     stack: Stack,
     features: Features

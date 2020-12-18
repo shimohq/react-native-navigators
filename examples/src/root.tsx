@@ -8,14 +8,6 @@ export default function Root(props: NavigationInjectedProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>react-native-navigators</Text>
-      <TouchableOpacity onPress={() => props.navigation.navigate('modal')}>
-        <Text style={styles.link}>Modal navigator demo</Text>
-      </TouchableOpacity>
-      {(Platform as PlatformIOSStatic).isPad ? (
-        <TouchableOpacity onPress={() => props.navigation.navigate('popover')}>
-          <Text style={styles.link}>Popover navigator demo</Text>
-        </TouchableOpacity>
-      ): null}
       <TouchableOpacity onPress={() => props.navigation.navigate('card')}>
         <Text style={styles.link}>Card navigator demo</Text>
       </TouchableOpacity>
