@@ -18,7 +18,6 @@ public class RNNavigatorsPackage implements ReactPackage {
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
     return Arrays.<ViewManager>asList(
-            new SceneModalManager(),
             new SceneCardManager(),
             new SceneManager(),
             new SceneStackManager()

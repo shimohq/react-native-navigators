@@ -2,9 +2,9 @@ package im.shimo.navigators;
 
 import android.content.Context;
 
-public class SceneModal extends SceneContainer {
+public class SceneCard extends SceneContainer {
 
-    public SceneModal(Context context) {
+    public SceneCard(Context context) {
         super(context);
     }
 

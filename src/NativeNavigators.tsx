@@ -133,7 +133,7 @@ export default class NativeNavigators extends PureComponent<
     } = this.props;
     const { closingRouteKey, routes, descriptors, screenProps } = this.state;
     const mode: NativeNavigatorModes =
-      navigationConfig.mode || NativeNavigatorModes.Modal;
+      navigationConfig.mode || NativeNavigatorModes.Stack;
 
     return (
       <NativeStackNavigator mode={mode}>

@@ -12,12 +12,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, RNNativeSceneMode) {
-    RNNativeSceneModeStack,
-    RNNativeSceneModePopover,
-    RNNativeSceneModeModal,
-};
-
 typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
     RNNativeStackNavigatorActionNone,
     RNNativeStackNavigatorActionShow,

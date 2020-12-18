@@ -60,7 +60,6 @@ export enum NativeNavigatorTransitions {
 
 export enum NativeNavigatorModes {
   Stack = 'stack',
-  Modal = 'modal', // present, 默认不透明
   Card = 'card', // add child controller，默认不透明
   Split = 'split' // todo
 }
