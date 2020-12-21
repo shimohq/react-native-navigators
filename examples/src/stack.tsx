@@ -1,9 +1,21 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Switch, Image } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, Switch, Image, StyleSheet } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
 import { createNativeNavigator, NativeNavigatorModes, NativeNavigatorTransitions } from 'react-native-navigators';
 
 import styles from './styles';
+
+const stackStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  contentContainerStyle: {
+    width: '200%',
+    height: '100%',
+    backgroundColor: 'red'
+  }
+});
 
 function StackIndex(props: NavigationInjectedProps) {
   return (
@@ -46,16 +58,21 @@ function StackIndex(props: NavigationInjectedProps) {
 function Gesture(props: NavigationInjectedProps) {
   const disabled = props.navigation.getParam('disabled', false);
   return (
-    <View style={styles.container}>
-      <Text>Gesture{disabled ? ' disabled' : ' enabled'}</Text>
-      <Switch
-        value={disabled}
-        onValueChange={() =>
-          props.navigation.setParams({
-            disabled: !disabled
-          })
-        }
-      />
+    <View style={stackStyles.container}>
+      <View style={styles.container}>
+        <Text>Gesture{disabled ? ' disabled' : ' enabled'}</Text>
+        <Switch
+          value={disabled}
+          onValueChange={() =>
+            props.navigation.setParams({
+              disabled: !disabled
+            })
+          }
+        />
+      </View>
+      <View style={stackStyles.container}>
+        <ScrollView style={stackStyles.container} contentContainerStyle={stackStyles.contentContainerStyle}/>
+      </View>
     </View>
   );
 }
