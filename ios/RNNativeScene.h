@@ -3,7 +3,6 @@
 
 #import "RNNativeConst.h"
 #import "RNNativeSceneController.h"
-#import "RNNativePopoverParams.h"
 
 @class RNNativeScene;
 
@@ -72,12 +71,6 @@
  */
 @property (nonatomic, assign) BOOL transparent;
 
-/**
- popover 信息
- 
- 只适用于 iPad
- */
-@property (nonatomic, strong) NSDictionary *popover;
 @property (nonatomic, copy) RCTDirectEventBlock onWillFocus;
 @property (nonatomic, copy) RCTDirectEventBlock onDidFocus;
 @property (nonatomic, copy) RCTDirectEventBlock onWillBlur;
@@ -97,7 +90,6 @@
 @property (nonatomic, assign) BOOL dismissed;
 @property (nonatomic, weak) id<RNNativeSceneDelegate> delegate;
 @property (nonatomic, strong, readonly) RNNativeSceneController *controller;
-@property (nonatomic, strong, readonly) RNNativePopoverParams *popoverParams;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 - (void)updateBounds;

@@ -7,13 +7,6 @@ import {
   NavigationScreenConfig
 } from 'react-navigation';
 
-export interface NativeNavigationPopover {
-  sourceViewNativeID: string;
-  contentSize: NativeNavigatorSize;
-  sourceRect?: NativeNavigatorRect;
-  directions?: NativeNavigatorDirection[];
-}
-
 export interface NativeNavigationOptions {
   transition?: NativeNavigatorTransitions;
   translucent?: boolean;
@@ -28,7 +21,6 @@ export interface NativeNavigationOptions {
   headerHidden?: boolean;
   headerTitle?: string;
   headerTitleStyle?: StyleProp<TextStyle>;
-  popover?: NativeNavigationPopover;
   statusBarStyle?: NativeNavigationStatusBarStyle;
   statusBarHidden?: boolean;
 }

@@ -77,13 +77,12 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
               key={key}
               transition={
                 navigation.dangerouslyGetParent()?.state?.isTransitioning ?
-                (options.transition || NativeNavigatorTransitions.Default) : NativeNavigatorTransitions.None
+                  (options.transition || NativeNavigatorTransitions.Default) : NativeNavigatorTransitions.None
               }
               closing={closingRouteKey === route.key}
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               transparent={options.transparent === true}
-              popover={options.popover}
               onDidFocus={this.handleDidFocus}
               onDidBlur={this.handleDidBlur}
               route={route}
