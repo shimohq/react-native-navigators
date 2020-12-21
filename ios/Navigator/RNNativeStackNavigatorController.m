@@ -82,7 +82,7 @@
         UIView *view = navigationController.topViewController.view;
         if ([view isKindOfClass:[RNNativeScene class]]) {
             RNNativeScene *scene = (RNNativeScene *)view;
-            return scene.gestureEnabled ;
+            return scene.gestureEnabled;
         }
     }
     
