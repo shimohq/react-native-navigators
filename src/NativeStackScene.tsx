@@ -9,7 +9,6 @@ import { NavigationRoute } from 'react-navigation';
 
 import {
   NativeNavigatorTransitions,
-  NativeNavigationPopover,
   NativeNavigationStatusBarStyle
 } from './types';
 
@@ -19,7 +18,6 @@ interface NativeStackNavigatorProps {
   transparent: boolean;
   transition: NativeNavigatorTransitions;
   gestureEnabled: boolean;
-  popover?: NativeNavigationPopover;
   onDidFocus: (route: NavigationRoute) => void;
   onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
   route: NavigationRoute;
@@ -56,7 +54,6 @@ export default class NativeStackNavigator extends PureComponent<
       transparent,
       transition,
       gestureEnabled,
-      popover,
       style,
       statusBarStyle,
       statusBarHidden
@@ -69,7 +66,6 @@ export default class NativeStackNavigator extends PureComponent<
         transparent={transparent}
         transition={transition}
         gestureEnabled={gestureEnabled}
-        popover={popover}
         onDidFocus={this.onDidFocus}
         onDidBlur={this.onDidBlur}
         style={

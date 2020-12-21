@@ -163,11 +163,6 @@
     }
 }
 
-- (void)setPopover:(NSDictionary *)popover {
-    _popover = popover;
-    _popoverParams = [[RNNativePopoverParams alloc] initWithParams:popover];
-}
-
 - (void)setStatus:(RNNativeSceneStatus)status {
     BOOL dismissed = false;
     if (status == RNNativeSceneStatusDidBlur && !_dismissed) {
