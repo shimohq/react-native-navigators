@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Switch, Image } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, Switch, Image } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
 import { createNativeNavigator, NativeNavigatorModes, NativeNavigatorTransitions } from 'react-native-navigators';
 
@@ -46,16 +46,21 @@ function StackIndex(props: NavigationInjectedProps) {
 function Gesture(props: NavigationInjectedProps) {
   const disabled = props.navigation.getParam('disabled', false);
   return (
-    <View style={styles.container}>
-      <Text>Gesture{disabled ? ' disabled' : ' enabled'}</Text>
-      <Switch
-        value={disabled}
-        onValueChange={() =>
-          props.navigation.setParams({
-            disabled: !disabled
-          })
-        }
-      />
+    <View style={{flex: 1}}>
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <Text>Gesture{disabled ? ' disabled' : ' enabled'}</Text>
+        <Switch
+          value={disabled}
+          onValueChange={() =>
+            props.navigation.setParams({
+              disabled: !disabled
+            })
+          }
+        />
+      </View>
+      <View style={{flex: 1}}>
+        <ScrollView style={{flex: 1}} contentContainerStyle={{width: '200%', height: '100%', backgroundColor: 'green'}}/>
+      </View>
     </View>
   );
 }

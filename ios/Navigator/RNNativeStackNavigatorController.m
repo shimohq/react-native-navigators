@@ -13,6 +13,8 @@
 
 @interface RNNativeStackNavigatorController () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
+
 @end
 
 @implementation RNNativeStackNavigatorController
@@ -26,6 +28,8 @@
     [pan addTarget:target action:NSSelectorFromString(@"handleNavigationTransition:")];
     pan.delegate = self;
     [self.view addGestureRecognizer:pan];
+    self.panGestureRecognizer = pan;
+    
     self.interactivePopGestureRecognizer.enabled = NO;
 }
 
@@ -42,6 +46,10 @@
     if ([view isKindOfClass:[RNNativeScene class]]) {
         [self updateFrameWithView:view parentView:self.view];
     }
+}
+
+- (void)viewDidLayoutSubviews {
+    [self findAndDisableScrollViewWithView:self.view];
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {
@@ -74,9 +82,10 @@
         UIView *view = navigationController.topViewController.view;
         if ([view isKindOfClass:[RNNativeScene class]]) {
             RNNativeScene *scene = (RNNativeScene *)view;
-            return scene.gestureEnabled;
+            return scene.gestureEnabled ;
         }
     }
+    
     return NO;
 }
 
@@ -111,6 +120,16 @@
     CGRect frame = view.frame;
     if (!CGRectEqualToRect(frame, parentFrame)) {
         view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(parentFrame), CGRectGetHeight(parentFrame));
+    }
+}
+
+- (void)findAndDisableScrollViewWithView:(UIView *)view {
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:[UIScrollView class]]) {
+            UIScrollView *scrollView = (UIScrollView *)subview;
+            [scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.panGestureRecognizer];
+        }
+        [self findAndDisableScrollViewWithView:subview];
     }
 }
 
