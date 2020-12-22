@@ -8,12 +8,12 @@
 
 #import "RNNativeStackNavigatorController.h"
 #import "RNNativeScene.h"
+#import "RNNativePanGestureRecognizerManager.h"
+
 #import <React/RCTRootContentView.h>
 #import <React/RCTTouchHandler.h>
 
 @interface RNNativeStackNavigatorController () <UIGestureRecognizerDelegate>
-
-@property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
 
 @end
 
@@ -28,7 +28,7 @@
     [pan addTarget:target action:NSSelectorFromString(@"handleNavigationTransition:")];
     pan.delegate = self;
     [self.view addGestureRecognizer:pan];
-    self.panGestureRecognizer = pan;
+    [[RNNativePanGestureRecognizerManager sharedInstance] addPanGestureRecognizer:pan];
 
     self.interactivePopGestureRecognizer.enabled = NO;
 }
@@ -46,10 +46,6 @@
     if ([view isKindOfClass:[RNNativeScene class]]) {
         [self updateFrameWithView:view parentView:self.view];
     }
-}
-
-- (void)viewDidLayoutSubviews {
-    [self findAndDisableGesturesWithView:self.view];
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {
@@ -120,21 +116,6 @@
     CGRect frame = view.frame;
     if (!CGRectEqualToRect(frame, parentFrame)) {
         view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(parentFrame), CGRectGetHeight(parentFrame));
-    }
-}
-
-- (void)findAndDisableGesturesWithView:(UIView *)view {
-    for (UIView *subview in view.subviews) {
-        if ([subview isKindOfClass:[UIScrollView class]]) {
-            UIScrollView *scrollView = (UIScrollView *)subview;
-            [scrollView.panGestureRecognizer requireGestureRecognizerToFail:_panGestureRecognizer];
-        } else if ([NSStringFromClass(subview.class) containsString:@"WKApplicationStateTrackingView"]) {
-            // Disable all gestures in webview when gesturing to return.
-            for (UIGestureRecognizer *gesture in subview.gestureRecognizers) {
-                [gesture requireGestureRecognizerToFail:_panGestureRecognizer];
-            }
-        }
-        [self findAndDisableGesturesWithView:subview];
     }
 }
 
