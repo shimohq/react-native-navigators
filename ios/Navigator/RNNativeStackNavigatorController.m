@@ -29,7 +29,7 @@
     pan.delegate = self;
     [self.view addGestureRecognizer:pan];
     self.panGestureRecognizer = pan;
-    
+
     self.interactivePopGestureRecognizer.enabled = NO;
 }
 
@@ -49,7 +49,7 @@
 }
 
 - (void)viewDidLayoutSubviews {
-    [self findAndDisableScrollViewWithView:self.view];
+    [self findAndDisableGesturesWithView:self.view];
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {
@@ -67,7 +67,7 @@
     if (location.x > 40) {
         return NO;
     }
-    
+
     // cancel touches in parent, this is needed to cancel RN touch events. For example when Touchable
     // item is close to an edge and we start pulling from edge we want the Touchable to be cancelled.
     // Without the below code the Touchable will remain active (highlighted) for the duration of back
@@ -76,7 +76,7 @@
     while (parent != nil && ![parent isKindOfClass:[RCTRootContentView class]]) parent = parent.superview;
     RCTRootContentView *rootView = (RCTRootContentView *)parent;
     [rootView.touchHandler cancel];
-    
+
     UINavigationController *navigationController = [self getTargetNavigationController:self];
     if (navigationController.viewControllers.count > 1) {
         UIView *view = navigationController.topViewController.view;
@@ -85,7 +85,7 @@
             return scene.gestureEnabled;
         }
     }
-    
+
     return NO;
 }
 
@@ -123,13 +123,18 @@
     }
 }
 
-- (void)findAndDisableScrollViewWithView:(UIView *)view {
+- (void)findAndDisableGesturesWithView:(UIView *)view {
     for (UIView *subview in view.subviews) {
         if ([subview isKindOfClass:[UIScrollView class]]) {
             UIScrollView *scrollView = (UIScrollView *)subview;
-            [scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.panGestureRecognizer];
+            [scrollView.panGestureRecognizer requireGestureRecognizerToFail:_panGestureRecognizer];
+        } else if ([NSStringFromClass(subview.class) containsString:@"WKApplicationStateTrackingView"]) {
+            // Disable all gestures in webview when gesturing to return.
+            for (UIGestureRecognizer *gesture in subview.gestureRecognizers) {
+                [gesture requireGestureRecognizerToFail:_panGestureRecognizer];
+            }
         }
-        [self findAndDisableScrollViewWithView:subview];
+        [self findAndDisableGesturesWithView:subview];
     }
 }
 
