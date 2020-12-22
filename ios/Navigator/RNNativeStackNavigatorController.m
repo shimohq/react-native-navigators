@@ -14,6 +14,7 @@
 @interface RNNativeStackNavigatorController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
+@property (nonatomic, assign) BOOL willDisableGestures;
 
 @end
 
@@ -49,7 +50,14 @@
 }
 
 - (void)viewDidLayoutSubviews {
-    [self findAndDisableGesturesWithView:self.view];
+    if (_willDisableGestures) {
+        return;
+    }
+    _willDisableGestures = YES;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        _willDisableGestures = NO;
+        [self findAndDisableGesturesWithView:self.view];
+    });
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {
