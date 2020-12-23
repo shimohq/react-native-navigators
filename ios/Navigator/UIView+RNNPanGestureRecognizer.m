@@ -23,7 +23,7 @@ void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 + (void)load {
-    Swizzle(UIScrollView.class, @selector(addGestureRecognizer:), @selector(rnn_addGestureRecognizer:));
+    Swizzle(UIScrollView.class, @selector(addGestureRecognizer:), @selector(rnn_addScrollViewGestureRecognizer:));
     Swizzle(NSClassFromString(@"WKApplicationStateTrackingView"), @selector(addGestureRecognizer:), @selector(rnn_addGestureRecognizer:));
 }
 
@@ -32,6 +32,15 @@ void Swizzle(Class c, SEL orig, SEL new) {
         [gestureRecognizer requireGestureRecognizerToFail:panGestureRecognizer];
     }
     [self rnn_addGestureRecognizer:gestureRecognizer];
+}
+
+- (void)rnn_addScrollViewGestureRecognizer:(UIGestureRecognizer*)gestureRecognizer {
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        for (UIPanGestureRecognizer *panGestureRecognizer in [[RNNativePanGestureRecognizerManager sharedInstance] getAllPanGestureRecognizers]) {
+            [gestureRecognizer requireGestureRecognizerToFail:panGestureRecognizer];
+        }
+    }
+    [self rnn_addScrollViewGestureRecognizer:gestureRecognizer];
 }
 
 @end
