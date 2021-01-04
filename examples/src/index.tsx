@@ -1,45 +1,44 @@
 import React from 'react';
-import { AppRegistry } from 'react-native';
+import {AppRegistry} from 'react-native';
 import {
   createAppContainer,
   NavigationState,
-  NavigationAction
+  NavigationAction,
 } from 'react-navigation';
 import {
   createNativeNavigator,
   NativeNavigatorModes,
-  NativeNavigatorHeaderModes
+  NativeNavigatorHeaderModes,
 } from 'react-native-navigators';
 
 import Root from './root';
 import CardScreen from './screens/card';
 import Stack from './stack';
 import Features from './features';
-import { name as appName } from '../app.json';
+import {name as appName} from '../app.json';
 
 const RootStack = createNativeNavigator(
   {
     root: Root,
     card: CardScreen,
     stack: Stack,
-    features: Features
+    features: Features,
   },
   {
     mode: NativeNavigatorModes.Stack,
     headerMode: NativeNavigatorHeaderModes.None,
-    initialRouteName: 'root'
-  }
+    initialRouteName: 'root',
+  },
 );
 
 const AppContainer = createAppContainer(RootStack);
 
 AppRegistry.registerComponent(appName, () => () => (
-
   <AppContainer
     onNavigationStateChange={(
       prevNavigationState: NavigationState,
       nextNavigationState: NavigationState,
-      action: NavigationAction
+      action: NavigationAction,
     ) => {
       console.log(
         'navigation state changed from:',
@@ -47,9 +46,8 @@ AppRegistry.registerComponent(appName, () => () => (
         'to:',
         nextNavigationState,
         'with action:',
-        action.type
+        action.type,
       );
     }}
   />
 ));
-

@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import {View} from 'react-native';
 import CardNavigator from '../card';
 import React, {PureComponent} from 'react';
 
@@ -13,15 +13,13 @@ export default class CardScreen extends PureComponent {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.4)'
-        }}
-      >
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        }}>
         <View
           style={{
             width: 300,
-            height: 350
-          }}
-        >
+            height: 350,
+          }}>
           <CardNavigator {...this.props} />
         </View>
       </View>

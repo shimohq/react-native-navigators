@@ -1,22 +1,22 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
 
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   title: {
     marginBottom: 20,
-    fontSize: 24
+    fontSize: 24,
   },
 
   link: {
@@ -24,18 +24,18 @@ export default StyleSheet.create({
     fontSize: 16,
     color: 'blue',
     textDecorationStyle: 'solid',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   },
 
   input: {
     height: 40,
     width: 240,
     borderWidth: 1,
-    borderColor: 'grey'
+    borderColor: 'grey',
   },
 
   border: {
     borderColor: 'red',
-    borderWidth: 1
-  }
+    borderWidth: 1,
+  },
 });

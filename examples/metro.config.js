@@ -4,7 +4,7 @@
  *
  * @format
  */
-var path = require("path");
+var path = require('path');
 
 module.exports = {
   transformer: {
@@ -13,6 +13,6 @@ module.exports = {
         experimentalImportSupport: false,
         inlineRequires: false,
       },
-    })
-  }
+    }),
+  },
 };

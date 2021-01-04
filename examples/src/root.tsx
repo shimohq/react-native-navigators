@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Platform, PlatformIOSStatic } from 'react-native';
-import { NavigationInjectedProps } from 'react-navigation';
+import {View, Text, TouchableOpacity} from 'react-native';
+import {NavigationInjectedProps} from 'react-navigation';
 
 import styles from './styles';
 
