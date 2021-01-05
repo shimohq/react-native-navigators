@@ -21,7 +21,7 @@ export function createNativeNavigator(
 
 export function createStackNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: Omit<NavigationNativeRouterConfig, 'mode'>
+  stackConfig: Omit<NavigationNativeRouterConfig, 'mode' | 'splitRules'>
 ) {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {
@@ -32,7 +32,10 @@ export function createStackNavigator(
 
 export function createCardNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>
+  stackConfig: Omit<
+    NavigationNativeRouterConfig,
+    'headerMode' | 'mode' | 'splitRules'
+  >
 ) {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {

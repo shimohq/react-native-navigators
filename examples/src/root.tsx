@@ -17,6 +17,9 @@ export default function Root(props: NavigationInjectedProps) {
       <TouchableOpacity onPress={() => props.navigation.navigate('features')}>
         <Text style={styles.link}>Features demo</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => props.navigation.navigate('split')}>
+        <Text style={styles.link}>Split demo</Text>
+      </TouchableOpacity>
     </View>
   );
 }

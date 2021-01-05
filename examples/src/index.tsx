@@ -15,6 +15,7 @@ import Root from './root';
 import CardScreen from './screens/card';
 import Stack from './stack';
 import Features from './features';
+import Split from './split';
 import {name as appName} from '../app.json';
 
 const RootStack = createNativeNavigator(
@@ -23,6 +24,7 @@ const RootStack = createNativeNavigator(
     card: CardScreen,
     stack: Stack,
     features: Features,
+    split: Split,
   },
   {
     mode: NativeNavigatorModes.Stack,

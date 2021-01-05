@@ -12,6 +12,7 @@ export interface NativeNavigationOptions {
   translucent?: boolean;
   transparent?: boolean;
   cardStyle?: StyleProp<ViewStyle>;
+  splitFullScreen?: boolean; // Options for secondary scene in split navigator
   gestureEnabled?: boolean;
   headerLeft?: ReactNode;
   headerCenter?: ReactNode;
@@ -25,8 +26,17 @@ export interface NativeNavigationOptions {
   statusBarHidden?: boolean;
 }
 
+export type NativeNavigatorSplitRules = Array<{
+  navigatorWidthRange: [
+    number /* range start */,
+    number? /* range end */
+  ] /* compute range rules */;
+  primarySceneWidth: number /* computed primary scene width */;
+}>;
+
 export interface NavigationNativeRouterConfig {
   headerMode?: NativeNavigatorHeaderModes;
+  splitRules?: NativeNavigatorSplitRules;
   mode?: NativeNavigatorModes;
   initialRouteName?: string;
   defaultNavigationOptions?: NavigationScreenConfig<
@@ -53,7 +63,7 @@ export enum NativeNavigatorTransitions {
 export enum NativeNavigatorModes {
   Stack = 'stack',
   Card = 'card', // add child controller，默认不透明
-  Split = 'split' // todo
+  Split = 'split' // 分屏
 }
 
 export enum NativeNavigatorHeaderModes {

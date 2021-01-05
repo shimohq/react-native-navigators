@@ -18,6 +18,7 @@ interface NativeStackNavigatorProps {
   transparent: boolean;
   transition: NativeNavigatorTransitions;
   gestureEnabled: boolean;
+  splitFullScreen: boolean;
   onDidFocus: (route: NavigationRoute) => void;
   onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
   route: NavigationRoute;
@@ -56,7 +57,8 @@ export default class NativeStackNavigator extends PureComponent<
       gestureEnabled,
       style,
       statusBarStyle,
-      statusBarHidden
+      statusBarHidden,
+      splitFullScreen
     } = this.props;
 
     return (
@@ -66,6 +68,7 @@ export default class NativeStackNavigator extends PureComponent<
         transparent={transparent}
         transition={transition}
         gestureEnabled={gestureEnabled}
+        splitFullScreen={splitFullScreen}
         onDidFocus={this.onDidFocus}
         onDidBlur={this.onDidBlur}
         style={

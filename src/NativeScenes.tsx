@@ -1,8 +1,5 @@
 import React, { PureComponent } from 'react';
-import {
-  NavigationRoute,
-  NavigationInjectedProps
-} from 'react-navigation';
+import { NavigationRoute, NavigationInjectedProps } from 'react-navigation';
 
 import {
   NativeNavigationDescriptorMap,
@@ -46,7 +43,13 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
   };
 
   public render() {
-    const { routes, descriptors, screenProps, mode, closingRouteKey } = this.props;
+    const {
+      routes,
+      descriptors,
+      screenProps,
+      mode,
+      closingRouteKey
+    } = this.props;
 
     return (
       <>
@@ -66,6 +69,8 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
 
           if (mode === NativeNavigatorModes.Stack) {
             headerMode = headerMode || NativeNavigatorHeaderModes.Auto;
+          } else if (mode === NativeNavigatorModes.Split) {
+            headerMode = NativeNavigatorHeaderModes.None; // split navigator do not support native header
           } else {
             headerMode = headerMode || NativeNavigatorHeaderModes.None;
           }
@@ -76,13 +81,18 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
             <NativeStackScene
               key={key}
               transition={
-                navigation.dangerouslyGetParent()?.state?.isTransitioning ?
-                  (options.transition || NativeNavigatorTransitions.Default) : NativeNavigatorTransitions.None
+                navigation.dangerouslyGetParent()?.state?.isTransitioning
+                  ? options.transition || NativeNavigatorTransitions.Default
+                  : NativeNavigatorTransitions.None
               }
               closing={closingRouteKey === route.key}
               gestureEnabled={options.gestureEnabled !== false}
               translucent={options.translucent === true}
               transparent={options.transparent === true}
+              splitFullScreen={
+                mode === NativeNavigatorModes.Split &&
+                options.splitFullScreen === true
+              }
               onDidFocus={this.handleDidFocus}
               onDidBlur={this.handleDidBlur}
               route={route}

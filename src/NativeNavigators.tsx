@@ -8,7 +8,8 @@ import {
 import {
   NativeNavigatorsProps,
   NativeNavigationDescriptorMap,
-  NativeNavigatorModes
+  NativeNavigatorModes,
+  NativeNavigatorSplitRules
 } from './types';
 import NativeStackNavigator from './NativeStackNavigator';
 import NativeScenes from './NativeScenes';
@@ -30,7 +31,11 @@ export default class NativeNavigators extends PureComponent<
   ): NativeStackScenesState | null {
     const { navigation, screenProps } = props;
 
-    if (navigation.state.routes === state.propRoutes && screenProps === state.screenProps && state.routes.length) {
+    if (
+      navigation.state.routes === state.propRoutes &&
+      screenProps === state.screenProps &&
+      state.routes.length
+    ) {
       return null;
     }
 
@@ -113,7 +118,7 @@ export default class NativeNavigators extends PureComponent<
   private handleDismissRoute = (route: NavigationRoute) => {
     const { navigation } = this.props;
     const { routes, propRoutes } = this.state;
-    
+
     this.setState({
       routes: routes.filter(r => r.key !== route.key),
       propRoutes: propRoutes.filter(r => r.key !== route.key)
@@ -127,16 +132,23 @@ export default class NativeNavigators extends PureComponent<
   };
 
   public render() {
-    const {
-      navigation,
-      navigationConfig
-    } = this.props;
+    const { navigation, navigationConfig } = this.props;
     const { closingRouteKey, routes, descriptors, screenProps } = this.state;
     const mode: NativeNavigatorModes =
       navigationConfig.mode || NativeNavigatorModes.Stack;
 
+    let splitRules: NativeNavigatorSplitRules | undefined =
+      navigationConfig.splitRules;
+
+    if (mode !== NativeNavigatorModes.Split && splitRules) {
+      console.warn(
+        `Navigation config \`splitRules\` is not supported for \`${mode}\` navigator.`
+      );
+      splitRules = undefined;
+    }
+
     return (
-      <NativeStackNavigator mode={mode}>
+      <NativeStackNavigator mode={mode} splitRules={splitRules}>
         <NativeScenes
           mode={mode}
           headerMode={navigationConfig.headerMode}
