@@ -12,6 +12,8 @@ import SplitPrimary from './screens/splitPrimary';
 import SplitSecondary from './screens/splitSecondary';
 import { NavigationInjectedProps } from 'react-navigation';
 
+const SplitNavigatorMinWidth = 640;
+
 const SplitNavigator = createSplitNavigator({
   primary: SplitPrimary,
   secondary: SplitSecondary
@@ -19,7 +21,7 @@ const SplitNavigator = createSplitNavigator({
   initialRouteName: 'primary',
   splitRules: [
     {
-      navigatorWidthRange: [640],
+      navigatorWidthRange: [SplitNavigatorMinWidth],
       primarySceneWidth: 300
     }
   ]
@@ -27,11 +29,11 @@ const SplitNavigator = createSplitNavigator({
 
 function Split(props: NavigationInjectedProps) {
   const [on, setOn] = useState(true);
-  const [enabled, setEnabled] = useState(Dimensions.get('window').width >= 640);
+  const [enabled, setEnabled] = useState(Dimensions.get('window').width >= SplitNavigatorMinWidth);
 
   useEffect(() => {
     Dimensions.addEventListener('change', ({ window: { width } }) => {
-      setEnabled(width >= 640);
+      setEnabled(width >= SplitNavigatorMinWidth);
     })
   }, []);
 
@@ -58,7 +60,7 @@ function Split(props: NavigationInjectedProps) {
           }
         />
       </View>
-      <View style={{ flex: 1, width: on ? '100%' : 639, borderColor: 'purple', borderWidth: 2, alignSelf: 'center' }} >
+      <View style={{ flex: 1, width: on ? '100%' : SplitNavigatorMinWidth - 2, borderColor: 'purple', borderWidth: 2, alignSelf: 'center' }} >
         <SplitNavigator {...props} />
       </View>
     </View>
