@@ -145,6 +145,10 @@ export default class NativeNavigators extends PureComponent<
         `Navigation config \`splitRules\` is not supported for \`${mode}\` navigator.`
       );
       splitRules = undefined;
+    } else if (mode === NativeNavigatorModes.Split && !splitRules) {
+      console.error(
+        `Navigation config \`splitRules\` is required for \`${mode}\` navigator.`
+      );
     }
 
     return (
