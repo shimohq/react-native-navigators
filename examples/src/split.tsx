@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   Switch,
   StyleSheet,
+  Dimensions
 } from 'react-native';
 import { createSplitNavigator } from 'react-native-navigators';
 
@@ -25,22 +26,41 @@ const SplitNavigator = createSplitNavigator({
 });
 
 function Split(props: NavigationInjectedProps) {
-  const [enabled, setEnabled] = useState(true);
+  const [on, setOn] = useState(true);
+  const [enabled, setEnabled] = useState(Dimensions.get('window').width >= 640);
+
+  useEffect(() => {
+    Dimensions.addEventListener('change', ({ window: { width } }) => {
+      setEnabled(width >= 640);
+    })
+  }, []);
+
+  if (!enabled) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text >
+            Split Navigator is not support in this window.
+        </Text>
+      </View>
+    )
+  }
 
   return (
-    <View >
-      <View style={{ paddingVertical: 10 ,alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderBottomColor: 'red', borderBottomWidth: StyleSheet.hairlineWidth }}>
+    <View style={{ flex: 1 }} >
+      <View style={{ paddingVertical: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderBottomColor: 'red', borderBottomWidth: StyleSheet.hairlineWidth  }}>
         <Text style={{ marginRight: 10 }}>
-            Split Mode:{enabled ? 'ON' : 'OFF'}
+            Split Mode:{on ? 'ON' : 'OFF'}
         </Text>
         <Switch
-          value={enabled}
+          value={on}
           onValueChange={() =>
-            setEnabled(!enabled)
+            setOn(!on)
           }
         />
       </View>
-      <SplitNavigator {...props} />
+      <View style={{ flex: 1, width: on ? '100%' : 639, borderColor: 'purple', borderWidth: 2, alignSelf: 'center' }} >
+        <SplitNavigator {...props} />
+      </View>
     </View>
   );
 }
