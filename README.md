@@ -6,3 +6,24 @@ This repository is inspired by [kmagiera/react-native-screens](https://github.co
 
 ## Usage
 
+```shell
+cd examples
+# could not use npm install
+yarn install
+npm run
+```
+
+iOS
+
+```shell
+cd examples/ios
+pod install
+open examples.xcworkspace
+```
+
+Android
+
+```shell
+cd examples/android
+studio .
+```
