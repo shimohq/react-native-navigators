@@ -67,10 +67,12 @@ export default createNativeNavigator(
       navigationOptions: (
         props: NavigationInjectedProps<{
           transition: NativeNavigatorTransitions;
-        }>,
+          gestureEnabled: boolean;
+        }>
       ) => {
         return {
           transition: props.navigation.getParam('transition'),
+          gestureEnabled: true
         };
       },
     },

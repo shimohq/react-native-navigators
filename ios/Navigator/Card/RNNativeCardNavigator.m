@@ -10,7 +10,7 @@
 #import "RNNativeScene.h"
 #import <React/RCTUIManager.h>
 
-@interface RNNativeCardNavigator()
+@interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate>
 
 @property (nonatomic, strong) RNNativeCardNavigatorController *controller;
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
@@ -23,8 +23,15 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     _viewControllers = [NSMutableArray array];
     _controller = [RNNativeCardNavigatorController new];
+    _controller.delegte = self;
     _updating = NO;
     return [super initWithBridge:bridge viewController:_controller];
+}
+
+#pragma mark - RNNativeCardNavigatorControllerDelegate
+
+- (void)didRemoveController:(nonnull UIViewController *)viewController {
+    [_viewControllers removeObject:viewController];
 }
 
 #pragma mark - RNNativeBaseNavigator
@@ -62,9 +69,9 @@
     // add scene
     for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
         RNNativeScene *scene = nextScenes[index];
-        if (index + 1 < size) { // 顶层 scene 必须显示
+        if (index + 2 < size) { // 顶部两层 scene 必须显示，否则手势返回不好处理
             RNNativeScene *nextScene = nextScenes[index + 1];
-            if (!nextScene.transparent) { // 非顶层 scene，上层 scene 透明才显示
+            if (!nextScene.transparent) { // 非部两层 scene，上层 scene 透明时才显示
                 continue;
             }
         }
@@ -146,10 +153,11 @@
     for (RNNativeScene *scene in removedScenes) {
         [self removeScene:scene];
     }
-    for (NSInteger index = 0, size = nextScenes.count - 1; index < size; index++) {
+    // 顶部两层 scene 必须显示，否则手势返回不好处理
+    for (NSInteger index = 0, size = nextScenes.count; index < size - 2; index++) {
         RNNativeScene *scene = nextScenes[index];
         RNNativeScene *nextScene = nextScenes[index + 1];
-        if (!nextScene.transparent) { // 非顶层 scene，且上层 scene 不透明
+        if (!nextScene.transparent) { // 非顶部两层 scene，且上层 scene 不透明
             [self removeScene:scene];
         }
     }
