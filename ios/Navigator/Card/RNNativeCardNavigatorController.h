@@ -9,7 +9,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol RNNativeCardNavigatorControllerDelegate <NSObject>
+
+- (void)didRemoveController:(nonnull UIViewController *)viewController;
+
+@end
+
 @interface RNNativeCardNavigatorController : UIViewController
+
+@property (nonatomic, weak) id<RNNativeCardNavigatorControllerDelegate> delegate;
 
 @end
 
