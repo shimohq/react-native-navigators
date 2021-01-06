@@ -23,7 +23,6 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     _viewControllers = [NSMutableArray array];
     _controller = [RNNativeCardNavigatorController new];
-    _controller.delegate = self;
     _updating = NO;
     return [super initWithBridge:bridge viewController:_controller];
 }
