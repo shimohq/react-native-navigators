@@ -10,7 +10,7 @@
 #import "RNNativeScene.h"
 #import <React/RCTUIManager.h>
 
-@interface RNNativeCardNavigator()
+@interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate>
 
 @property (nonatomic, strong) RNNativeCardNavigatorController *controller;
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
@@ -23,8 +23,15 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     _viewControllers = [NSMutableArray array];
     _controller = [RNNativeCardNavigatorController new];
+    _controller.delegte = self;
     _updating = NO;
     return [super initWithBridge:bridge viewController:_controller];
+}
+
+#pragma mark - RNNativeCardNavigatorControllerDelegate
+
+- (void)didRemoveController:(nonnull UIViewController *)viewController {
+    [_viewControllers removeObject:viewController];
 }
 
 #pragma mark - RNNativeBaseNavigator
