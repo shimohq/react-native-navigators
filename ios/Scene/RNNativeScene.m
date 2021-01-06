@@ -197,7 +197,6 @@
 #pragma mark - Private
 
 - (void)sendStatus:(RNNativeSceneStatus)status andDismissed:(BOOL)dismissed {
-    NSLog(@"sendStatus: %@, %d, %d",self, status, dismissed);
     switch (status) {
         case RNNativeSceneStatusWillFocus:
             if (_onWillFocus) {

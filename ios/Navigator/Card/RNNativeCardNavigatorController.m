@@ -7,7 +7,6 @@
 
 #import "RNNativeCardNavigatorController.h"
 #import "RNNativeScene.h"
-#import "RNNativePanGestureHandler.h"
 #import "RNNativePanGestureRecognizerManager.h"
 
 @interface RNNativeCardNavigatorController () <UIGestureRecognizerDelegate>
