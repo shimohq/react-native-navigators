@@ -18,9 +18,9 @@
 @property (nonatomic, weak) RCTBridge *bridge;
 @property (nonatomic, strong) __kindof UIViewController *viewController;
 @property (nonatomic, strong) NSMutableArray<RNNativeScene *> *currentScenes;
-@property (nonatomic, strong) NSMutableArray<RNNativeScene *> *nextScenes;
+@property (nonatomic, strong) NSMutableArray<__kindof UIView *> *nextViews;
 
-@property (nonatomic, copy) NSArray<RNNativeScene *> *needUpdateScenes;
+@property (nullable, nonatomic, copy) NSArray<RNNativeScene *> *needUpdateScenes;
 @property (nonatomic, assign) BOOL updatingScenes;
 
 @end
@@ -34,8 +34,8 @@
     if (self = [super init]) {
         _bridge = bridge;
         _viewController = viewController;
-        _currentScenes = [NSMutableArray new];
-        _nextScenes = [NSMutableArray new];
+        _currentScenes = [NSMutableArray array];
+        _nextViews = [NSMutableArray array];
         [self addSubview:viewController.view];
     }
     return self;
@@ -78,23 +78,26 @@
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
     [super insertReactSubview:subview atIndex:atIndex];
+    [_nextViews insertObject:subview atIndex:atIndex];
+    
     if (![subview isKindOfClass:[RNNativeScene class]]) {
         return;
     }
     
     RNNativeScene *scene = (RNNativeScene *)subview;
     scene.delegate = self;
-    [_nextScenes insertObject:scene atIndex:atIndex];
+    
     [self markUpdated];
 }
 
 - (void)removeReactSubview:(UIView *)subview
 {
     [super removeReactSubview:subview];
+    [_nextViews removeObject:subview];
+    
     if (![subview isKindOfClass:[RNNativeScene class]]) {
         return;
     }
-    [_nextScenes removeObject:(RNNativeScene *)subview];
     [self markUpdated];
 }
 
@@ -113,7 +116,7 @@
     [self updateScenes];
 }
 
-- (void)setNeedUpdateScenes:(NSArray<RNNativeScene *> *)neededUpdateScenes {
+- (void)setNeedUpdateScenes:(nullable NSArray<RNNativeScene *> *)neededUpdateScenes {
     if (_needUpdateScenes == neededUpdateScenes) {
         return;
     }
@@ -128,16 +131,16 @@
 #pragma mark - RCTInvalidating
 
 - (void)invalidate {
-    [self.nextScenes removeAllObjects];
+    [self.nextViews removeAllObjects];
     RCTExecuteOnMainQueue(^{
-        [self setNeedUpdateScenes:self.nextScenes];
+        [self setNeedUpdateScenes:@[]];
     });
 }
 
 #pragma mark - RNNativeSceneDelegate
 
 - (void)needUpdateForScene:(RNNativeScene *)scene {
-    if ([_nextScenes containsObject:scene]) {
+    if ([_nextViews containsObject:scene]) {
         [self markUpdated];
     }
 }
@@ -160,9 +163,12 @@
             RCTExecuteOnMainQueue(^{
                 self->_needUpdate = NO;
                 NSMutableArray<RNNativeScene *> *nextScenes = [NSMutableArray new];
-                for (RNNativeScene *scene in self.nextScenes) {
-                    if (!scene.closing && ![nextScenes containsObject:scene]) {
-                        [nextScenes addObject:scene];
+                for (UIView *view in self.nextViews) {
+                    if ([view isKindOfClass:[RNNativeScene class]]) {
+                        RNNativeScene *scene = (RNNativeScene *)view;
+                        if (!scene.closing && ![nextScenes containsObject:scene]) {
+                            [nextScenes addObject:scene];
+                        }
                     }
                 }
                 [self setNeedUpdateScenes:nextScenes];

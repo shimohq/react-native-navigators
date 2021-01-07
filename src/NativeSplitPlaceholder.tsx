@@ -3,12 +3,6 @@ import { requireNativeComponent, StyleSheet } from 'react-native';
 
 import { NavigationInjectedProps } from 'react-navigation';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});
-
 export type NativeSplitPlaceholderProps = {
   component: ComponentType<NavigationInjectedProps>;
 } & NavigationInjectedProps;
@@ -18,7 +12,7 @@ export default function NativeSplitPlaceholder(
 ) {
   const { component: Component, navigation } = props;
   return (
-    <RNNativeSplitPlaceholder style={styles.container}>
+    <RNNativeSplitPlaceholder style={StyleSheet.absoluteFill}>
       <Component navigation={navigation} />
     </RNNativeSplitPlaceholder>
   );

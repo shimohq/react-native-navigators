@@ -4,7 +4,7 @@
 
 @implementation RNNativeSceneShadowView
 
-- (void)setLocalData:(RNNativeNavigatorInsetsData *)data
+- (void)setLocalData:(NSObject *)data
 {
     if ([data isKindOfClass:[RNNativeNavigatorInsetsData class]]) {
         RNNativeNavigatorInsetsData *insets = (RNNativeNavigatorInsetsData *)data;

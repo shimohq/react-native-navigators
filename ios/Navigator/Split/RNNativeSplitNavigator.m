@@ -8,6 +8,7 @@
 #import "RNNativeSplitNavigator.h"
 #import "RNNativeSplitNavigatorController.h"
 #import "RNNativeScene.h"
+#import "RNNativeSplitPlaceholder.h"
 
 #import <React/RCTUIManager.h>
 
@@ -36,6 +37,7 @@
 @property (nonatomic, assign) CGFloat primarySceneWidth;
 // whether split mode
 @property (nonatomic, assign) BOOL split;
+@property (nullable, nonatomic, strong) RNNativeSplitPlaceholder *splitPlaceholder;
 
 @end
 
@@ -77,6 +79,7 @@
     }
     _navigatorBounds = navigatorBounds;
     [self updateScenesSize];
+    [self updateSplitPlaceholder];
     [self setNavigatorWidth:CGRectGetWidth(navigatorBounds)];
 }
 
@@ -95,6 +98,16 @@
     _primarySceneWidth = primarySceneWidth;
     _split = primarySceneWidth > 0;
     [self updateScenesFrame];
+    [self updateSplitPlaceholder];
+}
+
+- (void)setSplitPlaceholder:(nullable RNNativeSplitPlaceholder *)splitPlaceholder {
+    if (_splitPlaceholder == splitPlaceholder) {
+        return;
+    }
+    _splitPlaceholder = splitPlaceholder;
+   
+    [self addSplitPlaceholder];
 }
 
 #pragma mark - RNNativeSplitNavigatorControllerDelegate
@@ -114,6 +127,20 @@
 }
 
 #pragma mark - RNNativeBaseNavigator
+
+- (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
+    [super insertReactSubview:subview atIndex:atIndex];
+    if ([subview isKindOfClass:[RNNativeSplitPlaceholder class]]) {
+        [self setSplitPlaceholder:(RNNativeSplitPlaceholder *)subview];
+    }
+}
+
+- (void)removeReactSubview:(UIView *)subview {
+    [super removeReactSubview:subview];
+    if ([subview isKindOfClass:[RNNativeSplitPlaceholder class]]) {
+        [self setSplitPlaceholder:nil];
+    }
+}
 
 - (void)didFullScreenChangedWithScene:(RNNativeScene *)scene {
     // fullScreen is valid only for split mode
@@ -226,6 +253,41 @@
 
 #pragma mark - Layout
 
+- (void)addSplitPlaceholder {
+    // remove splitPlaceholder
+    if (!_splitPlaceholder) {
+        for (UIView *view in self.viewController.view.subviews) {
+            if ([view isKindOfClass:[RNNativeSplitPlaceholder class]]) {
+                [view removeFromSuperview];
+            }
+        }
+        return;
+    }
+    
+    // update splitPlaceholder
+    [self updateSplitPlaceholder];
+}
+
+- (void)updateSplitPlaceholder {
+    if (_split) {
+        UIView *splitPlaceholderParent = [_splitPlaceholder superview];
+        if (splitPlaceholderParent && splitPlaceholderParent != self.viewController.view) {
+            [_splitPlaceholder removeFromSuperview];
+            splitPlaceholderParent = nil;
+        }
+        if (!splitPlaceholderParent) {
+            [self.viewController.view addSubview:_splitPlaceholder];
+        }
+        _splitPlaceholder.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:1 fullScreen:NO split:YES primarySceneWidth:_primarySceneWidth];
+        _splitPlaceholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self.viewController.view sendSubviewToBack:_splitPlaceholder];
+    } else {
+        if ([_splitPlaceholder superview]) {
+            [_splitPlaceholder removeFromSuperview];
+        }
+    }
+}
+
 /**
  primarySceneWidth 变化时，scene 的 x y size 都要变
  */
@@ -255,13 +317,13 @@
             RNNativeScene *scene = (RNNativeScene *)view;
             CGRect frame = scene.frame;
             if (_split && !scene.splitFullScreen) {
-                if (index == 0) {
-                    view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), _primarySceneWidth, CGRectGetHeight(bounds));
+                if (sceneIndex == 0) {
+                    scene.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), _primarySceneWidth, CGRectGetHeight(bounds));
                 } else {
-                    view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(bounds) - _primarySceneWidth, CGRectGetHeight(bounds));
+                    scene.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(bounds) - _primarySceneWidth, CGRectGetHeight(bounds));
                 }
             } else {
-                view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(bounds), CGRectGetHeight(bounds));
+                scene.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(bounds), CGRectGetHeight(bounds));
             }
             sceneIndex++;
         }
