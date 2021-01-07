@@ -1,12 +1,15 @@
-import React, { ReactElement, useState } from 'react';
-import { requireNativeComponent, StyleSheet } from 'react-native';
+import React, { ReactElement, ComponentType, useState } from 'react';
+import { StyleSheet, requireNativeComponent } from 'react-native';
+import { NavigationInjectedProps } from 'react-navigation';
 
 import NativeStackScenes, { NativeScenesProps } from './NativeScenes';
+import NativeSplitPlaceholder from './NativeSplitPlaceholder';
 import { NativeNavigatorModes, NativeNavigatorSplitRules } from './types';
 
-interface NativeStackNavigatorProps {
+export interface NativeStackNavigatorProps extends NavigationInjectedProps {
   mode: NativeNavigatorModes;
   splitRules?: NativeNavigatorSplitRules;
+  splitPlaceholder?: ComponentType<NavigationInjectedProps>;
   children: ReactElement<NativeScenesProps, typeof NativeStackScenes>;
 }
 
@@ -38,8 +41,17 @@ export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
       Navigator = RNNativeStackNavigator;
       break;
   }
+
+  const { splitPlaceholder, navigation } = props;
+
   return (
     <Navigator style={styles.navigator} splitRules={props.splitRules}>
+      {splitPlaceholder ? (
+        <NativeSplitPlaceholder
+          navigation={navigation}
+          component={splitPlaceholder}
+        />
+      ) : null}
       {props.children}
     </Navigator>
   );

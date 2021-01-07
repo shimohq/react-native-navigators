@@ -50,7 +50,7 @@ function Index(props: NavigationInjectedProps) {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => props.navigation.dangerouslyGetParent().goBack()}>
+        onPress={() => props.navigation.dangerouslyGetParent()?.goBack()}>
         <Text style={styles.link}>Back to index</Text>
       </TouchableOpacity>
       <Text style={styles.title}>Card navigator</Text>

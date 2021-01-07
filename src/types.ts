@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, ComponentType } from 'react';
 import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import {
   NavigationParams,
@@ -37,6 +37,7 @@ export type NativeNavigatorSplitRules = Array<{
 export interface NavigationNativeRouterConfig {
   headerMode?: NativeNavigatorHeaderModes;
   splitRules?: NativeNavigatorSplitRules;
+  splitPlaceholder?: ComponentType<NavigationInjectedProps>;
   mode?: NativeNavigatorModes;
   initialRouteName?: string;
   defaultNavigationOptions?: NavigationScreenConfig<

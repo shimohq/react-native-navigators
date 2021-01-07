@@ -7,10 +7,11 @@ import {
   Dimensions
 } from 'react-native';
 import { createSplitNavigator } from 'react-native-navigators';
+import { NavigationInjectedProps } from 'react-navigation';
 
 import SplitPrimary from './screens/splitPrimary';
 import SplitSecondary from './screens/splitSecondary';
-import { NavigationInjectedProps } from 'react-navigation';
+import SplitPlaceholder from './screens/splitPlaceholder';
 
 const SplitNavigatorMinWidth = 640;
 
@@ -24,7 +25,8 @@ const SplitNavigator = createSplitNavigator({
       navigatorWidthRange: [SplitNavigatorMinWidth],
       primarySceneWidth: 300
     }
-  ]
+  ],
+  splitPlaceholder: SplitPlaceholder
 });
 
 function Split(props: NavigationInjectedProps) {
