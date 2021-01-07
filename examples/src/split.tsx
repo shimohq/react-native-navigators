@@ -29,26 +29,8 @@ const SplitNavigator = createSplitNavigator({
 
 function Split(props: NavigationInjectedProps) {
   const [on, setOn] = useState(true);
-  const [enabled, setEnabled] = useState(Dimensions.get('window').width >= SplitNavigatorMinWidth);
-
-  useEffect(() => {
-    Dimensions.addEventListener('change', ({ window: { width } }) => {
-      setEnabled(width >= SplitNavigatorMinWidth);
-    })
-  }, []);
-
-  if (!enabled) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text >
-            Split Navigator is not support in this window.
-        </Text>
-      </View>
-    )
-  }
-
   return (
-    <View style={{ flex: 1 }} >
+    <View style={{ flex: 1, backgroundColor: 'white' }} >
       <View style={{ paddingVertical: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderBottomColor: 'red', borderBottomWidth: StyleSheet.hairlineWidth  }}>
         <Text style={{ marginRight: 10 }}>
             Split Mode:{on ? 'ON' : 'OFF'}
@@ -60,7 +42,7 @@ function Split(props: NavigationInjectedProps) {
           }
         />
       </View>
-      <View style={{ flex: 1, width: on ? '100%' : SplitNavigatorMinWidth - 2, borderColor: 'purple', borderWidth: 2, alignSelf: 'center' }} >
+      <View style={{ flex: 1, width: on ? '100%' : SplitNavigatorMinWidth - 20, borderColor: 'purple', borderWidth: 2, alignSelf: 'center' }} >
         <SplitNavigator {...props} />
       </View>
     </View>

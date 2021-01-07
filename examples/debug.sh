@@ -2,7 +2,7 @@
 
 while :
 do
-  CHANGED=$(watchman-wait ../ -p 'src/**/*' 'ios/**/*' 'android/**/*')
+  CHANGED=$(watchman-wait ../ -p 'src/**/*')
   echo "File: ${CHANGED} changed"
   if [[ $CHANGED = src* ]]
   then

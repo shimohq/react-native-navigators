@@ -23,7 +23,7 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     _viewControllers = [NSMutableArray array];
     _controller = [RNNativeCardNavigatorController new];
-    _controller.delegte = self;
+    _controller.delegate = self;
     _updating = NO;
     return [super initWithBridge:bridge viewController:_controller];
 }
@@ -50,7 +50,7 @@
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    beginTransition(YES);
+    beginTransition(YES, nil);
     
     // viewControllers
     NSMutableArray *viewControllers = [NSMutableArray array];
@@ -81,9 +81,9 @@
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
         nextTopScene.frame = self.controller.view.bounds;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
-        endTransition(YES);
+        endTransition(YES, nil);
     } else if (action == RNNativeStackNavigatorActionShow) {
-        [UIView animateWithDuration:0.35 animations:^{
+        [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             nextTopScene.frame = self.controller.view.bounds;
         } completion:^(BOOL finished) {
             if (!finished) {
@@ -91,19 +91,19 @@
             }
             [nextTopScene.controller didMoveToParentViewController:self.controller];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
-            endTransition(YES);
+            endTransition(YES, nil);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene.controller willMoveToParentViewController:nil];
-        [UIView animateWithDuration:0.35 animations:^{
+        [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [self getFrameWithContainerView:self.controller.view transition:transition];
         } completion:^(BOOL finished) {
             if (!finished) {
                 nextTopScene.frame = self.controller.view.bounds;
             }
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
-            endTransition(YES);
+            endTransition(YES, nil);
         }];
     }
 }
