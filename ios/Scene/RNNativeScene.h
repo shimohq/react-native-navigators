@@ -17,6 +17,9 @@
 - (void)needUpdateForScene:(RNNativeScene *)scene;
 - (BOOL)isDismissedForScene:(RNNativeScene *)scene;
 
+@optional
+- (void)didFullScreenChangedWithScene:(RNNativeScene *)scene;
+
 @end
 
 @interface RNNativeScene : RCTView <RCTInvalidating>
@@ -85,6 +88,11 @@
  是否隐藏 status bar
  */
 @property (nonatomic, assign) BOOL statusBarHidden;
+
+/**
+ 分屏模式是否全屏显示
+ */
+@property (nonatomic, assign) BOOL splitFullScreen;
 
 @property (nonatomic, assign) RNNativeSceneStatus status;
 @property (nonatomic, assign) BOOL dismissed;

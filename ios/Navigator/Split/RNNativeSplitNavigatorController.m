@@ -1,22 +1,22 @@
 //
-//  RNNativeCardNavigatorController.m
+//  RNNativeSplitNavigatorController.m
 //  react-native-navigators
 //
-//  Created by Bell Zhong on 2019/11/12.
+//  Created by Bell Zhong on 2021/1/6.
 //
 
-#import "RNNativeCardNavigatorController.h"
+#import "RNNativeSplitNavigatorController.h"
 #import "RNNativeScene.h"
 #import "RNNativePanGestureRecognizerManager.h"
 #import "RNNativePanGestureHandler.h"
 
 #import "UIViewController+RNNativeNavigator.h"
 
-@interface RNNativeCardNavigatorController () <UIGestureRecognizerDelegate>
+@interface RNNativeSplitNavigatorController () <UIGestureRecognizerDelegate>
 
 @end
 
-@implementation RNNativeCardNavigatorController
+@implementation RNNativeSplitNavigatorController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,14 +31,7 @@
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    
-    // INFO: 切换 viewController 的同时旋转屏幕，新的 viewController 可能也会保持屏幕旋转之前的 frame。
-    // 为了修复这个问题，重新布局的时候重新设置 frame。
-    for (UIView *view in self.view.subviews) {
-        if ([view isKindOfClass:[RNNativeScene class]]) {
-            [self updateFrameWithView:view parentView:self.view];
-        }
-    }
+    [self.delegate willLayoutSubviews:self.view.bounds];
 }
 
 -(UIViewController *)childViewControllerForStatusBarStyle {
@@ -52,12 +45,18 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    NSArray<RNNativeScene *> *topTwoScenes = [self rnn_getTopScenesWithCount:2];
-    if (topTwoScenes.count < 2 || !topTwoScenes[0].gestureEnabled) {
+    NSArray<RNNativeScene *> *topScenes = [self rnn_getTopScenesWithCount:3];
+    BOOL split = [self.dataSource isSplit];
+    if (topScenes.count < (split ? 3 : 2)) {
+        return NO;
+    }
+    if (!topScenes[0].gestureEnabled) {
         return NO;
     }
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x > 120) {
+    RNNativeScene *topScene = topScenes[0];
+    CGFloat topSceneMinX = CGRectGetMinX(topScene.frame);
+    if (location.x < topSceneMinX || location.x > topSceneMinX + 120) {
         return NO;
     }
     return YES;
@@ -72,20 +71,9 @@
     }
     RNNativeScene *upScene = topTwoScenes[0];
     RNNativeScene *downScene = topTwoScenes[1];
-    
     [[RNNativePanGestureHandler sharedInstance] panWithGestureRecognizer:gesture upScene:upScene downScene:downScene didGoBack:^{
         [self.delegate didRemoveController:upScene.controller];
     }];
-}
-
-#pragma mark - Private
-
-- (void)updateFrameWithView:(UIView *)view parentView:(UIView *)parentView {
-    CGRect parentFrame = parentView.frame;
-    CGRect frame = view.frame;
-    if (!CGRectEqualToRect(frame, parentFrame)) {
-        view.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(parentFrame), CGRectGetHeight(parentFrame));
-    }
 }
 
 @end

@@ -73,7 +73,7 @@
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     BOOL hasAnimation = transition != RNNativeSceneTransitionNone && action != RNNativeStackNavigatorActionNone;
-    beginTransition(!hasAnimation);
+    beginTransition(!hasAnimation, nil);
     
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeScene *scene in nextScenes) {
@@ -112,7 +112,7 @@
     } else { // 无动画
         [_controller setViewControllers:willShowViewControllers animated:NO];
     }
-    endTransition(!hasAnimation);
+    endTransition(!hasAnimation, nil);
 }
 
 @end

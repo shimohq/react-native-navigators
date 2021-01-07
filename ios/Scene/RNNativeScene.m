@@ -194,6 +194,16 @@
     [_controller setStatusBarHidden:statusBarHidden];
 }
 
+- (void)setSplitFullScreen:(BOOL)splitFullScreen {
+    if (_splitFullScreen == splitFullScreen) {
+        return;
+    }
+    _splitFullScreen = splitFullScreen;
+    if ([self.delegate respondsToSelector:@selector(didFullScreenChangedWithScene:)]) {
+        [self.delegate didFullScreenChangedWithScene:self];
+    }
+}
+
 #pragma mark - Private
 
 - (void)sendStatus:(RNNativeSceneStatus)status andDismissed:(BOOL)dismissed {

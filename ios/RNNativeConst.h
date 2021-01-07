@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RNNativeScene;
+
 typedef NS_ENUM(NSInteger, RNNativeSceneTransition) {
     RNNativeSceneTransitionDefault,
     RNNativeSceneTransitionNone,
@@ -26,7 +28,9 @@ typedef NS_ENUM(NSInteger, RNNativeSceneStatus) {
     RNNativeSceneStatusWillFocus
 };
 
-typedef void (^RNNativeNavigatorTransitionBlock)(BOOL updateStatus);
+typedef void (^RNNativeNavigatorTransitionBlock)(BOOL updateStatus, NSArray<RNNativeScene *> * _Nullable primaryScene);
+
+static const float RNNativeNavigateDuration = 0.3;
 
 @interface RNNativeConst : NSObject
 

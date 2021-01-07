@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
 
 @interface RNNativeBaseNavigator : UIView <RCTInvalidating>
 
+@property (nonatomic, strong, readonly) __kindof UIViewController *viewController;
 @property (nonatomic, strong, readonly) NSMutableArray<RNNativeScene *> *currentScenes;
 @property (nonatomic, weak, readonly) RCTBridge *bridge;
 

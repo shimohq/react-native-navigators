@@ -16,7 +16,7 @@
 @interface RNNativeBaseNavigator () <UINavigationControllerDelegate, RNNativeSceneDelegate>
 
 @property (nonatomic, weak) RCTBridge *bridge;
-@property (nonatomic, strong) UIViewController *viewController;
+@property (nonatomic, strong) __kindof UIViewController *viewController;
 @property (nonatomic, strong) NSMutableArray<RNNativeScene *> *currentScenes;
 @property (nonatomic, strong) NSMutableArray<RNNativeScene *> *nextScenes;
 
@@ -30,7 +30,7 @@
     BOOL _needUpdate;
 }
 
-- (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(UIViewController *)viewController {
+- (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(__kindof UIViewController *)viewController {
     if (self = [super init]) {
         _bridge = bridge;
         _viewController = viewController;
@@ -233,13 +233,13 @@
                          nextScenes:nextScenes
                       removedScenes:removedScenes
                      insertedScenes:insertedScenes
-                    beginTransition:^(BOOL updateStatus) {
+                    beginTransition:^(BOOL updateStatus, NSArray<RNNativeScene *> *primaryScenes) {
         if (updateStatus) {
-            [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+            [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes action:action];
         }
-    } endTransition:^(BOOL updateStatus) {
+    } endTransition:^(BOOL updateStatus, NSArray<RNNativeScene *> *primaryScenes) {
         if (updateStatus) {
-            [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
+            [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes action:action];
         }
         [self setUpdatingScenes:NO];
     }];
@@ -249,31 +249,34 @@
 #pragma mark - Status
 
 - (void)willUpdateStatusWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                         removedScenes:(NSMutableArray<RNNativeScene *> *)removedScenes
+                         removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                         primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes
                                 action:(RNNativeStackNavigatorAction)action {
     if (action == RNNativeStackNavigatorActionHide) {
-        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes];
+        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
         [self willFocusWithNextScenes:nextScenes];
     } else {
         [self willFocusWithNextScenes:nextScenes];
-        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes];
+        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
     }
 }
 
 - (void)didUpdateStatusWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                        removedScenes:(NSMutableArray<RNNativeScene *> *)removedScenes
+                        removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                        primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes
                                action:(RNNativeStackNavigatorAction)action {
     if (action == RNNativeStackNavigatorActionHide) {
-        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes];
+        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
         [self didFocusedWithNextScenes:nextScenes];
     } else {
         [self didFocusedWithNextScenes:nextScenes];
-        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes];
+        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
     }
 }
 
 - (void)willBlurWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                 removedScenes:(NSMutableArray<RNNativeScene *> *)removedScenes {
+                 removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                 primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes {
     // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeScene *scene = removedScenes[index];
@@ -283,12 +286,16 @@
     // nextScenes
     for (NSInteger index = 0, size = nextScenes.count; index + 1 < size; index++) {
         RNNativeScene *scene = nextScenes[index];
+        if (![primaryScenes containsObject:scene]) { // 分屏时，主 scene 不要 blur
+            [scene setStatus:RNNativeSceneStatusWillBlur];
+        }
         [scene setStatus:RNNativeSceneStatusWillBlur];
     }
 }
 
 - (void)didBlurredWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                   removedScenes:(NSMutableArray<RNNativeScene *> *)removedScenes {
+                   removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                   primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes {
     // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeScene *scene = removedScenes[index];
@@ -298,7 +305,9 @@
     // nextScenes
     for (NSInteger index = 0, size = nextScenes.count; index + 1 < size; index++) {
         RNNativeScene *scene = nextScenes[index];
-        [scene setStatus:RNNativeSceneStatusDidBlur];
+        if (![primaryScenes containsObject:scene]) { // 分屏时，主 scene 不要 blur
+            [scene setStatus:RNNativeSceneStatusDidBlur];
+        }
     }
 }
 

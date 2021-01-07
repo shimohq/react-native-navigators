@@ -14,7 +14,7 @@ function SplitSecondary(props: NavigationInjectedProps) {
   }, [fullscreen]);
 
   return (
-    <View style={{ flex: 1, borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: 'white', borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Turn {fullscreen ? 'on' : 'off'} fullscreen</Text>
 
       <Switch
