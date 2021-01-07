@@ -1,8 +1,9 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, ComponentType } from 'react';
 import {
   NavigationRoute,
   StackActions,
-  NavigationActions
+  NavigationActions,
+  NavigationInjectedProps
 } from 'react-navigation';
 
 import {
@@ -151,8 +152,22 @@ export default class NativeNavigators extends PureComponent<
       );
     }
 
+    let splitPlaceholder: ComponentType<NavigationInjectedProps> | undefined =
+      navigationConfig.splitPlaceholder;
+    if (mode !== NativeNavigatorModes.Split && splitPlaceholder) {
+      console.warn(
+        `Navigation config \`splitPlaceholder\` is not supported for \`${mode}\` navigator.`
+      );
+      splitRules = undefined;
+    }
+
     return (
-      <NativeStackNavigator mode={mode} splitRules={splitRules}>
+      <NativeStackNavigator
+        mode={mode}
+        navigation={navigation}
+        splitRules={splitRules}
+        splitPlaceholder={splitPlaceholder}
+      >
         <NativeScenes
           mode={mode}
           headerMode={navigationConfig.headerMode}
