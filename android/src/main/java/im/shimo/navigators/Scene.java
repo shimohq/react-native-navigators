@@ -322,20 +322,16 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
   }
 
   public void setSplitFullScreen(boolean isFullScreen) {
-    if (!(mContainer instanceof SplitScene)) return;
     if (mIsFullScreen == isFullScreen) return;
     mIsFullScreen = isFullScreen;
-
+    if (!(mContainer instanceof SplitScene)) return;
 
     int left = mContainer.getPaddingLeft() + mContainer.getLeft();
     if (!isFullScreen) {
       left += ((SplitScene) mContainer).getCurrentRule().primarySceneWidth;
     }
 
-    Log.d(TAG, "play form  = [" + getLeft() + "] to [" + left + "]");
-    ValueAnimator valueAnimator = null;
-
-    valueAnimator = ValueAnimator.ofPropertyValuesHolder(
+    ValueAnimator valueAnimator = ValueAnimator.ofPropertyValuesHolder(
       PropertyValuesHolder.ofInt("left", getLeft(), left),
       PropertyValuesHolder.ofInt("right", getRight(), getRight())
     );
@@ -344,14 +340,10 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
       final LayoutParams layoutParams = getLayoutParams();
       int l = (Integer) animation.getAnimatedValue("left");
       int width = ((Integer) animation.getAnimatedValue("right")) - l;
-      Log.d(TAG, "width = [" + width + "]");
       setLeft(l);
       layoutParams.width = width;
       setLayoutParams(layoutParams);
     });
-
-
-
     valueAnimator.start();
   }
 
