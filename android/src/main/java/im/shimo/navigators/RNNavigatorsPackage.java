@@ -20,7 +20,9 @@ public class RNNavigatorsPackage implements ReactPackage {
     return Arrays.<ViewManager>asList(
             new SceneCardManager(),
             new SceneManager(),
-            new SceneStackManager()
+            new SceneStackManager(),
+            new SplitSceneManager(),
+            new SplitPlaceholderManager()
     );
   }
 }
