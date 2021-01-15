@@ -66,11 +66,11 @@ public class SplitScene extends SceneContainer {
         break;
       case SLIDE_FROM_RIGHT:
         anim[0] = R.anim.slide_in_right;
-        anim[1] = R.anim.slide_out_left_p50;
+        anim[1] = mIsSplitMode ? R.anim.no_anim : R.anim.slide_out_left_p50;
         break;
       case SLIDE_FROM_LEFT:
         anim[0] = R.anim.slide_in_left;
-        anim[1] = R.anim.slide_out_right_p50;
+        anim[1] = mIsSplitMode ? R.anim.no_anim : R.anim.slide_out_right_p50;
         break;
       case SLIDE_FROM_TOP:
         anim[0] = R.anim.slide_in_top;
@@ -91,11 +91,11 @@ public class SplitScene extends SceneContainer {
       case NONE:
         break;
       case SLIDE_FROM_RIGHT:
-        anim[0] = R.anim.slide_in_left_p50;
+        anim[0] = mIsSplitMode ? R.anim.no_anim :R.anim.slide_in_left_p50;
         anim[1] = R.anim.slide_out_right;
         break;
       case SLIDE_FROM_LEFT:
-        anim[0] = R.anim.slide_in_right_p50;
+        anim[0] = mIsSplitMode ? R.anim.no_anim :R.anim.slide_in_right_p50;
         anim[1] = R.anim.slide_out_left;
         break;
       case SLIDE_FROM_TOP:
@@ -189,12 +189,15 @@ public class SplitScene extends SceneContainer {
     if (current != null) {
       mCurrentRule = current;
       mIsSplitMode = true;
-      mSplitPlaceholder.setVisibility(VISIBLE);
     } else {
       mCurrentRule = DEFAULT_RULE;
       mIsSplitMode = false;
-      mSplitPlaceholder.setVisibility(GONE);
     }
+    if (mSplitPlaceholder !=null){
+      mSplitPlaceholder.setVisibility(mIsSplitMode?VISIBLE :GONE);
+    }
+
+
     post(this::requestLayout);
   }
 
