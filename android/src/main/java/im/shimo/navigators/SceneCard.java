@@ -12,10 +12,7 @@ public class SceneCard extends SceneContainer {
     void getAnimationOnPush(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-//                anim[0] = R.anim.no_anim;
-//                anim[1] = R.anim.no_anim;
                 break;
-
             case SLIDE_FROM_RIGHT:
                 anim[0] = R.anim.slide_in_right;
                 anim[1] = R.anim.slide_out_left_p50;
@@ -41,8 +38,6 @@ public class SceneCard extends SceneContainer {
     void getAnimationOnPop(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-//                anim[0] = R.anim.no_anim;
-//                anim[1] = R.anim.no_anim;
                 break;
             case SLIDE_FROM_RIGHT:
                 anim[0] = R.anim.slide_in_left_p50;
