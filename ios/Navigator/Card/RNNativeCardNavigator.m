@@ -18,7 +18,7 @@
 
 #import "RNNativeBaseNavigator+Layout.h"
 
-@interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate>
+@interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate, RNNativeCardNavigatorControllerDataSource>
 
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 @property (nonatomic, assign) BOOL updating;
@@ -30,6 +30,7 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     RNNativeCardNavigatorController *viewController = [RNNativeCardNavigatorController new];
     viewController.delegate = self;
+    viewController.dataSource = self;
     self = [super initWithBridge:bridge viewController:viewController];
     if (self) {
         _viewControllers = [NSMutableArray array];
@@ -42,6 +43,12 @@
 
 - (void)didRemoveController:(nonnull UIViewController *)viewController {
     [_viewControllers removeObject:viewController];
+}
+
+#pragma mark - RNNativeCardNavigatorControllerDataSource
+
+- (NSArray<RNNativeScene *> *)getCurrentScenes {
+    return self.currentScenes;
 }
 
 #pragma mark - RNNativeBaseNavigator

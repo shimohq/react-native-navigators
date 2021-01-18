@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RNNativeScene;
+
 @protocol RNNativeSplitNavigatorControllerDelegate <NSObject>
 
 - (void)didRemoveController:(nonnull UIViewController *)viewController;
@@ -19,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RNNativeSplitNavigatorControllerDataSource <NSObject>
 
 - (BOOL)isSplit;
+- (NSArray<RNNativeScene *> *)getCurrentScenes;
 
 @end
 

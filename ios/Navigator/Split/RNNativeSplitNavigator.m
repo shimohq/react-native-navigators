@@ -119,6 +119,10 @@
     return _split;
 }
 
+- (NSArray<RNNativeScene *> *)getCurrentScenes {
+    return self.currentScenes;
+}
+
 #pragma mark - RNNativeBaseNavigator
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {

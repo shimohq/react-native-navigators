@@ -9,12 +9,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^RNNativePanGestureHandlerDidGoBackBlock)(void);
+
 @class RNNativeScene;
 
 @interface RNNativePanGestureHandler : NSObject
 
+/**
+ only for split mode
+ */
+@property (nonatomic, weak) RNNativeScene *primaryScene;
+@property (nonatomic, weak) RNNativeScene *upScene;
+@property (nonatomic, weak) RNNativeScene *downScene;
+@property (nonatomic, copy) RNNativePanGestureHandlerDidGoBackBlock didGoBack;
+
 + (instancetype)sharedInstance;
-- (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture upScene:(RNNativeScene *)upScene downScene:(RNNativeScene *)downScene didGoBack:(void (^)(void))didGoBack;
+- (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture;
 
 @end
 
