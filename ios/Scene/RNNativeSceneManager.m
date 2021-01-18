@@ -2,22 +2,37 @@
 #import "RNNativeScene.h"
 #import "RNNativeSceneShadowView.h"
 
+@interface RNNativeSceneManager()
+
+@property (nonatomic, assign) CGFloat headerHeight;
+@property (nonatomic, assign) CGFloat headerTop;
+
+@end
+
 @implementation RNNativeSceneManager
 
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
-{
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        UINavigationController *navigationController = [[UINavigationController alloc] init];
+        _headerHeight = CGRectGetHeight(navigationController.navigationBar.frame);
+        _headerTop = [UIApplication sharedApplication].delegate.window.rootViewController.view.safeAreaInsets.top;
+    }
+    return self;
+}
+
+- (UIView *)view {
   return [[RNNativeScene alloc] initWithBridge:self.bridge];
 }
 
-- (RCTShadowView *)shadowView
-{
+- (RCTShadowView *)shadowView {
   return [RNNativeSceneShadowView new];
 }
 
-
+// for view
 RCT_EXPORT_VIEW_PROPERTY(onWillFocus, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onDidFocus, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onWillBlur, RCTDirectEventBlock)
@@ -30,6 +45,9 @@ RCT_EXPORT_VIEW_PROPERTY(transparent, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(statusBarStyle, UIStatusBarStyle)
 RCT_EXPORT_VIEW_PROPERTY(statusBarHidden, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(splitFullScreen, BOOL)
+
+// for shadow view
+RCT_EXPORT_SHADOW_PROPERTY(splitFullScreen, BOOL)
 
 @end
 

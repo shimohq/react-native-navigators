@@ -100,7 +100,6 @@
 @property (nonatomic, strong, readonly) RNNativeSceneController *controller;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
-- (void)updateBounds;
 - (void)registerListener:(id<RNNativeSceneListener>)listener;
 - (void)unregisterListener:(id<RNNativeSceneListener>)listener;
 

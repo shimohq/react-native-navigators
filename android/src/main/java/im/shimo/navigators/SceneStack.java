@@ -6,48 +6,14 @@ public class SceneStack extends SceneContainer {
 
     private static final String TAG = "SceneStack";
 
-//    SceneStackRootView rootView;
-
-
     public SceneStack(Context context) {
         super(context);
-//        rootView = new SceneStackRootView(context);
-//        addView(rootView);
     }
-
-//    @Override
-//    protected SceneStackModel adapt(Scene scene) {
-//        return new SceneStackModel(scene);
-//    }
-
-
-
-//    @Override
-//    public void addView(View child) {
-//        SceneStackRootView rootView = new SceneStackRootView(getContext());
-//        rootView.addView(child);
-//        super.addView(rootView);
-//    }
-//
-//
-//    @Override
-//    public void removeView(View view) {
-//        ViewParent parent = view.getParent();
-//        if (parent instanceof SceneStackRootView) {
-//            if (parent.getParent() instanceof SceneStack){
-//                super.removeView((View) parent);
-//            }
-//        } else {
-//            super.removeView(view);
-//        }
-//    }
 
     @Override
     void getAnimationOnPush(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-//                anim[0] = R.anim.no_anim;
-//                anim[1] = R.anim.no_anim;
                 break;
             default:
             case DEFAULT:
@@ -74,8 +40,6 @@ public class SceneStack extends SceneContainer {
     void getAnimationOnPop(Scene scene, int[] anim) {
         switch (scene.getStackAnimation()) {
             case NONE:
-//                anim[0] = R.anim.no_anim;
-//                anim[1] = R.anim.no_anim;
                 break;
             default:
             case DEFAULT:
@@ -98,27 +62,7 @@ public class SceneStack extends SceneContainer {
         }
     }
 
-//    public void setHeader(SceneStackHeader sceneStackHeader) {
-//        if (mSceneStackHeader == sceneStackHeader) return;
-//        mSceneStackHeader = sceneStackHeader;
-//        addViewInLayout(mSceneStackHeader, 0, generateDefaultLayoutParams());
-//        notifyChildUpdate();
-//    }
-//
-//    public void removeHeader() {
-//        mSceneStackHeader = null;
-//        notifyChildUpdate();
-//    }
 
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-    }
-
-    @Override
-    protected void onUpdate() {
-        super.onUpdate();
-    }
 
 
 }
