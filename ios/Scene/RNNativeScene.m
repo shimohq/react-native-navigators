@@ -177,12 +177,6 @@
     if (statusChanged || dismissed) {
         [self sendStatus:_status andDismissed:dismissed];
     }
-    if (statusChanged) {
-        RCTExecuteOnUIManagerQueue(^{
-            RNNativeSceneShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:self.reactTag];
-            [shadowView setStatus:status];
-        });
-    }
 }
 
 - (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {

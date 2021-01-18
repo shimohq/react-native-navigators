@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RNNativeStackNavigatorShadowView : RCTShadowView
 
-- (instancetype)initWithHeaderHeight:(CGFloat)headerHeight headerTop:(CGFloat)headerTop;
-
 @end
 
 NS_ASSUME_NONNULL_END
