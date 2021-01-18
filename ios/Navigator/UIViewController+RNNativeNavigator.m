@@ -23,15 +23,6 @@
     return nil;
 }
 
-- (RNNativeScene *)rnn_firstScene {
-    for (UIView *view in self.view.subviews) {
-        if ([view isKindOfClass:[RNNativeScene class]]) {
-            return (RNNativeScene *)view;
-        }
-    }
-    return nil;
-}
-
 - (NSArray<RNNativeScene *> *)rnn_getTopScenesWithCount:(NSInteger)count {
     NSMutableArray<RNNativeScene *> *topScenes = [NSMutableArray array];
     if (count <= 0) {

@@ -15,7 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UIViewController (RNNativeNavigator)
 
 - (RNNativeSceneController *)rnn_topSceneController;
-- (RNNativeScene *)rnn_firstScene;
 - (NSArray<RNNativeScene *> *)rnn_getTopScenesWithCount:(NSInteger)count;
 
 @end
