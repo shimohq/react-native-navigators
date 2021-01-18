@@ -28,16 +28,7 @@
         parentViewController = nil;
     }
     
-    if (!parentViewController) {
-        [self.viewController addChildViewController:scene.controller];
-    }
-    
-    if (superView) {
-        [self.viewController.view bringSubviewToFront:scene];
-    } else {
-        [self.viewController.view addSubview:scene];
-    }
-    
+    // update frame
     CGRect frame = scene.frame;
     CGRect bounds = self.viewController.view.bounds;
     if (split) {
@@ -52,6 +43,18 @@
         scene.frame = CGRectMake(frame.origin.x, frame.origin.y, bounds.size.width, bounds.size.height);
         scene.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
+    
+    // add view
+    if (!parentViewController) {
+        [self.viewController addChildViewController:scene.controller];
+    }
+    
+    if (superView) {
+        [self.viewController.view bringSubviewToFront:scene];
+    } else {
+        [self.viewController.view addSubview:scene];
+    }
+    
 }
 
 - (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes {

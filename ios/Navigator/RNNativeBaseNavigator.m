@@ -7,7 +7,6 @@
 //
 
 #import "RNNativeBaseNavigator.h"
-#import "RNNativeStackHeader.h"
 
 #import <React/RCTBridge.h>
 #import <React/RCTUIManager.h>
@@ -33,9 +32,12 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(__kindof UIViewController *)viewController {
     if (self = [super init]) {
         _bridge = bridge;
-        _viewController = viewController;
         _currentScenes = [NSMutableArray array];
         _nextViews = [NSMutableArray array];
+        
+        viewController.view.frame = self.bounds;
+        viewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _viewController = viewController;
         [self addSubview:viewController.view];
     }
     return self;
@@ -162,6 +164,7 @@
         RCTExecuteOnUIManagerQueue(^{
             RCTExecuteOnMainQueue(^{
                 self->_needUpdate = NO;
+    
                 NSMutableArray<RNNativeScene *> *nextScenes = [NSMutableArray new];
                 for (UIView *view in self.nextViews) {
                     if ([view isKindOfClass:[RNNativeScene class]]) {

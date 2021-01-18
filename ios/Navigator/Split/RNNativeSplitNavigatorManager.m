@@ -7,6 +7,7 @@
 
 #import "RNNativeSplitNavigatorManager.h"
 #import "RNNativeSplitNavigator.h"
+#import "RNNativeSplitNavigatorShadowView.h"
 
 @interface RNNativeSplitNavigatorManager() {
     NSPointerArray *_hostViews;
@@ -28,7 +29,13 @@ RCT_EXPORT_MODULE()
     return view;
 }
 
+- (RCTShadowView *)shadowView
+{
+  return [RNNativeSplitNavigatorShadowView new];
+}
+
 RCT_EXPORT_VIEW_PROPERTY(splitRules, NSArray)
+RCT_EXPORT_SHADOW_PROPERTY(splitRules, NSArray)
 
 #pragma mark - RCTInvalidating
 
