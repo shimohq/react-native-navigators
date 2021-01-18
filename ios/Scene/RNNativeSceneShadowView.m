@@ -20,12 +20,13 @@
 
 @implementation RNNativeSceneShadowView
 
-- (instancetype)init {
+- (instancetype)initWithHeaderHeight:(CGFloat)headerHeight headerTop:(CGFloat)headerTop {
     self = [super init];
     if (self) {
-        _status = RNNativeSceneStatusDidFocus;
-        _headerTop = 0;
-        _headerHeight = 0;
+        _headerTop = headerTop;
+        _headerHeight = headerHeight;
+        
+        _inStack = NO;
         _sceneTop = 0;
     }
     return self;
@@ -33,11 +34,11 @@
 
 #pragma mark - Setter
 
-- (void)setStatus:(RNNativeSceneStatus)status {
-    if (_status == status) {
+- (void)setInStack:(BOOL)inStack {
+    if (_inStack == inStack) {
         return;
     }
-    _status = status;
+    _inStack = inStack;
     [self updateSceneTop];
 }
 
@@ -62,6 +63,9 @@
 - (void)insertReactSubview:(RCTShadowView *)subview atIndex:(NSInteger)atIndex {
     [super insertReactSubview:subview atIndex:atIndex];
     if ([subview isKindOfClass:[RNNativeStackHeaderShadowView class]]) {
+        RNNativeStackHeaderShadowView *headerShadowView = (RNNativeStackHeaderShadowView *)subview;
+        [headerShadowView setTop:(YGValue){_headerTop, YGUnitPoint}];
+        [headerShadowView setHeight:(YGValue){_headerHeight, YGUnitPoint}];
         self.hasHeader = YES;
     }
 }
@@ -74,18 +78,10 @@
     }
 }
 
-#pragma mark - public
-
-- (void)updateWithHeaderTop:(CGFloat)headerTop headerHeight:(CGFloat)headerHeight {
-    _headerTop = headerTop;
-    _headerHeight = headerHeight;
-    [self updateSceneTop];
-}
-
 #pragma mark - private
 
 - (void)updateSceneTop {
-    if (_hasHeader && (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus)) {
+    if (_inStack && _hasHeader) {
         [self setSceneTop:_headerTop + _headerHeight];
     } else {
         [self setSceneTop:0];

@@ -29,7 +29,7 @@ RCT_EXPORT_MODULE()
 }
 
 - (RCTShadowView *)shadowView {
-  return [RNNativeSceneShadowView new];
+  return [[RNNativeSceneShadowView alloc] initWithHeaderHeight:_headerHeight headerTop:_headerTop];
 }
 
 // for view
