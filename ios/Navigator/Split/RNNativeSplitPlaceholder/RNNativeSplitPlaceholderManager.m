@@ -14,7 +14,7 @@
 RCT_EXPORT_MODULE()
 
 - (UIView *)view {
-    return [[RNNativeSplitPlaceholder alloc] initWithBridge:self.bridge];
+    return [RNNativeSplitPlaceholder new];
 }
 
 - (RCTShadowView *)shadowView

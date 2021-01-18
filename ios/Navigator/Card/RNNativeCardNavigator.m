@@ -8,12 +8,15 @@
 #import "RNNativeCardNavigator.h"
 #import "RNNativeCardNavigatorController.h"
 #import "RNNativeScene.h"
+#import "RNNativeNavigatorFrameData.h"
+#import "RNNativeNavigatorUtils.h"
 
 #import <React/RCTUIManager.h>
+#import <React/RCTUIManagerUtils.h>
+#import <React/RCTShadowView.h>
+#import <React/RCTRootShadowView.h>
 
-#import "RNNativeBaseNavigator+Util.h"
 #import "RNNativeBaseNavigator+Layout.h"
-
 
 @interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate>
 
@@ -57,6 +60,7 @@
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+    
     beginTransition(YES, nil);
     
     // viewControllers
@@ -70,7 +74,9 @@
     RNNativeScene *currentTopScene = self.currentScenes.lastObject;
     RNNativeScene *nextTopScene = nextScenes.lastObject;
     if (action == RNNativeStackNavigatorActionShow && transition != RNNativeSceneTransitionNone) {
-        nextTopScene.frame = [self getBeginFrameWithParentBounds:self.viewController.view.bounds transition:transition];
+        nextTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:nextTopScene.frame
+                                                               parentBounds:self.viewController.view.bounds
+                                                                 transition:transition];
     }
     
     // add scene
@@ -92,10 +98,10 @@
         endTransition(YES, nil);
     } else if (action == RNNativeStackNavigatorActionShow) {
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            nextTopScene.frame = self.viewController.view.bounds;
+            nextTopScene.frame = [RNNativeNavigatorUtils getEndFrameFrame:nextTopScene.frame];
         } completion:^(BOOL finished) {
             if (!finished) {
-                nextTopScene.frame = self.viewController.view.bounds;
+                nextTopScene.frame = [RNNativeNavigatorUtils getEndFrameFrame:nextTopScene.frame];
             }
             [nextTopScene.controller didMoveToParentViewController:self.viewController];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
@@ -105,11 +111,10 @@
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene.controller willMoveToParentViewController:nil];
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            currentTopScene.frame = [self getBeginFrameWithParentBounds:self.viewController.view.bounds transition:transition];
+            currentTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:currentTopScene.frame
+                                                                      parentBounds:self.viewController.view.bounds
+                                                                        transition:transition];
         } completion:^(BOOL finished) {
-            if (!finished) {
-                nextTopScene.frame = self.viewController.view.bounds;
-            }
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES, nil);
         }];

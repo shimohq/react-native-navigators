@@ -9,23 +9,18 @@
 #import "RNNativeSplitNavigatorController.h"
 #import "RNNativeScene.h"
 #import "RNNativeSplitPlaceholder.h"
+#import "RNNativeNavigatorFrameData.h"
+#import "RNNativeSplitRule.h"
+#import "RNNativeSplitUtils.h"
+#import "RNNativeNavigatorUtils.h"
 
+#import <React/RCTShadowView.h>
+#import <React/RCTRootShadowView.h>
 #import <React/RCTUIManager.h>
+#import <React/RCTUIManagerUtils.h>
+#import <yoga/yoga.h>
 
-#import "RNNativeBaseNavigator+Util.h"
 #import "RNNativeBaseNavigator+Layout.h"
-
-@interface RNNativeSplitRule : NSObject
-
-@property(nonatomic, assign) CGFloat primarySceneWidth;
-@property(nonatomic, assign) CGFloat navigatorWidthBegin;
-@property(nonatomic, assign) CGFloat navigatorWidthEnd;
-
-@end
-
-@implementation RNNativeSplitRule
-
-@end
 
 @interface RNNativeSplitNavigator() <RNNativeSplitNavigatorControllerDelegate, RNNativeSplitNavigatorControllerDataSource>
 
@@ -53,10 +48,10 @@
         _updating = NO;
         
         _splitRules = nil;
-        _rules = [self parseSplitRules:_splitRules];
+        _rules = [RNNativeSplitUtils parseSplitRules:_splitRules];
         _navigatorBounds = viewController.view.bounds;
         _navigatorWidth = CGRectGetWidth(viewController.view.frame);
-        _primarySceneWidth = [self getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth];
+        _primarySceneWidth = [RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth];
         _split = _primarySceneWidth > 0;
     }
     return self;
@@ -69,8 +64,8 @@
         return;
     }
     _splitRules = splitRules;
-    _rules = [self parseSplitRules:_splitRules];
-    [self setPrimarySceneWidth:[self getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
+    _rules = [RNNativeSplitUtils parseSplitRules:_splitRules];
+    [self setPrimarySceneWidth:[RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
 }
 
 - (void)setNavigatorBounds:(CGRect)navigatorBounds {
@@ -78,7 +73,6 @@
         return;
     }
     _navigatorBounds = navigatorBounds;
-    [self updateScenesSize];
     [self updateSplitPlaceholder];
     [self setNavigatorWidth:CGRectGetWidth(navigatorBounds)];
 }
@@ -88,7 +82,7 @@
         return;
     }
     _navigatorWidth = navigatorWidth;
-    [self setPrimarySceneWidth:[self getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
+    [self setPrimarySceneWidth:[RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
 }
 
 - (void)setPrimarySceneWidth:(CGFloat)primarySceneWidth {
@@ -97,7 +91,6 @@
     }
     _primarySceneWidth = primarySceneWidth;
     _split = primarySceneWidth > 0;
-    [self updateScenesFrame];
     [self updateSplitPlaceholder];
 }
 
@@ -163,7 +156,11 @@
     }
     
     // update frame
-    CGRect frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:index fullScreen:scene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+    CGRect frame = [RNNativeNavigatorUtils getEndFrameWithFrame:scene.frame
+                                                          index:index
+                                                     fullScreen:scene.splitFullScreen
+                                                          split:self.split
+                                              primarySceneWidth:self.primarySceneWidth];
     [UIView animateWithDuration:RNNativeNavigateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         scene.frame = frame;
     } completion:^(BOOL finished) {
@@ -187,6 +184,7 @@
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+    
     NSArray<RNNativeScene *> *primaryScenes = nextScenes.count > 0 ? @[nextScenes[0]] : nil;
     beginTransition(YES, primaryScenes);
     
@@ -197,13 +195,20 @@
     }
     [_viewControllers setArray:viewControllers];
 
-    // update will show view frame
     NSInteger currentTopSceneIndex = self.currentScenes.count - 1;
     RNNativeScene *currentTopScene = currentTopSceneIndex >= 0 ? self.currentScenes[currentTopSceneIndex] : nil;
     NSInteger nextTopSceneIndex = nextScenes.count - 1;
     RNNativeScene *nextTopScene = nextTopSceneIndex >= 0 ? nextScenes[nextTopSceneIndex] : nil;
-    if (action == RNNativeStackNavigatorActionShow && transition != RNNativeSceneTransitionNone) {
-        nextTopScene.frame = [self getBeginFrameWithParentBounds:self.viewController.view.bounds transition:transition index:nextTopSceneIndex fullScreen:nextTopScene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+    
+    // update will show view frame
+    if (action == RNNativeStackNavigatorActionShow) {
+        nextTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:nextTopScene.frame
+                                                               parentBounds:self.viewController.view.bounds
+                                                                 transition:transition
+                                                                      index:nextTopSceneIndex
+                                                                 fullScreen:nextTopScene.splitFullScreen
+                                                                      split:self.split
+                                                          primarySceneWidth:self.primarySceneWidth];
     }
     
     // add scene
@@ -221,16 +226,21 @@
     }
     
     // transition
+    CGRect nextTopSceneEndFrame = [RNNativeNavigatorUtils getEndFrameWithFrame:nextTopScene.frame
+                                                                         index:nextTopSceneIndex
+                                                                    fullScreen:nextTopScene.splitFullScreen
+                                                                         split:self.split
+                                                             primarySceneWidth:self.primarySceneWidth];
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        nextTopScene.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:nextTopSceneIndex fullScreen:nextTopScene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+        nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:self.split];
         endTransition(YES, primaryScenes);
     } else if (action == RNNativeStackNavigatorActionShow) {
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            nextTopScene.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:nextTopSceneIndex fullScreen:nextTopScene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+            nextTopScene.frame = nextTopSceneEndFrame;
         } completion:^(BOOL finished) {
             if (!finished) {
-                nextTopScene.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:nextTopSceneIndex fullScreen:nextTopScene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+                nextTopScene.frame = nextTopSceneEndFrame;
             }
             [nextTopScene.controller didMoveToParentViewController:self.viewController];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:self.split];
@@ -240,11 +250,14 @@
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene.controller willMoveToParentViewController:nil];
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            currentTopScene.frame = [self getBeginFrameWithParentBounds:self.viewController.view.bounds transition:transition index:currentTopSceneIndex fullScreen:currentTopScene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+            currentTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:currentTopScene.frame
+                                                                      parentBounds:self.viewController.view.bounds
+                                                                        transition:transition
+                                                                             index:currentTopSceneIndex
+                                                                        fullScreen:currentTopScene.splitFullScreen
+                                                                             split:self.split
+                                                                 primarySceneWidth:self.primarySceneWidth];
         } completion:^(BOOL finished) {
-            if (!finished) {
-                nextTopScene.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:nextTopSceneIndex fullScreen:nextTopScene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
-            }
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:self.split];
             endTransition(YES, primaryScenes);
         }];
@@ -278,84 +291,12 @@
         if (!splitPlaceholderParent) {
             [self.viewController.view addSubview:_splitPlaceholder];
         }
-        _splitPlaceholder.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:1 fullScreen:NO split:YES primarySceneWidth:_primarySceneWidth];
-        _splitPlaceholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self.viewController.view sendSubviewToBack:_splitPlaceholder];
     } else {
         if ([_splitPlaceholder superview]) {
             [_splitPlaceholder removeFromSuperview];
         }
     }
-}
-
-/**
- primarySceneWidth 变化时，scene 的 x y size 都要变
- */
-- (void)updateScenesFrame {
-    NSArray *subviews = self.viewController.view.subviews;
-    NSInteger sceneIndex = 0;
-    for (NSInteger index = 0, size = subviews.count; index < size; index++) {
-        UIView *view = subviews[index];
-        if ([view isKindOfClass:[RNNativeScene class]]) {
-            RNNativeScene *scene = (RNNativeScene *)view;
-            view.frame = [self getFrameWithParentBounds:self.viewController.view.bounds index:sceneIndex fullScreen:scene.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
-            sceneIndex++;
-        }
-    }
-}
-
-/**
- 屏幕宽高变化时，只改变 scene 的宽高，不改变 x 和 y
- */
-- (void)updateScenesSize {
-    NSArray *subviews = self.viewController.view.subviews;
-    CGRect bounds = self.viewController.view.bounds;
-    NSInteger sceneIndex = 0;
-    for (NSInteger index = 0, size = subviews.count; index < size; index++) {
-        UIView *view = subviews[index];
-        if ([view isKindOfClass:[RNNativeScene class]]) {
-            RNNativeScene *scene = (RNNativeScene *)view;
-            CGRect frame = scene.frame;
-            if (_split && !scene.splitFullScreen) {
-                if (sceneIndex == 0) {
-                    scene.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), _primarySceneWidth, CGRectGetHeight(bounds));
-                } else {
-                    scene.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(bounds) - _primarySceneWidth, CGRectGetHeight(bounds));
-                }
-            } else {
-                scene.frame = CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(bounds), CGRectGetHeight(bounds));
-            }
-            sceneIndex++;
-        }
-    }
-}
-
-#pragma mark - Private
-
-- (NSArray<RNNativeSplitRule *> *)parseSplitRules:(NSArray<NSDictionary *> *)splitRules {
-    NSMutableArray *rules = [NSMutableArray array];
-    [splitRules enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        RNNativeSplitRule *rule = [RNNativeSplitRule new];
-        rule.primarySceneWidth = [obj[@"primarySceneWidth"] floatValue];
-        NSArray<NSNumber *> *navigatorWidthRange = obj[@"navigatorWidthRange"];
-        rule.navigatorWidthBegin = navigatorWidthRange.count > 0 ? [navigatorWidthRange[0] floatValue] : 0;
-        rule.navigatorWidthEnd = navigatorWidthRange.count > 1 ? [navigatorWidthRange[1] floatValue] : CGFLOAT_MAX;
-        [rules addObject:rule];
-    }];
-    return rules;
-}
-
-- (CGFloat)getPrimarySceneWidthWithRules:(NSArray<RNNativeSplitRule *> *)rules navigatorWidth:(CGFloat)navigatorWidth {
-    for (RNNativeSplitRule *rule in rules) {
-        if (rule.navigatorWidthBegin < rule.navigatorWidthEnd
-            && rule.navigatorWidthEnd > 0
-            && navigatorWidth >= rule.navigatorWidthBegin
-            && navigatorWidth <= rule.navigatorWidthEnd
-            && rule.primarySceneWidth < navigatorWidth) {
-            return rule.primarySceneWidth;
-        }
-    }
-    return 0;
 }
 
 @end

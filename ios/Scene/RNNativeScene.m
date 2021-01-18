@@ -3,6 +3,7 @@
 #import "RNNativeNavigatorInsetsData.h"
 #import "RNNativeNavigatorFrameData.h"
 #import "RNNativeStackHeader.h"
+#import "RNNativeSceneShadowView.h"
 
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
@@ -12,6 +13,7 @@
 
 @property (nonatomic, strong) RNNativeSceneController *controller;
 @property (nonatomic, strong) NSPointerArray *listeners;
+@property (nonatomic, weak) RCTBridge *bridge;
 
 @end
 
@@ -60,7 +62,6 @@
         && (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus)) {
         [_controller.navigationController setNavigationBarHidden:NO];
         [(RNNativeStackHeader *)subview attachViewController:_controller];
-        [self updateBounds];
     }
 }
 
@@ -72,18 +73,10 @@
         && (_status == RNNativeSceneStatusWillFocus || _status == RNNativeSceneStatusDidFocus)) {
         [_controller.navigationController setNavigationBarHidden:YES];
         [(RNNativeStackHeader *)subview detachViewController];
-        [self updateBounds];
     }
 }
 
 #pragma mark - UIView
-
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    
-    RNNativeNavigatorFrameData *data = [[RNNativeNavigatorFrameData alloc] initWithFrame:self.frame];
-    [_bridge.uiManager setLocalData:data forView:self];
-}
 
 - (BOOL)resignFirstResponder {
     _firstResponderView = [self findFirstResponderView:self];
@@ -184,6 +177,12 @@
     if (statusChanged || dismissed) {
         [self sendStatus:_status andDismissed:dismissed];
     }
+    if (statusChanged) {
+        RCTExecuteOnUIManagerQueue(^{
+            RNNativeSceneShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:self.reactTag];
+            [shadowView setStatus:status];
+        });
+    }
 }
 
 - (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle {
@@ -243,18 +242,6 @@
         }
     }
     return NO;
-}
-
-- (void)updateBounds
-{
-    CGFloat offset = 0;
-    UINavigationController *navigationController = _controller.navigationController;
-    if (!navigationController.isNavigationBarHidden && !_translucent) {
-        CGRect frame = navigationController.navigationBar.frame;
-        offset = frame.origin.y + frame.size.height;
-    }
-    [_bridge.uiManager setLocalData:[[RNNativeNavigatorInsetsData alloc] initWithInsets:UIEdgeInsetsMake(offset, 0, 0, 0)]
-                            forView:self];
 }
 
 - (UIView *)findFirstResponderView:(UIView *)view {
