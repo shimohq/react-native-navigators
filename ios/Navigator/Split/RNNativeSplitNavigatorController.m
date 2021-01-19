@@ -14,6 +14,8 @@
 
 @interface RNNativeSplitNavigatorController () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, strong) RNNativePanGestureHandler *panGestureHandler;
+
 @end
 
 @implementation RNNativeSplitNavigatorController
@@ -45,16 +47,16 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    NSArray<RNNativeScene *> *topScenes = [self rnn_getTopScenesWithCount:3];
+    NSArray<RNNativeScene *> *currentScenes = [self.dataSource getCurrentScenes];
     BOOL split = [self.dataSource isSplit];
-    if (topScenes.count < (split ? 3 : 2)) {
+    if (currentScenes.count < (split ? 3 : 2)) {
         return NO;
     }
-    if (!topScenes[0].gestureEnabled) {
+    RNNativeScene *topScene = currentScenes.lastObject;
+    if (!topScene.gestureEnabled) {
         return NO;
     }
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    RNNativeScene *topScene = topScenes[0];
     CGFloat topSceneMinX = CGRectGetMinX(topScene.frame);
     if (location.x < topSceneMinX || location.x > topSceneMinX + 120) {
         return NO;
@@ -65,15 +67,30 @@
 #pragma mark - UIPanGestureRecognizer - Action
 
 - (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture {
-    NSArray<RNNativeScene *> *topTwoScenes = [self rnn_getTopScenesWithCount:2];
-    if (topTwoScenes.count < 2) {
-        return;
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        NSArray<RNNativeScene *> *currentScenes = [self.dataSource getCurrentScenes];
+        NSInteger count = currentScenes.count;
+        if (count < 2) {
+            return;
+        }
+        RNNativeScene *firstScene = currentScenes[count - 1];
+        RNNativeScene *secondScene = currentScenes[count - 2];
+        self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
+        self.panGestureHandler.firstScene = firstScene;
+        self.panGestureHandler.secondScene = secondScene;
+        if ([self.dataSource isSplit]) {
+            self.panGestureHandler.primaryScene = currentScenes[0];
+        }
+        self.panGestureHandler.didGoBack = ^{
+            [self.delegate didRemoveController:firstScene.controller];
+        };
     }
-    RNNativeScene *upScene = topTwoScenes[0];
-    RNNativeScene *downScene = topTwoScenes[1];
-    [[RNNativePanGestureHandler sharedInstance] panWithGestureRecognizer:gesture upScene:upScene downScene:downScene didGoBack:^{
-        [self.delegate didRemoveController:upScene.controller];
-    }];
+    [self.panGestureHandler panWithGestureRecognizer:gesture];
+    if (gesture.state == UIGestureRecognizerStateEnded
+        || gesture.state == UIGestureRecognizerStateCancelled
+        || gesture.state == UIGestureRecognizerStateFailed) {
+        self.panGestureHandler = nil;
+    }
 }
 
 @end

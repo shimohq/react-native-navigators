@@ -14,6 +14,8 @@
 
 @interface RNNativeCardNavigatorController () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, strong) RNNativePanGestureHandler *panGestureHandler;
+
 @end
 
 @implementation RNNativeCardNavigatorController
@@ -66,16 +68,27 @@
 #pragma mark - UIPanGestureRecognizer - Action
 
 - (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture {
-    NSArray<RNNativeScene *> *topTwoScenes = [self rnn_getTopScenesWithCount:2];
-    if (topTwoScenes.count < 2) {
-        return;
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        NSArray<RNNativeScene *> *currentScenes = [self.dataSource getCurrentScenes];
+        NSInteger count = currentScenes.count;
+        if (count < 2) {
+            return;
+        }
+        RNNativeScene *firstScene = currentScenes[count - 1];
+        RNNativeScene *secondScene = currentScenes[count - 2];
+        self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
+        self.panGestureHandler.firstScene = firstScene;
+        self.panGestureHandler.secondScene = secondScene;
+        self.panGestureHandler.didGoBack = ^{
+            [self.delegate didRemoveController:firstScene.controller];
+        };
     }
-    RNNativeScene *upScene = topTwoScenes[0];
-    RNNativeScene *downScene = topTwoScenes[1];
-    
-    [[RNNativePanGestureHandler sharedInstance] panWithGestureRecognizer:gesture upScene:upScene downScene:downScene didGoBack:^{
-        [self.delegate didRemoveController:upScene.controller];
-    }];
+    [self.panGestureHandler panWithGestureRecognizer:gesture];
+    if (gesture.state == UIGestureRecognizerStateEnded
+        || gesture.state == UIGestureRecognizerStateCancelled
+        || gesture.state == UIGestureRecognizerStateFailed) {
+        self.panGestureHandler = nil;
+    }
 }
 
 #pragma mark - Private
