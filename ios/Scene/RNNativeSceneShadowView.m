@@ -1,8 +1,6 @@
 #import "RNNativeSceneShadowView.h"
 #import "RNNativeStackHeaderShadowView.h"
 #import "RNNativeStackNavigatorShadowView.h"
-#import "RNNativeNavigatorInsetsData.h"
-#import "RNNativeNavigatorFrameData.h"
 
 #import <React/RCTUIManagerUtils.h>
 #import <React/RCTUtils.h>

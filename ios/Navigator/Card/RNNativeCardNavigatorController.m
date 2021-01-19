@@ -74,13 +74,13 @@
         if (count < 2) {
             return;
         }
-        RNNativeScene *upScene = currentScenes[count - 1];
-        RNNativeScene *downScene = currentScenes[count - 2];
+        RNNativeScene *firstScene = currentScenes[count - 1];
+        RNNativeScene *secondScene = currentScenes[count - 2];
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
-        self.panGestureHandler.upScene = upScene;
-        self.panGestureHandler.downScene = downScene;
+        self.panGestureHandler.firstScene = firstScene;
+        self.panGestureHandler.secondScene = secondScene;
         self.panGestureHandler.didGoBack = ^{
-            [self.delegate didRemoveController:upScene.controller];
+            [self.delegate didRemoveController:firstScene.controller];
         };
     }
     [self.panGestureHandler panWithGestureRecognizer:gesture];

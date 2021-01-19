@@ -1,7 +1,5 @@
 #import "RNNativeScene.h"
 #import "RNNativeSceneController.h"
-#import "RNNativeNavigatorInsetsData.h"
-#import "RNNativeNavigatorFrameData.h"
 #import "RNNativeStackHeader.h"
 #import "RNNativeSceneShadowView.h"
 

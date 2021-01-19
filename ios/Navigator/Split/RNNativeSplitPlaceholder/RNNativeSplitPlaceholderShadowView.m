@@ -6,7 +6,6 @@
 //
 
 #import "RNNativeSplitPlaceholderShadowView.h"
-#import "RNNativeNavigatorFrameData.h"
 
 @implementation RNNativeSplitPlaceholderShadowView
 

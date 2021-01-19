@@ -8,7 +8,6 @@
 #import "RNNativeCardNavigator.h"
 #import "RNNativeCardNavigatorController.h"
 #import "RNNativeScene.h"
-#import "RNNativeNavigatorFrameData.h"
 #import "RNNativeNavigatorUtils.h"
 
 #import <React/RCTUIManager.h>

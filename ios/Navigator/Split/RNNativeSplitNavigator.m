@@ -9,7 +9,6 @@
 #import "RNNativeSplitNavigatorController.h"
 #import "RNNativeScene.h"
 #import "RNNativeSplitPlaceholder.h"
-#import "RNNativeNavigatorFrameData.h"
 #import "RNNativeSplitRule.h"
 #import "RNNativeSplitUtils.h"
 #import "RNNativeNavigatorUtils.h"

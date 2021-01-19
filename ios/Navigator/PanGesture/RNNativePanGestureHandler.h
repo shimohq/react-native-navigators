@@ -19,8 +19,8 @@ typedef void (^RNNativePanGestureHandlerDidGoBackBlock)(void);
  only for split mode
  */
 @property (nonatomic, weak) RNNativeScene *primaryScene;
-@property (nonatomic, weak) RNNativeScene *upScene;
-@property (nonatomic, weak) RNNativeScene *downScene;
+@property (nonatomic, weak) RNNativeScene *firstScene;
+@property (nonatomic, weak) RNNativeScene *secondScene;
 @property (nonatomic, copy) RNNativePanGestureHandlerDidGoBackBlock didGoBack;
 
 + (instancetype)sharedInstance;
