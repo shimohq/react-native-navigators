@@ -1,7 +1,5 @@
 #import "RNNativeScene.h"
 #import "RNNativeSceneController.h"
-#import "RNNativeNavigatorInsetsData.h"
-#import "RNNativeNavigatorFrameData.h"
 #import "RNNativeStackHeader.h"
 #import "RNNativeSceneShadowView.h"
 
@@ -176,12 +174,6 @@
     }
     if (statusChanged || dismissed) {
         [self sendStatus:_status andDismissed:dismissed];
-    }
-    if (statusChanged) {
-        RCTExecuteOnUIManagerQueue(^{
-            RNNativeSceneShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:self.reactTag];
-            [shadowView setStatus:status];
-        });
     }
 }
 

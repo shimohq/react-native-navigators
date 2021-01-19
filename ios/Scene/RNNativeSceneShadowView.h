@@ -1,13 +1,6 @@
 #import <React/RCTShadowView.h>
-#import "RNNativeConst.h"
 
 @class RNNativeSceneShadowView;
-
-@protocol RNNativeSceneShadowViewDelegate <NSObject>
-
-- (void)didHeaderUpdated:(RNNativeSceneShadowView *)shadow;
-
-@end
 
 @interface RNNativeSceneShadowView : RCTShadowView
 
@@ -16,8 +9,11 @@
  */
 @property (nonatomic, assign) BOOL splitFullScreen;
 
-@property (nonatomic, assign) RNNativeSceneStatus status;
+/**
+ Whether in StackNavigator
+ */
+@property (nonatomic, assign) BOOL inStack;
 
-- (void)updateWithHeaderTop:(CGFloat)headerTop headerHeight:(CGFloat)headerHeight;
+- (instancetype)initWithHeaderHeight:(CGFloat)headerHeight headerTop:(CGFloat)headerTop;
 
 @end
