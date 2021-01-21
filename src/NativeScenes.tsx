@@ -3,21 +3,17 @@ import { NavigationRoute, NavigationInjectedProps } from 'react-navigation';
 
 import {
   NativeNavigationDescriptorMap,
-  NativeNavigatorTransitions,
   NativeNavigatorHeaderModes,
   NativeNavigatorModes
 } from './types';
-import NativeSceneView from './NativeSceneView';
-import NativeStackScene from './NativeStackScene';
-import NativeHeader from './NativeHeader';
-import NativeStackSceneContainer from './NativeStackSceneContainer';
+import NativeScene from './NativeScene';
 
 export interface NativeScenesProps extends NavigationInjectedProps {
   routes: NavigationRoute[];
   mode: NativeNavigatorModes;
   headerMode?: NativeNavigatorHeaderModes;
   descriptors: NativeNavigationDescriptorMap;
-  screenProps?: any;
+  screenProps?: unknown;
   onOpenRoute: (route: NavigationRoute) => void;
   onCloseRoute: (route: NavigationRoute) => void;
   onDismissRoute: (route: NavigationRoute) => void;
@@ -25,7 +21,7 @@ export interface NativeScenesProps extends NavigationInjectedProps {
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
-  private handleDidFocus = (route: NavigationRoute) => {
+  private handleDidFocus = (route: NavigationRoute): void => {
     this.props.onOpenRoute(route);
   };
 
@@ -48,69 +44,26 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
       descriptors,
       screenProps,
       mode,
-      closingRouteKey
+      closingRouteKey,
+      headerMode
     } = this.props;
 
     return (
       <>
         {routes.map(route => {
-          const { key } = route;
-          const descriptor = descriptors[key];
-
-          if (!descriptor) {
-            return null;
-          }
-
-          const { options, navigation } = descriptor;
-
-          let headerMode = options.headerHidden
-            ? NativeNavigatorHeaderModes.None
-            : this.props.headerMode;
-
-          if (mode === NativeNavigatorModes.Stack) {
-            headerMode = headerMode || NativeNavigatorHeaderModes.Auto;
-          } else if (mode === NativeNavigatorModes.Split) {
-            headerMode = NativeNavigatorHeaderModes.None; // split navigator do not support native header
-          } else {
-            headerMode = headerMode || NativeNavigatorHeaderModes.None;
-          }
-
-          const SceneComponent = descriptor.getComponent();
-
+          const descriptor = descriptors[route.key];
           return (
-            <NativeStackScene
-              key={key}
-              transition={
-                navigation.dangerouslyGetParent()?.state?.isTransitioning
-                  ? options.transition || NativeNavigatorTransitions.Default
-                  : NativeNavigatorTransitions.None
-              }
+            <NativeScene
+              key={route.key}
               closing={closingRouteKey === route.key}
-              gestureEnabled={options.gestureEnabled !== false}
-              translucent={options.translucent === true}
-              transparent={options.transparent === true}
-              splitFullScreen={
-                mode === NativeNavigatorModes.Split &&
-                options.splitFullScreen === true
-              }
+              descriptor={descriptor}
+              route={route}
+              screenProps={screenProps}
+              mode={mode}
+              headerMode={headerMode}
               onDidFocus={this.handleDidFocus}
               onDidBlur={this.handleDidBlur}
-              route={route}
-              style={options.cardStyle}
-              statusBarStyle={options.statusBarStyle}
-              statusBarHidden={options.statusBarHidden}
-            >
-              <NativeStackSceneContainer>
-                <NativeSceneView
-                  screenProps={screenProps}
-                  navigation={navigation}
-                  component={SceneComponent}
-                />
-                {headerMode === NativeNavigatorHeaderModes.Auto ? (
-                  <NativeHeader descriptor={descriptor} route={route} />
-                ) : null}
-              </NativeStackSceneContainer>
-            </NativeStackScene>
+            />
           );
         })}
       </>
