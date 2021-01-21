@@ -321,9 +321,28 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     }
   }
 
+  protected Scene findRootSplitSceneChildScene() {
+    Scene scene = this;
+    ViewParent viewParent = getParent();
+    while (viewParent instanceof ViewGroup) {
+      viewParent = ((ViewGroup) viewParent).getParent();
+      if (viewParent instanceof Scene) {
+        if (((Scene) viewParent).mContainer instanceof SplitScene) {
+          scene = (Scene) viewParent;
+        }
+      }
+    }
+    return scene;
+  }
+
   public void setSplitFullScreen(boolean isFullScreen) {
     if (mIsFullScreen == isFullScreen) return;
     mIsFullScreen = isFullScreen;
+    Scene scene = findRootSplitSceneChildScene();
+    if (this != scene) {
+      scene.setSplitFullScreen(isFullScreen);
+      return;
+    }
     if (!(mContainer instanceof SplitScene)) return;
 
     int left = mContainer.getPaddingLeft() + mContainer.getLeft();
@@ -335,7 +354,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
       PropertyValuesHolder.ofInt("left", getLeft(), left),
       PropertyValuesHolder.ofInt("right", getRight(), getRight())
     );
-    valueAnimator.setDuration(3000);
+    valueAnimator.setDuration(300);
     valueAnimator.addUpdateListener((ValueAnimator animation) -> {
       final LayoutParams layoutParams = getLayoutParams();
       int l = (Integer) animation.getAnimatedValue("left");
