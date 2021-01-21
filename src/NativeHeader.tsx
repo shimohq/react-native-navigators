@@ -2,15 +2,12 @@ import React from 'react';
 import { Text, StyleSheet, Platform } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 
-import {
-  NativeNavigationDescriptor,
-  NativeNavigationHeaderTypes
-} from './types';
+import { NativeNavigationHeaderTypes, NativeNavigationOptions } from './types';
 import NativeStackHeader from './NativeStackHeader';
 import NativeStackHeaderItem from './NativeStackHeaderItem';
 
 export interface NativeStackHeaderProps {
-  descriptor: NativeNavigationDescriptor;
+  options: NativeNavigationOptions;
   route: NavigationRoute;
 }
 
@@ -24,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 export default function NativeHeader(props: NativeStackHeaderProps) {
-  const { route, descriptor } = props;
+  const { route, options } = props;
   const { key } = route;
   const {
     headerCenter,
@@ -34,7 +31,7 @@ export default function NativeHeader(props: NativeStackHeaderProps) {
     headerBorderColor,
     headerTitle,
     headerTitleStyle
-  } = descriptor.options;
+  } = options;
 
   const center = headerCenter ? (
     headerCenter

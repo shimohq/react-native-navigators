@@ -1,8 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo, createContext } from 'react';
 import { NavigationRoute, NavigationParams } from 'react-navigation';
 
 import {
   NativeNavigationDescriptor,
+  NativeNavigationOptions,
   NativeNavigatorTransitions,
   NativeNavigatorHeaderModes,
   NativeNavigatorModes
@@ -22,6 +23,10 @@ export interface NativeSceneProps {
   onDidFocus: (route: NavigationRoute) => void;
   onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
 }
+
+export const NativeNavigationDescriptorContext = createContext<{
+  options: NativeNavigationOptions;
+} | null>(null);
 
 export default memo(function NativeScene(props: NativeSceneProps) {
   const {
@@ -46,14 +51,12 @@ export default memo(function NativeScene(props: NativeSceneProps) {
     : props.headerMode;
 
   if (mode === NativeNavigatorModes.Stack) {
-    headerMode = headerMode || NativeNavigatorHeaderModes.Auto;
+    headerMode = headerMode ?? NativeNavigatorHeaderModes.Auto;
   } else if (mode === NativeNavigatorModes.Split) {
     headerMode = NativeNavigatorHeaderModes.None; // split navigator do not support native header
   } else {
-    headerMode = headerMode || NativeNavigatorHeaderModes.None;
+    headerMode = headerMode ?? NativeNavigatorHeaderModes.None;
   }
-
-  const SceneComponent = descriptor.getComponent();
 
   return (
     <NativeStackScene
@@ -63,26 +66,26 @@ export default memo(function NativeScene(props: NativeSceneProps) {
           ? options.transition || NativeNavigatorTransitions.Default
           : NativeNavigatorTransitions.None
       }
-      closing={closing}
       gestureEnabled={options.gestureEnabled !== false}
       translucent={options.translucent === true}
       transparent={options.transparent === true}
       splitFullScreen={options.splitFullScreen === true}
-      onDidFocus={onDidFocus}
-      onDidBlur={onDidBlur}
-      route={route}
       style={options.cardStyle}
       statusBarStyle={options.statusBarStyle}
       statusBarHidden={options.statusBarHidden}
+      closing={closing}
+      onDidFocus={onDidFocus}
+      onDidBlur={onDidBlur}
+      route={route}
     >
       <NativeStackSceneContainer>
         <NativeSceneView
           screenProps={screenProps}
           navigation={navigation}
-          component={SceneComponent}
+          component={descriptor.getComponent()}
         />
         {headerMode === NativeNavigatorHeaderModes.Auto ? (
-          <NativeHeader descriptor={descriptor} route={route} />
+          <NativeHeader options={options} route={route} />
         ) : null}
       </NativeStackSceneContainer>
     </NativeStackScene>
