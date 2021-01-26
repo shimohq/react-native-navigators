@@ -13,12 +13,14 @@
 #import "RNNativeSplitPlaceholderShadowView.h"
 
 #import <React/RCTShadowView.h>
+#import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
 #import <React/RCTUtils.h>
+#import <React/RCTUIManagerObserverCoordinator.h>
 
-@interface RNNativeSplitNavigatorShadowView()
+@interface RNNativeSplitNavigatorShadowView() <RNNativeSceneShadowViewDelegate, RCTUIManagerObserver>
 
-@property (nonatomic, assign) CGSize navigatorSize;
+@property (nonatomic, weak) RCTBridge *bridge;
 @property (nonatomic, assign) CGFloat navigatorWidth;
 @property (nonatomic, strong) NSArray<RNNativeSplitRule *> *rules;
 @property (nonatomic, assign) CGFloat primarySceneWidth;
@@ -29,36 +31,38 @@
 
 @implementation RNNativeSplitNavigatorShadowView
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         _splitRules = nil;
         _rules = [RNNativeSplitUtils parseSplitRules:_splitRules];
-        _navigatorSize = self.layoutMetrics.frame.size;
-        _navigatorSize = CGSizeEqualToSize(CGSizeZero, _navigatorSize) ? CGSizeMake(1024, 768) : _navigatorSize;
-        _navigatorWidth = _navigatorSize.width;
+        _navigatorWidth = CGRectGetWidth(self.layoutMetrics.frame);
         _primarySceneWidth = [RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth];
         _split = _primarySceneWidth > 0;
     }
     return self;
 }
 
-#pragma mark - Setter
-
-- (void)setLayoutMetrics:(RCTLayoutMetrics)layoutMetrics {
-    [super setLayoutMetrics:layoutMetrics];
-    [self setNavigatorSize:layoutMetrics.frame.size];
-}
-
-- (void)setNavigatorSize:(CGSize)navigatorSize {
-    if (CGSizeEqualToSize(_navigatorSize, navigatorSize)) {
-        return;
+- (instancetype)initWithBridge:(RCTBridge *)bridge {
+    self = [self init];
+    if (self) {
+        _bridge = bridge;
+        [bridge.uiManager.observerCoordinator addObserver:self];
     }
-    _navigatorSize = navigatorSize;
-    [self setNavigatorWidth:_navigatorSize.width];
-    [self updateSubShadowViews];
+    return self;
 }
+
+- (void)dealloc {
+    [self.bridge.uiManager.observerCoordinator removeObserver:self];
+}
+
+#pragma mark - RCTUIManagerObserver
+
+- (void)uiManagerDidPerformLayout:(RCTUIManager *)manager {
+    [self setNavigatorWidth:CGRectGetWidth(self.layoutMetrics.frame)];
+}
+
+#pragma mark - Setter
 
 - (void)setNavigatorWidth:(CGFloat)navigatorWidth {
     if (_navigatorWidth == navigatorWidth) {
@@ -66,6 +70,7 @@
     }
     _navigatorWidth = navigatorWidth;
     [self setPrimarySceneWidth:[RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
+    [self updateSubShadowViews];
 }
 
 - (void)setSplitRules:(NSArray<NSDictionary *> *)splitRules {
@@ -89,13 +94,16 @@
 
 - (void)insertReactSubview:(RCTShadowView *)subview atIndex:(NSInteger)atIndex {
     [super insertReactSubview:subview atIndex:atIndex];
-    if (CGSizeEqualToSize(CGSizeZero, self.navigatorSize)) {
+    
+    if (self.navigatorWidth <= 0) {
         return;
     }
     if ([subview isKindOfClass:[RNNativeSplitPlaceholderShadowView class]]) {
-        [self updateShadowView:subview index:1 fullScreen:NO split:YES primarySceneWidth:_primarySceneWidth];
+        [subview setDisplay: self.split ? YGDisplayFlex : YGDisplayNone];
+        [self updateShadowView:subview index:1 fullScreen:NO split:self.split primarySceneWidth:self.primarySceneWidth];
     } else if ([subview isKindOfClass:[RNNativeSceneShadowView class]]) {
         RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView*)subview;
+        sceneShadowView.delegate = self;
         NSInteger sceneIndex = 0;
         for (NSInteger index = 0; index < atIndex; index++) {
             RCTShadowView *shadowView = self.reactSubviews[index];
@@ -103,14 +111,30 @@
                 sceneIndex++;
             }
         }
-        [self updateShadowView:sceneShadowView index:sceneIndex fullScreen:sceneShadowView.splitFullScreen split:_split primarySceneWidth:_primarySceneWidth];
+        [self updateShadowView:sceneShadowView index:sceneIndex fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
     }
+}
+
+#pragma mark - RNNativeSceneShadowViewDelegate
+
+- (void)didSplitFullScrennChanged:(RNNativeSceneShadowView *)sceneShadowView {
+    NSInteger sceneIndex = -1;
+    for (NSInteger index = 0, size = self.reactSubviews.count; index < size; index++) {
+        RCTShadowView *shadowView = self.reactSubviews[index];
+        if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
+            sceneIndex++;
+        }
+        if (sceneShadowView == shadowView) {
+            break;
+        }
+    }
+    [self updateShadowView:sceneShadowView index:sceneIndex fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
 }
 
 #pragma mark - Private
 
 - (void)updateSubShadowViews {
-    if (CGSizeEqualToSize(CGSizeZero, self.navigatorSize)) {
+    if (self.navigatorWidth <= 0) {
         return;
     }
     // INFO 必须要切线程，否则会报 dirtyNode 错误
@@ -118,13 +142,16 @@
         RCTExecuteOnUIManagerQueue(^{
             NSInteger index = -1;
             for (RCTShadowView *shadowView in self.reactSubviews) {
-                if (![shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
-                    continue;
+                if ([shadowView isKindOfClass:[RNNativeSplitPlaceholderShadowView class]]) {
+                    [shadowView setDisplay:self.split ? YGDisplayFlex : YGDisplayNone];
+                    [self updateShadowView:shadowView index:1 fullScreen:NO split:self.split primarySceneWidth:self.primarySceneWidth];
+                } else if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
+                    index++;
+                    RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)shadowView;
+                    [self updateShadowView:sceneShadowView index:index fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
                 }
-                index++;
-                RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)shadowView;
-                [self updateShadowView:sceneShadowView index:index fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
             }
+            [self.bridge.uiManager setNeedsLayout];
         });
     });
 }
@@ -141,13 +168,13 @@
             [shadowView setWidth:(YGValue){primarySceneWidth,YGUnitPoint}];
         } else {
             [shadowView setLeft:(YGValue){primarySceneWidth,YGUnitPoint}];
-            [shadowView setRight:YGValueZero];
-            [shadowView setWidth:YGValueAuto];
+            [shadowView setWidth:(YGValue){_navigatorWidth - primarySceneWidth,YGUnitPoint}];
+            [shadowView setRight:YGValueUndefined];
         }
     } else {
         [shadowView setLeft:YGValueZero];
-        [shadowView setRight:YGValueZero];
-        [shadowView setWidth:YGValueAuto];
+        [shadowView setWidth:(YGValue){_navigatorWidth, YGUnitPoint}];
+        [shadowView setRight:YGValueUndefined];
     }
 }
 

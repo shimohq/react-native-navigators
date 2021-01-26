@@ -15,9 +15,7 @@
 
 @end
 
-@implementation RNNativeScene
-{
-    __weak RCTBridge *_bridge;
+@implementation RNNativeScene {
     RCTTouchHandler *_touchHandler;
     __weak UIView *_firstResponderView;
     BOOL _dismissed;
@@ -193,6 +191,10 @@
     if ([self.delegate respondsToSelector:@selector(didFullScreenChangedWithScene:)]) {
         [self.delegate didFullScreenChangedWithScene:self];
     }
+}
+
+- (void)setEnableLifeCycle:(BOOL)enableLifeCycle {
+    [_controller setEnableLifeCycle:enableLifeCycle];
 }
 
 #pragma mark - Private

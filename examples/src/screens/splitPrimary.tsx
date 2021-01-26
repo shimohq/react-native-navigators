@@ -12,6 +12,10 @@ export default function SplitPrimary(props: NavigationInjectedProps) {
         onPress={() => props.navigation.navigate('secondary')}>
         <Text style={styles.link}> Navigate Secondary </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate('splitFeatures')}>
+        <Text style={styles.link}> Navigate Features </Text>
+      </TouchableOpacity>
     </View>
   );
 }

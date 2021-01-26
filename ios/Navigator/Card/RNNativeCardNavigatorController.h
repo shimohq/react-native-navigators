@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RNNativeCardNavigatorControllerDataSource <NSObject>
 
-- (BOOL)isSplit;
 - (NSArray<RNNativeScene *> *)getCurrentScenes;
 
 @end

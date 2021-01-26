@@ -100,6 +100,10 @@
     if (![subview isKindOfClass:[RNNativeScene class]]) {
         return;
     }
+    
+    RNNativeScene *scene = (RNNativeScene *)subview;
+    scene.delegate = nil;
+    
     [self markUpdated];
 }
 

@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RNNativeSplitNavigatorControllerDelegate <NSObject>
 
 - (void)didRemoveController:(nonnull UIViewController *)viewController;
-- (void)willLayoutSubviews:(CGRect)parentBounds;
 
 @end
 

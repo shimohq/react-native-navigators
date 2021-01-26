@@ -11,13 +11,15 @@ import { NavigationInjectedProps } from 'react-navigation';
 
 import SplitPrimary from './screens/splitPrimary';
 import SplitSecondary from './screens/splitSecondary';
+import Features from './features';
 import SplitPlaceholder from './screens/splitPlaceholder';
 
 const SplitNavigatorMinWidth = 640;
 
 const SplitNavigator = createSplitNavigator({
   primary: SplitPrimary,
-  secondary: SplitSecondary
+  secondary: SplitSecondary,
+  splitFeatures: Features
 }, {
   initialRouteName: 'primary',
   splitRules: [

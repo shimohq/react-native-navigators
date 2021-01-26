@@ -20,6 +20,11 @@
  */
 @property (nonatomic, assign) BOOL statusBarHidden;
 
+/**
+ Whether enable ViewController life cycle to update status
+ */
+@property (nonatomic, assign) BOOL enableLifeCycle;
+
 - (instancetype)initWithNativeScene:(RNNativeScene *)nativeScene;
 
 @end

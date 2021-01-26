@@ -29,7 +29,7 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle == UIStatusBarStyleDarkContent) {
+    if (_statusBarStyle == 3) {
         if (@available(iOS 13.0, *)) {
             return UIStatusBarStyleDarkContent;
         } else {
@@ -60,32 +60,44 @@
 
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [super willMoveToParentViewController:parent];
-    [_nativeScene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
+    if (_enableLifeCycle) {
+        [_nativeScene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
+    }
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [super didMoveToParentViewController:parent];
-    [_nativeScene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
+    if (_enableLifeCycle) {
+        [_nativeScene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [_nativeScene setStatus:RNNativeSceneStatusWillFocus];
+    if (_enableLifeCycle) {
+        [_nativeScene setStatus:RNNativeSceneStatusWillFocus];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [_nativeScene setStatus:RNNativeSceneStatusDidFocus];
+    if (_enableLifeCycle) {
+        [_nativeScene setStatus:RNNativeSceneStatusDidFocus];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_nativeScene setStatus:RNNativeSceneStatusWillBlur];
+    if (_enableLifeCycle) {
+        [_nativeScene setStatus:RNNativeSceneStatusWillBlur];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    [_nativeScene setStatus:RNNativeSceneStatusDidBlur];
+    if (_enableLifeCycle) {
+        [_nativeScene setStatus:RNNativeSceneStatusDidBlur];
+    }
 }
 
 #pragma mark - Setter

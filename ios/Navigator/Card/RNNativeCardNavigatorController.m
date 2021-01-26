@@ -79,8 +79,9 @@
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
         self.panGestureHandler.firstScene = firstScene;
         self.panGestureHandler.secondScene = secondScene;
+        __weak typeof(self) weakSelf = self;
         self.panGestureHandler.didGoBack = ^{
-            [self.delegate didRemoveController:firstScene.controller];
+            [weakSelf.delegate didRemoveController:firstScene.controller];
         };
     }
     [self.panGestureHandler panWithGestureRecognizer:gesture];

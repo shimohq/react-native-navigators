@@ -8,6 +8,9 @@
 #import "RNNativeBaseNavigator+Layout.h"
 #import "RNNativeSceneController.h"
 #import "RNNativeScene.h"
+#import "RNNativeSplitNavigator.h"
+
+#import "UIView+RNNativeNavigator.h"
 
 @implementation RNNativeBaseNavigator (Layout)
 
@@ -16,22 +19,29 @@
 }
 
 - (void)addScene:(RNNativeScene *)scene index:(NSInteger)index split:(BOOL)split primarySceneWidth:(CGFloat)primarySceneWidth {
+    UIViewController *targetViewController;
+    if (scene.splitFullScreen) {
+        targetViewController = [self rnn_nearestSplitNavigatorController] ?: self.viewController;
+    } else {
+        targetViewController = self.viewController;
+    }
+    
     UIView *superView = [scene superview];
-    if (superView && superView != self.viewController.view) {
+    if (superView && superView != targetViewController.view) {
         [scene removeFromSuperview];
         superView = nil;
     }
     
     UIViewController *parentViewController = [scene.controller parentViewController];
-    if (parentViewController && parentViewController != self.viewController) {
+    if (parentViewController && parentViewController != targetViewController) {
         [scene.controller removeFromParentViewController];
         parentViewController = nil;
     }
     
     // update frame
     CGRect frame = scene.frame;
-    CGRect bounds = self.viewController.view.bounds;
-    if (split) {
+    CGRect bounds = targetViewController.view.bounds;
+    if (split && !scene.splitFullScreen) {
         if (index == 0) {
             scene.frame = CGRectMake(frame.origin.x, frame.origin.y, primarySceneWidth, bounds.size.height);
             scene.autoresizingMask = UIViewAutoresizingFlexibleHeight;
@@ -46,15 +56,14 @@
     
     // add view
     if (!parentViewController) {
-        [self.viewController addChildViewController:scene.controller];
+        [targetViewController addChildViewController:scene.controller];
     }
     
     if (superView) {
-        [self.viewController.view bringSubviewToFront:scene];
+        [targetViewController.view bringSubviewToFront:scene];
     } else {
-        [self.viewController.view addSubview:scene];
+        [targetViewController.view addSubview:scene];
     }
-    
 }
 
 - (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes {

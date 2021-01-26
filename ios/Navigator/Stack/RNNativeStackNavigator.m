@@ -60,6 +60,22 @@
     return viewController && ![_controller.viewControllers containsObject:viewController];
 }
 
+- (void)insertSubview:(UIView *)view atIndex:(NSInteger)index {
+    [super insertSubview:view atIndex:index];
+    if ([view isKindOfClass:[RNNativeScene class]]) {
+        RNNativeScene *scene = (RNNativeScene *)view;
+        scene.enableLifeCycle = YES;
+    }
+}
+
+- (void)removeReactSubview:(UIView *)subview {
+    [super removeReactSubview:subview];
+    if ([subview isKindOfClass:[RNNativeScene class]]) {
+        RNNativeScene *scene = (RNNativeScene *)subview;
+        scene.enableLifeCycle = NO;
+    }
+}
+
 /**
  push or pop
  

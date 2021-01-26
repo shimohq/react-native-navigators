@@ -56,6 +56,14 @@
     self.top = (YGValue){_sceneTop, YGUnitPoint};
 }
 
+- (void)setSplitFullScreen:(BOOL)splitFullScreen {
+    if (_splitFullScreen == splitFullScreen) {
+        return;
+    }
+    _splitFullScreen = splitFullScreen;
+    [self.delegate didSplitFullScrennChanged:self];
+}
+
 #pragma mark - RCTShadowView
 
 - (void)insertReactSubview:(RCTShadowView *)subview atIndex:(NSInteger)atIndex {
