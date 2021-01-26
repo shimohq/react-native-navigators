@@ -133,7 +133,6 @@
         UIView *parentView = scene.superview;
         
         if (parentView && parentView != targetViewController.view) {
-            scene.backgroundColor = [UIColor redColor];
             CGRect tempFrame = [targetViewController.view convertRect:targetViewController.view.bounds toView:parentView];
             RCTExecuteOnUIManagerQueue(^{
                 RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
