@@ -38,22 +38,6 @@
         parentViewController = nil;
     }
     
-    // update frame
-    CGRect frame = scene.frame;
-    CGRect bounds = targetViewController.view.bounds;
-    if (split && !scene.splitFullScreen) {
-        if (index == 0) {
-            scene.frame = CGRectMake(frame.origin.x, frame.origin.y, primarySceneWidth, bounds.size.height);
-            scene.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-        } else {
-            scene.frame = CGRectMake(frame.origin.x, frame.origin.y, bounds.size.width - primarySceneWidth, bounds.size.height);
-            scene.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        }
-    } else {
-        scene.frame = CGRectMake(frame.origin.x, frame.origin.y, bounds.size.width, bounds.size.height);
-        scene.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    }
-    
     // add view
     if (!parentViewController) {
         [targetViewController addChildViewController:scene.controller];
