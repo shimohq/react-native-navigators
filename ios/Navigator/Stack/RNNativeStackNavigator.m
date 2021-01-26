@@ -60,10 +60,10 @@
     return viewController && ![_controller.viewControllers containsObject:viewController];
 }
 
-- (void)insertSubview:(UIView *)view atIndex:(NSInteger)index {
-    [super insertSubview:view atIndex:index];
-    if ([view isKindOfClass:[RNNativeScene class]]) {
-        RNNativeScene *scene = (RNNativeScene *)view;
+- (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
+    [super insertReactSubview:subview atIndex:atIndex];
+    if ([subview isKindOfClass:[RNNativeScene class]]) {
+        RNNativeScene *scene = (RNNativeScene *)subview;
         scene.enableLifeCycle = YES;
     }
 }
