@@ -31,8 +31,7 @@
 
 @implementation RNNativeSplitNavigatorShadowView
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         _splitRules = nil;
@@ -53,6 +52,10 @@
     return self;
 }
 
+- (void)dealloc {
+    [self.bridge.uiManager.observerCoordinator removeObserver:self];
+}
+
 #pragma mark - RCTUIManagerObserver
 
 - (void)uiManagerDidPerformLayout:(RCTUIManager *)manager {
@@ -60,27 +63,6 @@
 }
 
 #pragma mark - Setter
-
-//- (void)setLayoutMetrics:(RCTLayoutMetrics)layoutMetrics {
-//    [super setLayoutMetrics:layoutMetrics];
-//
-//    NSLog(@"layoutMetrics: setLayoutMetrics: %@", NSStringFromCGRect(self.layoutMetrics.frame));
-//
-////    [self setNavigatorWidth:CGRectGetWidth(layoutMetrics.frame)];
-//}
-
-//- (void)layoutWithMetrics:(RCTLayoutMetrics)layoutMetrics layoutContext:(RCTLayoutContext)layoutContext {
-//    [super layoutWithMetrics:layoutMetrics layoutContext:layoutContext];
-//    
-//}
-
-//- (void)layoutSubviewsWithContext:(RCTLayoutContext)layoutContext {
-//    [super layoutSubviewsWithContext:layoutContext];
-//
-//    NSLog(@"layoutMetrics: layoutSubviewsWithContext: %@", self);
-//
-//    [self setNavigatorWidth:CGRectGetWidth(self.layoutMetrics.frame)];
-//}
 
 - (void)setNavigatorWidth:(CGFloat)navigatorWidth {
     if (_navigatorWidth == navigatorWidth) {
@@ -113,7 +95,6 @@
 - (void)insertReactSubview:(RCTShadowView *)subview atIndex:(NSInteger)atIndex {
     [super insertReactSubview:subview atIndex:atIndex];
     
-    NSLog(@"layoutMetrics: insertReactSubview: %@", NSStringFromCGRect(self.layoutMetrics.frame));
     if (self.navigatorWidth <= 0) {
         return;
     }
@@ -180,7 +161,6 @@
               fullScreen:(BOOL)fullScreen
                    split:(BOOL)split
        primarySceneWidth:(CGFloat)primarySceneWidth {
-    NSLog(@"updateShadowView: %f %f", primarySceneWidth, _navigatorWidth);
     if (split && !fullScreen) {
         if (index == 0) {
             [shadowView setLeft:YGValueZero];

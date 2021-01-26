@@ -9,9 +9,9 @@
 #import "RNNativeSplitNavigator.h"
 #import "RNNativeSplitNavigatorShadowView.h"
 
-@interface RNNativeSplitNavigatorManager() {
-    NSPointerArray *_hostViews;
-}
+@interface RNNativeSplitNavigatorManager()
+
+@property (nonatomic, strong) NSPointerArray *hostViews;
 
 @end
 
@@ -19,17 +19,20 @@
 
 RCT_EXPORT_MODULE()
 
+- (void)setBridge:(RCTBridge *)bridge {
+    [super setBridge:bridge];
+    
+    _hostViews = [NSPointerArray weakObjectsPointerArray];
+}
+
 - (UIView *)view {
     RNNativeSplitNavigator *view = [[RNNativeSplitNavigator alloc] initWithBridge:self.bridge];
-    if (!_hostViews) {
-        _hostViews = [NSPointerArray weakObjectsPointerArray];
-    }
     [_hostViews addPointer:(__bridge void *)view];
     return view;
 }
 
 - (RCTShadowView *)shadowView {
-  return [[RNNativeSplitNavigatorShadowView alloc] initWithBridge:self.bridge];
+    return [[RNNativeSplitNavigatorShadowView alloc] initWithBridge:self.bridge];
 }
 
 RCT_EXPORT_VIEW_PROPERTY(splitRules, NSArray)

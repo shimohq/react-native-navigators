@@ -35,6 +35,10 @@
     return self;
 }
 
+- (void)dealloc {
+    [self.bridge.uiManager.observerCoordinator removeObserver:self];
+}
+
 #pragma mark - RCTShadowView
 
 - (void)insertReactSubview:(RCTShadowView *)subview atIndex:(NSInteger)atIndex {
@@ -67,20 +71,6 @@
 
 #pragma mark - Setter
 
-//- (void)setLayoutMetrics:(RCTLayoutMetrics)layoutMetrics {
-//    [super setLayoutMetrics:layoutMetrics];
-//
-////    [self setNavigatorWidth:layoutMetrics.frame.size.width];
-//}
-
-//- (void)layoutSubviewsWithContext:(RCTLayoutContext)layoutContext {
-//    [super layoutSubviewsWithContext:layoutContext];
-//
-//    NSLog(@"layoutMetrics: layoutSubviewsWithContext: %@", self);
-//
-//    [self setNavigatorWidth:CGRectGetWidth(self.layoutMetrics.frame)];
-//}
-
 - (void)setNavigatorWidth:(CGFloat)navigatorWidth {
     if (_navigatorWidth == navigatorWidth) {
         return;
@@ -106,7 +96,6 @@
                         taregetShadowView = self;
                     }
                     CGFloat width = CGRectGetWidth(taregetShadowView.layoutMetrics.frame);
-                    NSLog(@"Card Width: %f", width);
                     if (width > 0) {
                         [sceneShadowView setLeft:YGValueZero];
                         [sceneShadowView setRight:YGValueUndefined];
