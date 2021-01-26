@@ -18,7 +18,7 @@
 @interface RNNativeCardNavigatorShadowView() <RCTUIManagerObserver>
 
 @property (nonatomic, weak) RCTBridge *bridge;
-@property (nonatomic, assign) CGFloat navigatorWidth;
+@property (nonatomic, assign) CGSize navigatorSize;
 
 @end
 
@@ -28,7 +28,7 @@
     self = [super init];
     if (self) {
         _bridge = bridge;
-        _navigatorWidth = self.layoutMetrics.frame.size.width;
+        _navigatorSize = self.layoutMetrics.frame.size;
 
         [bridge.uiManager.observerCoordinator addObserver:self];
     }
@@ -44,63 +44,38 @@
 - (void)insertReactSubview:(RCTShadowView *)subview atIndex:(NSInteger)atIndex {
     [super insertReactSubview:subview atIndex:atIndex];
     
-    if ([subview isKindOfClass:[RNNativeSceneShadowView class]]) {
-        if (self.navigatorWidth > 0) {
-            RCTShadowView *taregetShadowView;
-            RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)subview;
-            if (sceneShadowView.splitFullScreen) {
-                taregetShadowView = [self findSplitNavigatorShadowView:self] ?: self;
-            } else {
-                taregetShadowView = self;
-            }
-            CGFloat width = CGRectGetWidth(taregetShadowView.layoutMetrics.frame);
-            if (width > 0) {
-                [sceneShadowView setLeft:YGValueZero];
-                [sceneShadowView setRight:YGValueUndefined];
-                [sceneShadowView setWidth:(YGValue){width,YGUnitPoint}];
-            }
-        }
+    if (!CGSizeEqualToSize(CGSizeZero, self.navigatorSize) && [subview isKindOfClass:[RNNativeSceneShadowView class]]) {
+        RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)subview;
+        [self updateShadowView:sceneShadowView withParentShadowView:self];
     }
 }
 
 #pragma mark - RCTUIManagerObserver
 
 - (void)uiManagerDidPerformLayout:(RCTUIManager *)manager {
-    [self setNavigatorWidth:self.layoutMetrics.frame.size.width];
+    [self setNavigatorSize:self.layoutMetrics.frame.size];
 }
 
 #pragma mark - Setter
 
-- (void)setNavigatorWidth:(CGFloat)navigatorWidth {
-    if (_navigatorWidth == navigatorWidth) {
+- (void)setNavigatorSize:(CGSize)navigatorSize {
+    if (CGSizeEqualToSize(_navigatorSize, navigatorSize)) {
         return;
     }
-    _navigatorWidth = navigatorWidth;
-    
+    _navigatorSize = navigatorSize;
     [self updateSubShadowViews];
 }
 
 - (void)updateSubShadowViews {
-    if (_navigatorWidth <= 0) {
+    if (CGSizeEqualToSize(CGSizeZero, self.navigatorSize)) {
         return;
     }
     RCTExecuteOnMainQueue(^{
         RCTExecuteOnUIManagerQueue(^{
             for (RCTShadowView *shadowView in self.reactSubviews) {
                 if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
-                    RCTShadowView *taregetShadowView;
                     RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)shadowView;
-                    if (sceneShadowView.splitFullScreen) {
-                        taregetShadowView = [self findSplitNavigatorShadowView:sceneShadowView] ?: self;
-                    } else {
-                        taregetShadowView = self;
-                    }
-                    CGFloat width = CGRectGetWidth(taregetShadowView.layoutMetrics.frame);
-                    if (width > 0) {
-                        [sceneShadowView setLeft:YGValueZero];
-                        [sceneShadowView setRight:YGValueUndefined];
-                        [sceneShadowView setWidth:(YGValue){width,YGUnitPoint}];
-                    }
+                    [self updateShadowView:sceneShadowView withParentShadowView:self];
                 }
             }
             [self.bridge.uiManager setNeedsLayout];
@@ -109,6 +84,29 @@
 }
 
 #pragma mark - Private
+
+- (void)updateShadowView:(RNNativeSceneShadowView *)shadowView withParentShadowView:(RCTShadowView *)parentShadowView {
+    if (shadowView.splitFullScreen) {
+        RCTShadowView *taregetShadowView = [self findSplitNavigatorShadowView:parentShadowView] ?: parentShadowView;
+        CGRect frame = taregetShadowView.layoutMetrics.frame;
+        
+        [shadowView setLeft:YGValueZero];
+        [shadowView setWidth:(YGValue){CGRectGetWidth(frame),YGUnitPoint}];
+        [shadowView setRight:YGValueUndefined];
+        
+        [shadowView setTop:YGValueZero];
+        [shadowView setHeight:(YGValue){CGRectGetHeight(frame), YGUnitPoint}];
+        [shadowView setBottom:YGValueUndefined];
+    } else {
+        [shadowView setLeft:YGValueZero];
+        [shadowView setWidth:YGValueAuto];
+        [shadowView setRight:YGValueZero];
+        
+        [shadowView setTop:YGValueZero];
+        [shadowView setHeight:YGValueAuto];
+        [shadowView setBottom:YGValueZero];
+    }
+}
 
 - (RNNativeSplitNavigatorShadowView *)findSplitNavigatorShadowView:(RCTShadowView *)shadowView {
     if (!shadowView) {

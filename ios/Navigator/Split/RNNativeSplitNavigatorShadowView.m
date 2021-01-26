@@ -59,7 +59,7 @@
 #pragma mark - RCTUIManagerObserver
 
 - (void)uiManagerDidPerformLayout:(RCTUIManager *)manager {
-    [self setNavigatorWidth:self.layoutMetrics.frame.size.width];
+    [self setNavigatorWidth:CGRectGetWidth(self.layoutMetrics.frame)];
 }
 
 #pragma mark - Setter
@@ -168,18 +168,13 @@
             [shadowView setWidth:(YGValue){primarySceneWidth,YGUnitPoint}];
         } else {
             [shadowView setLeft:(YGValue){primarySceneWidth,YGUnitPoint}];
-//            [shadowView setRight:YGValueZero];
-//            [shadowView setWidth:YGValueAuto];
-            
             [shadowView setWidth:(YGValue){_navigatorWidth - primarySceneWidth,YGUnitPoint}];
             [shadowView setRight:YGValueUndefined];
         }
     } else {
         [shadowView setLeft:YGValueZero];
-//        [shadowView setRight:YGValueZero];
-//        [shadowView setWidth:YGValueAuto];
-        [shadowView setRight:YGValueUndefined];
         [shadowView setWidth:(YGValue){_navigatorWidth, YGUnitPoint}];
+        [shadowView setRight:YGValueUndefined];
     }
 }
 

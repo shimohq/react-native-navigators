@@ -95,8 +95,6 @@
             [targetViewController.view addSubview:scene];
         }
         
-        
-        // update frame
         CGRect frame = targetViewController.view.bounds;
         if (CGRectEqualToRect(scene.frame, frame)) {
             return;
@@ -111,18 +109,16 @@
                                                                                      springDamping:0.0
                                                                                    initialVelocity:0.0
                                                                                      animationType:RCTAnimationTypeEaseInEaseOut];
-                RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {
-                    
-                }];
+                RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {}];
                 RCTExecuteOnMainQueue(^{
                     [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
                 });
                 
-                [shadowView setLeft:(YGValue){0, YGUnitPoint}];
+                [shadowView setLeft:YGValueZero];
                 [shadowView setWidth:(YGValue){CGRectGetWidth(frame), YGUnitPoint}];
                 [shadowView setRight:YGValueUndefined];
                 
-                [shadowView setTop:(YGValue){0, YGUnitPoint}];
+                [shadowView setTop:YGValueZero];
                 [shadowView setHeight:(YGValue){CGRectGetHeight(frame), YGUnitPoint}];
                 [shadowView setBottom:YGValueUndefined];
                 
@@ -160,18 +156,33 @@
                                 [targetViewController addChildViewController:scene.controller];
                             }
                             scene.frame = targetViewController.view.bounds;
+                            
                             [targetViewController.view addSubview:scene];
+                            
+                            // end yoga layout
+                            RCTExecuteOnUIManagerQueue(^{
+                                [shadowView setLeft:YGValueZero];
+                                [shadowView setWidth:YGValueAuto];
+                                [shadowView setRight:YGValueZero];
+                                
+                                [shadowView setTop:YGValueZero];
+                                [shadowView setHeight:YGValueAuto];
+                                [shadowView setBottom:YGValueZero];
+                                
+                                [self.bridge.uiManager setNeedsLayout];
+                            });
                         });
                     }];
                     RCTExecuteOnMainQueue(^{
                         [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
                     });
                     
+                    // temp yoga layout
                     [shadowView setLeft:(YGValue){CGRectGetMinX(tempFrame), YGUnitPoint}];
                     [shadowView setWidth:(YGValue){CGRectGetWidth(tempFrame), YGUnitPoint}];
                     [shadowView setRight:YGValueUndefined];
                     
-                    [shadowView setTop:(YGValue){0, YGUnitPoint}];
+                    [shadowView setTop:(YGValue){CGRectGetMinY(tempFrame), YGUnitPoint}];
                     [shadowView setHeight:(YGValue){CGRectGetHeight(tempFrame), YGUnitPoint}];
                     [shadowView setBottom:YGValueUndefined];
                     
@@ -190,13 +201,13 @@
                 RCTExecuteOnUIManagerQueue(^{
                     RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
                     if (shadowView) {
-                        [shadowView setLeft:(YGValue){0, YGUnitPoint}];
-                        [shadowView setWidth:(YGValue){CGRectGetWidth(frame), YGUnitPoint}];
-                        [shadowView setRight:YGValueUndefined];
+                        [shadowView setLeft:YGValueZero];
+                        [shadowView setWidth:YGValueAuto];
+                        [shadowView setRight:YGValueZero];
                         
-                        [shadowView setTop:(YGValue){0, YGUnitPoint}];
-                        [shadowView setHeight:(YGValue){CGRectGetHeight(frame), YGUnitPoint}];
-                        [shadowView setBottom:YGValueUndefined];
+                        [shadowView setTop:YGValueZero];
+                        [shadowView setHeight:YGValueAuto];
+                        [shadowView setBottom:YGValueZero];
                         
                         [self.bridge.uiManager setNeedsLayout];
                     }

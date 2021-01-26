@@ -138,7 +138,6 @@ function SplitFullScreen(props: NavigationInjectedProps) {
     },
   } = props;
   const {fullscreen} = params || {};
-  console.log('fullscreen', fullscreen);
   return (
     <View style={[styles.container, {borderColor: 'red', borderWidth: 5}]}>
       <Text>fullscreen: {fullscreen ? 'true' : 'false'}</Text>
@@ -200,7 +199,6 @@ export default createNativeNavigator(
     splitFullScreen: {
       screen: SplitFullScreen,
       navigationOptions: (props: NavigationInjectedProps): NativeNavigationOptions => {
-        console.log('Features Navigator ', props.navigation.getParam('fullscreen'));
         return {
           headerLeft: (
             <TouchableOpacity onPress={() => props.navigation.goBack()}>
