@@ -10,10 +10,8 @@
 @implementation RNNativeNavigatorUtils
 
 + (CGRect)getBeginFrameWithFrame:(CGRect)frame
-                    parentBounds:(CGRect)parentBounds
                       transition:(RNNativeSceneTransition)transition {
     return [self getBeginFrameWithFrame:frame
-                           parentBounds:parentBounds
                              transition:transition
                                   index:0
                              fullScreen:NO
@@ -22,12 +20,15 @@
 }
 
 + (CGRect)getBeginFrameWithFrame:(CGRect)frame
-                    parentBounds:(CGRect)parentBounds
                       transition:(RNNativeSceneTransition)transition
                            index:(NSInteger)index
                       fullScreen:(BOOL)fullScreen
                            split:(BOOL)split
                primarySceneWidth:(CGFloat)primarySceneWidth {
+    
+    CGFloat width = CGRectGetWidth(frame);
+    CGFloat height = CGRectGetHeight(frame);
+    
     CGFloat endY = 0;
     CGFloat endX;
     if (split && !fullScreen) {
@@ -40,17 +41,17 @@
     frame.origin.y = endY;
     switch (transition) {
         case RNNativeSceneTransitionSlideFormRight:
-            frame.origin.x = endX + CGRectGetWidth(parentBounds);
+            frame.origin.x = endX + width;
             break;
         case RNNativeSceneTransitionSlideFormLeft:
-            frame.origin.x = endX - CGRectGetWidth(parentBounds);
+            frame.origin.x = endX - width;
             break;
         case RNNativeSceneTransitionSlideFormTop:
-            frame.origin.y = endY - CGRectGetHeight(parentBounds);
+            frame.origin.y = endY - height;
             break;
         case RNNativeSceneTransitionSlideFormBottom:
         case RNNativeSceneTransitionDefault:
-            frame.origin.y = endY + CGRectGetHeight(parentBounds);
+            frame.origin.y = endY + height;
         case RNNativeSceneTransitionNone:
         default:
             break;
@@ -58,7 +59,7 @@
     return frame;
 }
 
-+ (CGRect)getEndFrameFrame:(CGRect)frame {
++ (CGRect)getEndFrameWithFrame:(CGRect)frame {
     return [self getEndFrameWithFrame:frame index:0 fullScreen:NO split:NO primarySceneWidth:0];
 }
 
@@ -74,30 +75,6 @@
     }
     frame.origin.y = 0;
     return frame;
-}
-
-+ (CGRect)getFrameWithParentBounds:(CGRect)bounds {
-    return [self getFrameWithParentBounds:bounds
-                                    index:0
-                               fullScreen:NO
-                                    split:NO
-                        primarySceneWidth:0];
-}
-
-+ (CGRect)getFrameWithParentBounds:(CGRect)bounds
-                             index:(NSInteger)index
-                        fullScreen:(BOOL)fullScreen
-                             split:(BOOL)split
-                 primarySceneWidth:(CGFloat)primarySceneWidth {
-    if (split && !fullScreen) {
-        if (index == 0) {
-            return CGRectMake(0, 0, primarySceneWidth, CGRectGetHeight(bounds));
-        } else {
-            return CGRectMake(primarySceneWidth, 0, CGRectGetWidth(bounds) - primarySceneWidth, CGRectGetHeight(bounds));
-        }
-    } else {
-        return bounds;
-    }
 }
 
 @end

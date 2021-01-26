@@ -14,8 +14,12 @@
 #import <React/RCTUIManagerUtils.h>
 #import <React/RCTShadowView.h>
 #import <React/RCTRootShadowView.h>
+#import <React/RCTLayoutAnimationGroup.h>
+#import <React/RCTLayoutAnimation.h>
+
 
 #import "RNNativeBaseNavigator+Layout.h"
+#import "UIView+RNNativeNavigator.h"
 
 @interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate, RNNativeCardNavigatorControllerDataSource>
 
@@ -38,6 +42,12 @@
     return self;
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    self.viewController.view.frame = self.bounds;
+}
+
 #pragma mark - RNNativeCardNavigatorControllerDelegate
 
 - (void)didRemoveController:(nonnull UIViewController *)viewController {
@@ -51,6 +61,151 @@
 }
 
 #pragma mark - RNNativeBaseNavigator
+
+- (void)didFullScreenChangedWithScene:(RNNativeScene *)scene {
+    // determine whether scene is in the navigator
+    NSInteger index = [self.currentScenes indexOfObject:scene];
+    if (index == NSNotFound) {
+        return;
+    }
+    
+    UIViewController *targetViewController;
+    if (scene.splitFullScreen) {
+        // toggle to enable full screen
+        UIViewController *splitNavigatorController = [scene rnn_nearestSplitNavigatorController];
+        targetViewController = splitNavigatorController ?: self.viewController;
+        
+        UIViewController *parentController = scene.controller.parentViewController;
+        UIView *parentView = scene.superview;
+        
+        if (parentController && parentController != targetViewController) {
+            [scene.controller removeFromParentViewController];
+            parentController = nil;
+        }
+        if (parentView && parentView != targetViewController.view) {
+            scene.frame = [scene convertRect:scene.frame toView:targetViewController.view];
+            [scene removeFromSuperview];
+            parentView = nil;
+        }
+        
+        if (!parentController) {
+            [targetViewController addChildViewController:scene.controller];
+        }
+        if (!parentView) {
+            [targetViewController.view addSubview:scene];
+        }
+        
+        
+        // update frame
+        CGRect frame = targetViewController.view.bounds;
+        if (CGRectEqualToRect(scene.frame, frame)) {
+            return;
+        }
+        
+        RCTExecuteOnUIManagerQueue(^{
+            RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
+            if (shadowView) {
+                RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
+                                                                                             delay:0.0
+                                                                                          property:@"fullScreen"
+                                                                                     springDamping:0.0
+                                                                                   initialVelocity:0.0
+                                                                                     animationType:RCTAnimationTypeEaseInEaseOut];
+                RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {
+                    
+                }];
+                RCTExecuteOnMainQueue(^{
+                    [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
+                });
+                
+                [shadowView setLeft:(YGValue){0, YGUnitPoint}];
+                [shadowView setWidth:(YGValue){CGRectGetWidth(frame), YGUnitPoint}];
+                [shadowView setRight:YGValueUndefined];
+                
+                [shadowView setTop:(YGValue){0, YGUnitPoint}];
+                [shadowView setHeight:(YGValue){CGRectGetHeight(frame), YGUnitPoint}];
+                [shadowView setBottom:YGValueUndefined];
+                
+                [self.bridge.uiManager setNeedsLayout];
+            }
+        });
+    } else {
+        // toggle to disable full screen
+        targetViewController = self.viewController;
+        
+        UIViewController *parentController = scene.controller.parentViewController;
+        UIView *parentView = scene.superview;
+        
+        if (parentView && parentView != targetViewController.view) {
+            scene.backgroundColor = [UIColor redColor];
+            CGRect tempFrame = [targetViewController.view convertRect:targetViewController.view.bounds toView:parentView];
+            RCTExecuteOnUIManagerQueue(^{
+                RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
+                if (shadowView) {
+                    RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
+                                                                                                 delay:0.0
+                                                                                              property:@"fullScreen"
+                                                                                         springDamping:0.0
+                                                                                       initialVelocity:0.0
+                                                                                         animationType:RCTAnimationTypeEaseInEaseOut];
+                    RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {
+                        RCTExecuteOnMainQueue(^{
+                            if (parentController && parentController != targetViewController) {
+                                [scene.controller removeFromParentViewController];
+                            }
+
+                            [scene removeFromSuperview];
+
+                            if (!parentController) {
+                                [targetViewController addChildViewController:scene.controller];
+                            }
+                            scene.frame = targetViewController.view.bounds;
+                            [targetViewController.view addSubview:scene];
+                        });
+                    }];
+                    RCTExecuteOnMainQueue(^{
+                        [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
+                    });
+                    
+                    [shadowView setLeft:(YGValue){CGRectGetMinX(tempFrame), YGUnitPoint}];
+                    [shadowView setWidth:(YGValue){CGRectGetWidth(tempFrame), YGUnitPoint}];
+                    [shadowView setRight:YGValueUndefined];
+                    
+                    [shadowView setTop:(YGValue){0, YGUnitPoint}];
+                    [shadowView setHeight:(YGValue){CGRectGetHeight(tempFrame), YGUnitPoint}];
+                    [shadowView setBottom:YGValueUndefined];
+                    
+                    [self.bridge.uiManager setNeedsLayout];
+                }
+            });
+        } else {
+            if (!parentController) {
+                [targetViewController addChildViewController:scene.controller];
+            }
+            if (!parentView) {
+                [targetViewController.view addSubview:scene];
+            }
+            CGRect frame = targetViewController.view.bounds;
+            if (CGRectEqualToRect(scene.frame, frame)) {
+                RCTExecuteOnUIManagerQueue(^{
+                    RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
+                    if (shadowView) {
+                        [shadowView setLeft:(YGValue){0, YGUnitPoint}];
+                        [shadowView setWidth:(YGValue){CGRectGetWidth(frame), YGUnitPoint}];
+                        [shadowView setRight:YGValueUndefined];
+                        
+                        [shadowView setTop:(YGValue){0, YGUnitPoint}];
+                        [shadowView setHeight:(YGValue){CGRectGetHeight(frame), YGUnitPoint}];
+                        [shadowView setBottom:YGValueUndefined];
+                        
+                        [self.bridge.uiManager setNeedsLayout];
+                    }
+                });
+            }
+            scene.frame = targetViewController.view.bounds;
+        }
+    }
+}
 
 - (BOOL)isDismissedForViewController:(UIViewController *)viewController {
     return viewController && ![_viewControllers containsObject:viewController];
@@ -81,7 +236,6 @@
     RNNativeScene *nextTopScene = nextScenes.lastObject;
     if (action == RNNativeStackNavigatorActionShow && transition != RNNativeSceneTransitionNone) {
         nextTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:nextTopScene.frame
-                                                               parentBounds:self.viewController.view.bounds
                                                                  transition:transition];
     }
     
@@ -98,16 +252,17 @@
     }
     
     // transition
+    CGRect nextTopSceneEndFrame = [RNNativeNavigatorUtils getEndFrameWithFrame:nextTopScene.frame];
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        nextTopScene.frame = self.viewController.view.bounds;
+        nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES, nil);
     } else if (action == RNNativeStackNavigatorActionShow) {
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            nextTopScene.frame = [RNNativeNavigatorUtils getEndFrameFrame:nextTopScene.frame];
+            nextTopScene.frame = nextTopSceneEndFrame;
         } completion:^(BOOL finished) {
             if (!finished) {
-                nextTopScene.frame = [RNNativeNavigatorUtils getEndFrameFrame:nextTopScene.frame];
+                nextTopScene.frame = nextTopSceneEndFrame;
             }
             [nextTopScene.controller didMoveToParentViewController:self.viewController];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
@@ -118,7 +273,6 @@
         [currentTopScene.controller willMoveToParentViewController:nil];
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:currentTopScene.frame
-                                                                      parentBounds:self.viewController.view.bounds
                                                                         transition:transition];
         } completion:^(BOOL finished) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];

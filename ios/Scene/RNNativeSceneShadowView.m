@@ -30,6 +30,13 @@
     return self;
 }
 
+- (void)layoutSubviewsWithContext:(RCTLayoutContext)layoutContext {
+    [super layoutSubviewsWithContext:layoutContext];
+    
+    NSLog(@"layoutMetrics: layoutSubviewsWithContext: %@", self);
+    
+}
+
 #pragma mark - Setter
 
 - (void)setInStack:(BOOL)inStack {
@@ -54,6 +61,14 @@
     }
     _sceneTop = sceneTop;
     self.top = (YGValue){_sceneTop, YGUnitPoint};
+}
+
+- (void)setSplitFullScreen:(BOOL)splitFullScreen {
+    if (_splitFullScreen == splitFullScreen) {
+        return;
+    }
+    _splitFullScreen = splitFullScreen;
+    [self.delegate didSplitFullScrennChanged:self];
 }
 
 #pragma mark - RCTShadowView

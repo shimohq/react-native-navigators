@@ -10,6 +10,7 @@ import {
 import {NavigationInjectedProps, StackActions} from 'react-navigation';
 import {
   createNativeNavigator,
+  NativeNavigationOptions,
   NativeNavigatorModes,
 } from 'react-native-navigators';
 
@@ -69,6 +70,14 @@ function FeaturesIndex(props: NavigationInjectedProps) {
         }>
         <Text style={styles.link}>Status bar style - Light Content</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>
+          props.navigation.navigate('splitFullScreen', {
+            splitFullScreen: true,
+          })
+        }>
+        <Text style={styles.link}>Split Full Screen - False</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -121,6 +130,30 @@ function StatusBar(props: NavigationInjectedProps) {
   );
 }
 
+function SplitFullScreen(props: NavigationInjectedProps) {
+  const {
+    navigation: {
+      setParams,
+      state: {params},
+    },
+  } = props;
+  const {fullscreen} = params || {};
+  console.log('fullscreen', fullscreen);
+  return (
+    <View style={[styles.container, {borderColor: 'red', borderWidth: 5}]}>
+      <Text>fullscreen: {fullscreen ? 'true' : 'false'}</Text>
+      <Switch
+        value={fullscreen}
+        onValueChange={() =>
+          setParams({
+            fullscreen: !fullscreen,
+          })
+        }
+      />
+    </View>
+  );
+}
+
 export default createNativeNavigator(
   {
     featuresIndex: {
@@ -164,9 +197,24 @@ export default createNativeNavigator(
         };
       },
     },
+    splitFullScreen: {
+      screen: SplitFullScreen,
+      navigationOptions: (props: NavigationInjectedProps): NativeNavigationOptions => {
+        console.log('Features Navigator ', props.navigation.getParam('fullscreen'));
+        return {
+          headerLeft: (
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <Text style={styles.link}>Back</Text>
+            </TouchableOpacity>
+          ),
+          splitFullScreen: props.navigation.getParam('fullscreen'),
+          statusBarHidden: props.navigation.getParam('statusBarHidden')
+        };
+      },
+    }
   },
   {
-    mode: NativeNavigatorModes.Stack,
+    mode: NativeNavigatorModes.Card,
     initialRouteName: 'featuresIndex',
   },
 );

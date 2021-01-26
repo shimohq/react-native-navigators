@@ -31,11 +31,6 @@
     [[RNNativePanGestureRecognizerManager sharedInstance] addPanGestureRecognizer:panGestureRecognizer];
 }
 
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self.delegate willLayoutSubviews:self.view.bounds];
-}
-
 -(UIViewController *)childViewControllerForStatusBarStyle {
     return [self rnn_topSceneController];
 }
@@ -81,8 +76,9 @@
         if ([self.dataSource isSplit]) {
             self.panGestureHandler.primaryScene = currentScenes[0];
         }
+        __weak typeof(self) weakSelf = self;
         self.panGestureHandler.didGoBack = ^{
-            [self.delegate didRemoveController:firstScene.controller];
+            [weakSelf.delegate didRemoveController:firstScene.controller];
         };
     }
     [self.panGestureHandler panWithGestureRecognizer:gesture];

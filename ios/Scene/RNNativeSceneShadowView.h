@@ -2,6 +2,12 @@
 
 @class RNNativeSceneShadowView;
 
+@protocol RNNativeSceneShadowViewDelegate <NSObject>
+
+- (void)didSplitFullScrennChanged:(RNNativeSceneShadowView *)sceneShadowView;
+
+@end
+
 @interface RNNativeSceneShadowView : RCTShadowView
 
 /**
@@ -13,6 +19,8 @@
  Whether in StackNavigator
  */
 @property (nonatomic, assign) BOOL inStack;
+
+@property (nonatomic, weak) id<RNNativeSceneShadowViewDelegate> delegate;
 
 - (instancetype)initWithHeaderHeight:(CGFloat)headerHeight headerTop:(CGFloat)headerTop;
 

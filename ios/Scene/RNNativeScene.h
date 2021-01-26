@@ -91,8 +91,14 @@
 
 /**
  分屏模式是否全屏显示
+ 只有 Split Card 模式的 scene 支持
  */
 @property (nonatomic, assign) BOOL splitFullScreen;
+
+/**
+ Whether enable ViewController life cycle to update status
+ */
+@property (nonatomic, assign) BOOL enableLifeCycle;
 
 @property (nonatomic, assign) RNNativeSceneStatus status;
 @property (nonatomic, assign) BOOL dismissed;

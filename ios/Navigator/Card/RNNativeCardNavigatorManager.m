@@ -7,6 +7,7 @@
 
 #import "RNNativeCardNavigatorManager.h"
 #import "RNNativeCardNavigator.h"
+#import "RNNativeCardNavigatorShadowView.h"
 
 @interface RNNativeCardNavigatorManager() {
     NSPointerArray *_hostViews;
@@ -18,14 +19,17 @@
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
-{
+- (UIView *)view {
     RNNativeCardNavigator *view = [[RNNativeCardNavigator alloc] initWithBridge:self.bridge];
     if (!_hostViews) {
         _hostViews = [NSPointerArray weakObjectsPointerArray];
     }
     [_hostViews addPointer:(__bridge void *)view];
     return view;
+}
+
+- (RCTShadowView *)shadowView {
+    return [RNNativeCardNavigatorShadowView new];
 }
 
 #pragma mark - RCTInvalidating
