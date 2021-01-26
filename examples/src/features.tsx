@@ -73,7 +73,7 @@ function FeaturesIndex(props: NavigationInjectedProps) {
       <TouchableOpacity
         onPress={() =>
           props.navigation.navigate('splitFullScreen', {
-            splitFullScreen: true,
+            fullScreen: true,
           })
         }>
         <Text style={styles.link}>Split Full Screen - False</Text>
@@ -137,15 +137,15 @@ function SplitFullScreen(props: NavigationInjectedProps) {
       state: {params},
     },
   } = props;
-  const {fullscreen} = params || {};
+  const {fullScreen} = params || {};
   return (
     <View style={[styles.container, {borderColor: 'red', borderWidth: 5}]}>
-      <Text>fullscreen: {fullscreen ? 'true' : 'false'}</Text>
+      <Text>fullScreen: {fullScreen ? 'true' : 'false'}</Text>
       <Switch
-        value={fullscreen}
+        value={fullScreen}
         onValueChange={() =>
           setParams({
-            fullscreen: !fullscreen,
+            fullScreen: !fullScreen,
           })
         }
       />
@@ -205,7 +205,7 @@ export default createNativeNavigator(
               <Text style={styles.link}>Back</Text>
             </TouchableOpacity>
           ),
-          splitFullScreen: props.navigation.getParam('fullscreen'),
+          splitFullScreen: props.navigation.getParam('fullScreen'),
           statusBarHidden: props.navigation.getParam('statusBarHidden')
         };
       },

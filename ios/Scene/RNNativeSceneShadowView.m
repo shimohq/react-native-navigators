@@ -30,13 +30,6 @@
     return self;
 }
 
-- (void)layoutSubviewsWithContext:(RCTLayoutContext)layoutContext {
-    [super layoutSubviewsWithContext:layoutContext];
-    
-    NSLog(@"layoutMetrics: layoutSubviewsWithContext: %@", self);
-    
-}
-
 #pragma mark - Setter
 
 - (void)setInStack:(BOOL)inStack {

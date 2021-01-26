@@ -23,7 +23,6 @@ typedef void (^RNNativePanGestureHandlerDidGoBackBlock)(void);
 @property (nonatomic, weak) RNNativeScene *secondScene;
 @property (nonatomic, copy) RNNativePanGestureHandlerDidGoBackBlock didGoBack;
 
-+ (instancetype)sharedInstance;
 - (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture;
 
 @end

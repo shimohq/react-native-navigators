@@ -198,13 +198,13 @@
             if (!finished) {
                 nextTopScene.frame = nextTopSceneEndFrame;
             }
-            [nextTopScene.controller didMoveToParentViewController:self.viewController];
+            [nextTopScene setStatus:RNNativeSceneStatusDidFocus];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:self.split];
             endTransition(YES, primaryScenes);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
-        [currentTopScene.controller willMoveToParentViewController:nil];
+        [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:currentTopScene.frame
                                                                         transition:transition

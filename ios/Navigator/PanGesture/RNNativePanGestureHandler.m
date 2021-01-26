@@ -27,8 +27,8 @@
             [self.primaryScene.superview bringSubviewToFront:self.primaryScene];
         }
         
-        [self.firstScene.controller viewWillDisappear:YES];
-        [self.secondScene.controller viewWillAppear:YES];
+        [self.firstScene setStatus:RNNativeSceneStatusWillBlur];
+        [self.secondScene setStatus:RNNativeSceneStatusWillFocus];
         
         CGRect downFrame = self.secondScene.frame;
         downFrame.origin.x = self.beginX - CGRectGetWidth(downFrame) / 3.0;
@@ -84,9 +84,9 @@
         
         [self.firstScene removeFromSuperview];
         [self.firstScene.controller removeFromParentViewController];
-        [self.firstScene.controller viewDidDisappear:YES];
+        [self.firstScene setStatus:RNNativeSceneStatusDidBlur];
         
-        [self.secondScene.controller viewDidAppear:YES];
+        [self.secondScene setStatus:RNNativeSceneStatusDidFocus];
         
         if (self.primaryScene) {
             [self.primaryScene.superview sendSubviewToBack:self.primaryScene];
@@ -95,8 +95,9 @@
 }
 
 - (void)cancelGoBack {
-    [self.firstScene.controller viewWillAppear:YES];
-    [self.secondScene.controller viewWillDisappear:YES];
+    [self.firstScene setStatus:RNNativeSceneStatusWillFocus];
+    [self.secondScene setStatus:RNNativeSceneStatusWillBlur];
+    
     [UIView animateWithDuration:RNNativeNavigateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         // up scene
         CGRect upSceneFrame = self.firstScene.frame;
@@ -113,8 +114,8 @@
         downFrame.origin.x = self.beginX;
         self.secondScene.frame = downFrame;
         
-        [self.firstScene.controller viewDidAppear:YES];
-        [self.secondScene.controller viewDidDisappear:YES];
+        [self.firstScene setStatus:RNNativeSceneStatusDidFocus];
+        [self.secondScene setStatus:RNNativeSceneStatusDidBlur];
         
         if (self.primaryScene) {
             [self.primaryScene.superview sendSubviewToBack:self.primaryScene];

@@ -29,7 +29,7 @@
 #pragma mark - UIViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    if (_statusBarStyle == UIStatusBarStyleDarkContent) {
+    if (_statusBarStyle == 3) {
         if (@available(iOS 13.0, *)) {
             return UIStatusBarStyleDarkContent;
         } else {
@@ -61,17 +61,15 @@
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [super willMoveToParentViewController:parent];
     if (_enableLifeCycle) {
-        
+        [_nativeScene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
     }
-    [_nativeScene setStatus:parent ? RNNativeSceneStatusWillFocus : RNNativeSceneStatusWillBlur];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [super didMoveToParentViewController:parent];
     if (_enableLifeCycle) {
-        
+        [_nativeScene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
     }
-    [_nativeScene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
