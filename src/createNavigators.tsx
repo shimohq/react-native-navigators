@@ -5,6 +5,7 @@ import {
 } from 'react-navigation';
 
 import NativeNavigators from './NativeNavigators';
+import SplitRouter from './SplitRouter';
 import {
   NavigationNativeRouterConfig,
   NativeNavigationOptions,
@@ -48,7 +49,7 @@ export function createSplitNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>
 ) {
-  const router = StackRouter(routeConfigMap, stackConfig);
+  const router = SplitRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {
     ...stackConfig,
     mode: NativeNavigatorModes.Split
