@@ -42,6 +42,8 @@ export default function SplitRouter(
             ...newState,
             index: newState.routes.length - 1
           };
+        } else {
+          return newState;
         }
       }
     }
