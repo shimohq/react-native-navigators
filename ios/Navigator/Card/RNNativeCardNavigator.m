@@ -9,6 +9,8 @@
 #import "RNNativeCardNavigatorController.h"
 #import "RNNativeScene.h"
 #import "RNNativeNavigatorUtils.h"
+#import "RNNativeCardNavigatorShadowView.h"
+#import "RNNativeSceneShadowView.h"
 
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
@@ -17,7 +19,6 @@
 #import <React/RCTLayoutAnimationGroup.h>
 #import <React/RCTLayoutAnimation.h>
 
-
 #import "RNNativeBaseNavigator+Layout.h"
 #import "UIView+RNNativeNavigator.h"
 
@@ -25,6 +26,7 @@
 
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 @property (nonatomic, assign) BOOL updating;
+@property (nonatomic, assign) BOOL enableClipsToBounds;
 
 @end
 
@@ -38,14 +40,50 @@
     if (self) {
         _viewControllers = [NSMutableArray array];
         _updating = NO;
+        _enableClipsToBounds = YES;
+        [self updateForEnableClipsToBounds:_enableClipsToBounds];
     }
     return self;
 }
+
+- (void)updateEnableClipsToBounds {
+    [self updateEnableClipsToBounds:self.currentScenes];
+}
+
+#pragma mark - View
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     
     self.viewController.view.frame = self.bounds;
+}
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *result = [super hitTest:point withEvent:event];
+    if (!result) {
+        for (UIView *view in self.reactSubviews.reverseObjectEnumerator) {
+            if ([view isKindOfClass:[RNNativeScene class]]) {
+                RNNativeScene *scene = (RNNativeScene *)view;
+                if (scene.splitFullScreen) {
+                    if (CGRectContainsPoint(scene.frame, point)) {
+                        result = scene;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+#pragma mark - Setter
+
+- (void)setEnableClipsToBounds:(BOOL)enableClipsToBounds {
+    if (enableClipsToBounds == _enableClipsToBounds) {
+        return;
+    }
+    _enableClipsToBounds = enableClipsToBounds;
+    [self updateForEnableClipsToBounds:enableClipsToBounds];
 }
 
 #pragma mark - RNNativeCardNavigatorControllerDelegate
@@ -69,152 +107,39 @@
         return;
     }
     
-    UIViewController *targetViewController;
+    // update enableClipsToBounds
     if (scene.splitFullScreen) {
-        // toggle to enable full screen
-        UIViewController *splitNavigatorController = [scene rnn_nearestSplitNavigatorController];
-        targetViewController = splitNavigatorController ?: self.viewController;
-        
-        UIViewController *parentController = scene.controller.parentViewController;
-        UIView *parentView = scene.superview;
-        
-        if (parentController && parentController != targetViewController) {
-            [scene.controller removeFromParentViewController];
-            parentController = nil;
+        [self setEnableClipsToBounds:NO];
+    }
+    
+    RCTExecuteOnUIManagerQueue(^{
+        RCTShadowView *parentShadowView = [self.bridge.uiManager shadowViewForReactTag:self.reactTag];
+        if (![parentShadowView isKindOfClass:[RNNativeCardNavigatorShadowView class]]) {
+            return;
         }
-        if (parentView && parentView != targetViewController.view) {
-            scene.frame = [scene convertRect:scene.frame toView:targetViewController.view];
-            [scene removeFromSuperview];
-            parentView = nil;
-        }
-        
-        if (!parentController) {
-            [targetViewController addChildViewController:scene.controller];
-        }
-        if (!parentView) {
-            [targetViewController.view addSubview:scene];
-        }
-        
-        CGRect frame = targetViewController.view.bounds;
-        if (CGRectEqualToRect(scene.frame, frame)) {
+        RCTShadowView *sceneShadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
+        if (![sceneShadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
             return;
         }
         
-        RCTExecuteOnUIManagerQueue(^{
-            RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
-            if (shadowView) {
-                RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
-                                                                                             delay:0.0
-                                                                                          property:@"fullScreen"
-                                                                                     springDamping:0.0
-                                                                                   initialVelocity:0.0
-                                                                                     animationType:RCTAnimationTypeEaseInEaseOut];
-                RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {}];
-                RCTExecuteOnMainQueue(^{
-                    [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
-                });
-                
-                [shadowView setLeft:YGValueZero];
-                [shadowView setWidth:(YGValue){CGRectGetWidth(frame), YGUnitPoint}];
-                [shadowView setRight:YGValueUndefined];
-                
-                [shadowView setTop:YGValueZero];
-                [shadowView setHeight:(YGValue){CGRectGetHeight(frame), YGUnitPoint}];
-                [shadowView setBottom:YGValueUndefined];
-                
-                [self.bridge.uiManager setNeedsLayout];
+        RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
+                                                                                     delay:0.0
+                                                                                  property:@"fullScreen"
+                                                                             springDamping:0.0
+                                                                           initialVelocity:0.0
+                                                                             animationType:RCTAnimationTypeEaseInEaseOut];
+        RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {
+            if (!scene.splitFullScreen) {
+                [self updateEnableClipsToBounds];
             }
+        }];
+        RCTExecuteOnMainQueue(^{
+            [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
         });
-    } else {
-        // toggle to disable full screen
-        targetViewController = self.viewController;
         
-        UIViewController *parentController = scene.controller.parentViewController;
-        UIView *parentView = scene.superview;
-        
-        if (parentView && parentView != targetViewController.view) {
-            CGRect tempFrame = [targetViewController.view convertRect:targetViewController.view.bounds toView:parentView];
-            RCTExecuteOnUIManagerQueue(^{
-                RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
-                if (shadowView) {
-                    RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
-                                                                                                 delay:0.0
-                                                                                              property:@"fullScreen"
-                                                                                         springDamping:0.0
-                                                                                       initialVelocity:0.0
-                                                                                         animationType:RCTAnimationTypeEaseInEaseOut];
-                    RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {
-                        RCTExecuteOnMainQueue(^{
-                            if (parentController && parentController != targetViewController) {
-                                [scene.controller removeFromParentViewController];
-                            }
-
-                            [scene removeFromSuperview];
-
-                            if (!parentController) {
-                                [targetViewController addChildViewController:scene.controller];
-                            }
-                            scene.frame = targetViewController.view.bounds;
-                            
-                            [targetViewController.view addSubview:scene];
-                            
-                            // end yoga layout
-                            RCTExecuteOnUIManagerQueue(^{
-                                [shadowView setLeft:YGValueZero];
-                                [shadowView setWidth:YGValueAuto];
-                                [shadowView setRight:YGValueZero];
-                                
-                                [shadowView setTop:YGValueZero];
-                                [shadowView setHeight:YGValueAuto];
-                                [shadowView setBottom:YGValueZero];
-                                
-                                [self.bridge.uiManager setNeedsLayout];
-                            });
-                        });
-                    }];
-                    RCTExecuteOnMainQueue(^{
-                        [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
-                    });
-                    
-                    // temp yoga layout
-                    [shadowView setLeft:(YGValue){CGRectGetMinX(tempFrame), YGUnitPoint}];
-                    [shadowView setWidth:(YGValue){CGRectGetWidth(tempFrame), YGUnitPoint}];
-                    [shadowView setRight:YGValueUndefined];
-                    
-                    [shadowView setTop:(YGValue){CGRectGetMinY(tempFrame), YGUnitPoint}];
-                    [shadowView setHeight:(YGValue){CGRectGetHeight(tempFrame), YGUnitPoint}];
-                    [shadowView setBottom:YGValueUndefined];
-                    
-                    [self.bridge.uiManager setNeedsLayout];
-                }
-            });
-        } else {
-            if (!parentController) {
-                [targetViewController addChildViewController:scene.controller];
-            }
-            if (!parentView) {
-                [targetViewController.view addSubview:scene];
-            }
-            CGRect frame = targetViewController.view.bounds;
-            if (CGRectEqualToRect(scene.frame, frame)) {
-                RCTExecuteOnUIManagerQueue(^{
-                    RCTShadowView *shadowView = [self.bridge.uiManager shadowViewForReactTag:scene.reactTag];
-                    if (shadowView) {
-                        [shadowView setLeft:YGValueZero];
-                        [shadowView setWidth:YGValueAuto];
-                        [shadowView setRight:YGValueZero];
-                        
-                        [shadowView setTop:YGValueZero];
-                        [shadowView setHeight:YGValueAuto];
-                        [shadowView setBottom:YGValueZero];
-                        
-                        [self.bridge.uiManager setNeedsLayout];
-                    }
-                });
-            }
-            scene.frame = targetViewController.view.bounds;
-        }
-    }
+        [(RNNativeCardNavigatorShadowView *)parentShadowView updateShadowView:(RNNativeSceneShadowView *)sceneShadowView];
+        [self.bridge.uiManager setNeedsLayout];
+    });
 }
 
 - (BOOL)isDismissedForViewController:(UIViewController *)viewController {
@@ -231,8 +156,9 @@
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
-    
     beginTransition(YES, nil);
+    
+    [self updateEnableClipsToBounds:nextScenes];
     
     // viewControllers
     NSMutableArray *viewControllers = [NSMutableArray array];
@@ -245,8 +171,8 @@
     RNNativeScene *currentTopScene = self.currentScenes.lastObject;
     RNNativeScene *nextTopScene = nextScenes.lastObject;
     if (action == RNNativeStackNavigatorActionShow && transition != RNNativeSceneTransitionNone) {
-        nextTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:nextTopScene.frame
-                                                                 transition:transition];
+        nextTopScene.frame = [self getBeginFrameWithScene:nextTopScene
+                                               transition:transition];
     }
     
     // add scene
@@ -262,7 +188,8 @@
     }
     
     // transition
-    CGRect nextTopSceneEndFrame = [RNNativeNavigatorUtils getEndFrameWithFrame:nextTopScene.frame];
+    CGRect nextTopSceneEndFrame = [self getEndFrameWithScene:nextTopScene];
+    
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
         nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
@@ -282,13 +209,81 @@
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            currentTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:currentTopScene.frame
-                                                                        transition:transition];
+            currentTopScene.frame = [self getBeginFrameWithScene:currentTopScene
+                                                      transition:transition];
         } completion:^(BOOL finished) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES, nil);
         }];
     }
+}
+
+#pragma mark - Private
+
+- (void)updateEnableClipsToBounds:(NSArray<RNNativeScene *> *)scenes {
+    BOOL enableClipsToBounds = YES;
+    for (RNNativeScene *nativeScene in scenes) {
+        if (nativeScene.splitFullScreen) {
+            enableClipsToBounds = NO;
+            break;
+        }
+    }
+    [self setEnableClipsToBounds:enableClipsToBounds];
+}
+
+/// RCTShadowView 的 overflow 属性无效，所以用 UIView 的 clipsToBounds
+- (void)updateForEnableClipsToBounds:(BOOL)enableClipsToBounds {
+    if (enableClipsToBounds) {
+        self.clipsToBounds = YES;
+        self.layer.masksToBounds = YES;
+    } else {
+        self.clipsToBounds = NO;
+        self.layer.masksToBounds = NO;
+    }
+}
+
+- (CGRect)getBeginFrameWithScene:(RNNativeScene *)scene
+                      transition:(RNNativeSceneTransition)transition {
+    CGRect frame = [self getEndFrameWithScene:scene];
+    
+    CGFloat width = CGRectGetWidth(frame);
+    CGFloat height = CGRectGetHeight(frame);
+    CGFloat endX = CGRectGetMinX(frame);
+    CGFloat endY = CGRectGetMinY(frame);
+   
+    switch (transition) {
+        case RNNativeSceneTransitionSlideFormRight:
+            frame.origin.x = endX + width;
+            break;
+        case RNNativeSceneTransitionSlideFormLeft:
+            frame.origin.x = endX - width;
+            break;
+        case RNNativeSceneTransitionSlideFormTop:
+            frame.origin.y = endY - height;
+            break;
+        case RNNativeSceneTransitionSlideFormBottom:
+        case RNNativeSceneTransitionDefault:
+            frame.origin.y = endY + height;
+        case RNNativeSceneTransitionNone:
+        default:
+            break;
+    }
+    return frame;
+}
+
+- (CGRect)getEndFrameWithScene:(RNNativeScene *)scene {
+    CGRect frame = scene.frame;
+    frame.origin.x = 0;
+    frame.origin.y = 0;
+    if (scene.splitFullScreen) {
+        UIViewController *splitNavigatorController = [self rnn_nearestSplitNavigatorController];
+        if (splitNavigatorController) {
+            CGRect relativeFrame = [splitNavigatorController.view convertRect:splitNavigatorController.view.bounds toView:self];
+            frame.origin.x = CGRectGetMinX(relativeFrame);
+            frame.origin.y = CGRectGetMinY(relativeFrame);
+        }
+    }
+    return frame;
 }
 
 @end
