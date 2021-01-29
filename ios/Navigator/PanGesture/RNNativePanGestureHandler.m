@@ -25,7 +25,7 @@
         self.firstSceneBeginX = CGRectGetMinX(self.firstScene.frame);
         self.secondSceneBeginX = CGRectGetMinX(self.secondScene.frame);
         
-        if (self.primaryScene) {
+        if (self.primaryScene && !self.firstScene.splitFullScreen && !self.secondScene.splitFullScreen) {
             [self.primaryScene.superview bringSubviewToFront:self.primaryScene];
         }
         
@@ -38,13 +38,21 @@
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
         // first scene
         CGRect firstSceneFrame = self.firstScene.frame;
-        firstSceneFrame.origin.x += point.x;
+        CGFloat firstSceneFrameX = firstSceneFrame.origin.x + point.x;
+        if (firstSceneFrameX < self.firstSceneBeginX) {
+            return;
+        }
+        firstSceneFrame.origin.x = firstSceneFrameX;
         self.firstScene.frame = firstSceneFrame;
         
         // second scene
         CGRect secondSceneFrame = self.secondScene.frame;
-        secondSceneFrame.origin.x += point.x / 3.0;
-        self.secondScene.frame = secondSceneFrame;
+        CGFloat secondSceneFrameX = secondSceneFrame.origin.x + point.x / 3.0;
+        if (secondSceneFrameX >= self.secondSceneBeginX - CGRectGetWidth(secondSceneFrame) / 3.0
+            && secondSceneFrameX <= self.secondSceneBeginX) {
+            secondSceneFrame.origin.x = secondSceneFrameX;
+            self.secondScene.frame = secondSceneFrame;
+        }
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
         CGPoint velocity = [gesture velocityInView:gesture.view];
         BOOL success;

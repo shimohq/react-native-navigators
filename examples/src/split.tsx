@@ -19,6 +19,7 @@ const SplitNavigatorMinWidth = 640;
 const SplitNavigator = createSplitNavigator({
   primary: SplitPrimary,
   secondary: SplitSecondary,
+  secondary2: SplitSecondary,
   splitFeatures: Features
 }, {
   initialRouteName: 'primary',
