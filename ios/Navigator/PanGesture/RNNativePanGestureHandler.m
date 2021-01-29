@@ -10,7 +10,8 @@
 
 @interface RNNativePanGestureHandler()
 
-@property (nonatomic, assign) CGFloat beginX;
+@property (nonatomic, assign) CGFloat firstSceneBeginX;
+@property (nonatomic, assign) CGFloat secondSceneBeginX;
 
 @end
 
@@ -21,7 +22,8 @@
     [gesture setTranslation:CGPointZero inView:gesture.view];
 
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        self.beginX = CGRectGetMinX(self.firstScene.frame);
+        self.firstSceneBeginX = CGRectGetMinX(self.firstScene.frame);
+        self.secondSceneBeginX = CGRectGetMinX(self.secondScene.frame);
         
         if (self.primaryScene) {
             [self.primaryScene.superview bringSubviewToFront:self.primaryScene];
@@ -30,21 +32,21 @@
         [self.firstScene setStatus:RNNativeSceneStatusWillBlur];
         [self.secondScene setStatus:RNNativeSceneStatusWillFocus];
         
-        CGRect downFrame = self.secondScene.frame;
-        downFrame.origin.x = self.beginX - CGRectGetWidth(downFrame) / 3.0;
-        self.secondScene.frame = downFrame;
+        CGRect secondSceneFrame = self.secondScene.frame;
+        secondSceneFrame.origin.x = self.secondSceneBeginX - CGRectGetWidth(secondSceneFrame) / 3.0;
+        self.secondScene.frame = secondSceneFrame;
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
-        // up scene
-        CGRect upFrame = self.firstScene.frame;
-        upFrame.origin.x += point.x;
-        self.firstScene.frame = upFrame;
+        // first scene
+        CGRect firstSceneFrame = self.firstScene.frame;
+        firstSceneFrame.origin.x += point.x;
+        self.firstScene.frame = firstSceneFrame;
         
-        // down scene
-        CGRect downFrame = self.secondScene.frame;
-        downFrame.origin.x += point.x / 3.0;
-        self.secondScene.frame = downFrame;
+        // second scene
+        CGRect secondSceneFrame = self.secondScene.frame;
+        secondSceneFrame.origin.x += point.x / 3.0;
+        self.secondScene.frame = secondSceneFrame;
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
-        CGPoint velocity =[gesture velocityInView:gesture.view];
+        CGPoint velocity = [gesture velocityInView:gesture.view];
         BOOL success;
         if (velocity.x > 500) {
             success = YES;
@@ -52,7 +54,7 @@
             success = NO;
         } else {
             CGRect frame = self.firstScene.frame;
-            success = CGRectGetMinX(frame) + point.x >= self.beginX + CGRectGetWidth(frame) / 2.0;
+            success = CGRectGetMinX(frame) + point.x >= self.firstSceneBeginX + CGRectGetWidth(frame) / 2.0;
         }
         if (success) {
             [self goBack];
@@ -68,15 +70,15 @@
 
 - (void)goBack {
     [UIView animateWithDuration:RNNativeNavigateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        // up scene
-        CGRect upSceneFrame = self.firstScene.frame;
-        upSceneFrame.origin.x = self.beginX + CGRectGetWidth(upSceneFrame);
-        self.firstScene.frame = upSceneFrame;
+        // first scene
+        CGRect firstSceneFrame = self.firstScene.frame;
+        firstSceneFrame.origin.x = self.firstSceneBeginX + CGRectGetWidth(firstSceneFrame);
+        self.firstScene.frame = firstSceneFrame;
         
-        // down scene
-        CGRect downSceneFrame = self.secondScene.frame;
-        downSceneFrame.origin.x = self.beginX;
-        self.secondScene.frame = downSceneFrame;
+        // second scene
+        CGRect secondSceneFrame = self.secondScene.frame;
+        secondSceneFrame.origin.x = self.secondSceneBeginX;
+        self.secondScene.frame = secondSceneFrame;
     } completion:^(BOOL finished) {
         if (self.didGoBack) {
             self.didGoBack();
@@ -99,20 +101,20 @@
     [self.secondScene setStatus:RNNativeSceneStatusWillBlur];
     
     [UIView animateWithDuration:RNNativeNavigateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        // up scene
-        CGRect upSceneFrame = self.firstScene.frame;
-        upSceneFrame.origin.x = self.beginX;
-        self.firstScene.frame = upSceneFrame;
+        // first scene
+        CGRect firstSceneFrame = self.firstScene.frame;
+        firstSceneFrame.origin.x = self.firstSceneBeginX;
+        self.firstScene.frame = firstSceneFrame;
         
-        // down scene
-        CGRect downFrame = self.secondScene.frame;
-        downFrame.origin.x = self.beginX - CGRectGetWidth(downFrame) / 3.0;
-        self.secondScene.frame = downFrame;
+        // second scene
+        CGRect secondSceneFrame = self.secondScene.frame;
+        secondSceneFrame.origin.x = self.secondSceneBeginX - CGRectGetWidth(secondSceneFrame) / 3.0;
+        self.secondScene.frame = secondSceneFrame;
     } completion:^(BOOL finished) {
-        // down scene
-        CGRect downFrame = self.secondScene.frame;
-        downFrame.origin.x = self.beginX;
-        self.secondScene.frame = downFrame;
+        // second scene
+        CGRect secondSceneFrame = self.secondScene.frame;
+        secondSceneFrame.origin.x = self.secondSceneBeginX;
+        self.secondScene.frame = secondSceneFrame;
         
         [self.firstScene setStatus:RNNativeSceneStatusDidFocus];
         [self.secondScene setStatus:RNNativeSceneStatusDidBlur];

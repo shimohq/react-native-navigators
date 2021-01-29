@@ -17,8 +17,7 @@ RCT_EXPORT_MODULE()
     return [RNNativeSplitPlaceholder new];
 }
 
-- (RCTShadowView *)shadowView
-{
+- (RCTShadowView *)shadowView {
   return [RNNativeSplitPlaceholderShadowView new];
 }
 

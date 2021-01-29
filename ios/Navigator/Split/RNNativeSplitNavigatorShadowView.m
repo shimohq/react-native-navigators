@@ -8,15 +8,17 @@
 #import "RNNativeSplitNavigatorShadowView.h"
 #import "RNNativeSplitRule.h"
 #import "RNNativeSplitUtils.h"
-#import "RNNativeNavigatorUtils.h"
 #import "RNNativeSceneShadowView.h"
 #import "RNNativeSplitPlaceholderShadowView.h"
+#import "RNNativeConst.h"
 
 #import <React/RCTShadowView.h>
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
 #import <React/RCTUtils.h>
 #import <React/RCTUIManagerObserverCoordinator.h>
+#import <React/RCTLayoutAnimation.h>
+#import <React/RCTLayoutAnimationGroup.h>
 
 @interface RNNativeSplitNavigatorShadowView() <RNNativeSceneShadowViewDelegate, RCTUIManagerObserver>
 
@@ -128,6 +130,18 @@
             break;
         }
     }
+    
+    RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
+                                                                                                 delay:0.0
+                                                                                              property:@"fullScreen"
+                                                                                         springDamping:0.0
+                                                                                       initialVelocity:0.0
+                                                                                         animationType:RCTAnimationTypeEaseInEaseOut];
+    RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {}];
+    RCTExecuteOnMainQueue(^{
+        [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
+    });
+    
     [self updateShadowView:sceneShadowView index:sceneIndex fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
 }
 

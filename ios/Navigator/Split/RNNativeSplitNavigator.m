@@ -11,7 +11,6 @@
 #import "RNNativeSplitPlaceholder.h"
 #import "RNNativeSplitRule.h"
 #import "RNNativeSplitUtils.h"
-#import "RNNativeNavigatorUtils.h"
 
 #import <React/RCTShadowView.h>
 #import <React/RCTRootShadowView.h>
@@ -159,12 +158,12 @@
     
     // update will show view frame
     if (action == RNNativeStackNavigatorActionShow) {
-        nextTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:nextTopScene.frame
-                                                                 transition:transition
-                                                                      index:nextTopSceneIndex
-                                                                 fullScreen:nextTopScene.splitFullScreen
-                                                                      split:self.split
-                                                          primarySceneWidth:self.primarySceneWidth];
+        nextTopScene.frame = [self getBeginFrameWithFrame:nextTopScene.frame
+                                               transition:transition
+                                                    index:nextTopSceneIndex
+                                               fullScreen:nextTopScene.splitFullScreen
+                                                    split:self.split
+                                        primarySceneWidth:self.primarySceneWidth];
     }
     
     // add scene
@@ -178,15 +177,15 @@
                 continue;
             }
         }
-        [self addScene:scene index:index split:self.split primarySceneWidth:self.primarySceneWidth];
+        [self addScene:scene];
     }
     
     // transition
-    CGRect nextTopSceneEndFrame = [RNNativeNavigatorUtils getEndFrameWithFrame:nextTopScene.frame
-                                                                         index:nextTopSceneIndex
-                                                                    fullScreen:nextTopScene.splitFullScreen
-                                                                         split:self.split
-                                                             primarySceneWidth:self.primarySceneWidth];
+    CGRect nextTopSceneEndFrame = [self getEndFrameWithFrame:nextTopScene.frame
+                                                       index:nextTopSceneIndex
+                                                  fullScreen:nextTopScene.splitFullScreen
+                                                       split:self.split
+                                           primarySceneWidth:self.primarySceneWidth];
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
         nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:self.split];
@@ -206,12 +205,12 @@
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
-            currentTopScene.frame = [RNNativeNavigatorUtils getBeginFrameWithFrame:currentTopScene.frame
-                                                                        transition:transition
-                                                                             index:currentTopSceneIndex
-                                                                        fullScreen:currentTopScene.splitFullScreen
-                                                                             split:self.split
-                                                                 primarySceneWidth:self.primarySceneWidth];
+            currentTopScene.frame = [self getBeginFrameWithFrame:currentTopScene.frame
+                                                      transition:transition
+                                                           index:currentTopSceneIndex
+                                                      fullScreen:currentTopScene.splitFullScreen
+                                                           split:self.split
+                                               primarySceneWidth:self.primarySceneWidth];
         } completion:^(BOOL finished) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:self.split];
             endTransition(YES, primaryScenes);
@@ -242,6 +241,58 @@
         [self.viewController.view addSubview:_splitPlaceholder];
     }
     [self.viewController.view sendSubviewToBack:_splitPlaceholder];
+}
+
+#pragma mark - Private
+
+- (CGRect)getBeginFrameWithFrame:(CGRect)frame
+                      transition:(RNNativeSceneTransition)transition
+                           index:(NSInteger)index
+                      fullScreen:(BOOL)fullScreen
+                           split:(BOOL)split
+               primarySceneWidth:(CGFloat)primarySceneWidth {
+    
+    CGFloat width = CGRectGetWidth(frame);
+    CGFloat height = CGRectGetHeight(frame);
+    
+    CGRect endFrame = [self getEndFrameWithFrame:frame index:index fullScreen:fullScreen split:split primarySceneWidth:primarySceneWidth];
+    CGFloat endY = CGRectGetMinY(endFrame);
+    CGFloat endX = CGRectGetMinX(endFrame);
+    
+    frame.origin.x = endX;
+    frame.origin.y = endY;
+    switch (transition) {
+        case RNNativeSceneTransitionSlideFormRight:
+            frame.origin.x = endX + width;
+            break;
+        case RNNativeSceneTransitionSlideFormLeft:
+            frame.origin.x = endX - width;
+            break;
+        case RNNativeSceneTransitionSlideFormTop:
+            frame.origin.y = endY - height;
+            break;
+        case RNNativeSceneTransitionSlideFormBottom:
+        case RNNativeSceneTransitionDefault:
+            frame.origin.y = endY + height;
+        case RNNativeSceneTransitionNone:
+        default:
+            break;
+    }
+    return frame;
+}
+
+- (CGRect)getEndFrameWithFrame:(CGRect)frame
+                         index:(NSInteger)index
+                    fullScreen:(BOOL)fullScreen
+                         split:(BOOL)split
+             primarySceneWidth:(CGFloat)primarySceneWidth {
+    if (split && !fullScreen) {
+        frame.origin.x = index == 0 ? 0 : primarySceneWidth;
+    } else {
+        frame.origin.x = 0;
+    }
+    frame.origin.y = 0;
+    return frame;
 }
 
 @end

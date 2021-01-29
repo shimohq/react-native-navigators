@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <React/RCTView.h>
 #import <React/RCTViewManager.h>
 #import "RNNativeScene.h"
 
@@ -18,7 +19,7 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
     RNNativeStackNavigatorActionHide
 };
 
-@interface RNNativeBaseNavigator : UIView <RCTInvalidating>
+@interface RNNativeBaseNavigator : RCTView <RCTInvalidating>
 
 @property (nonatomic, strong, readonly) __kindof UIViewController *viewController;
 @property (nonatomic, strong, readonly) NSMutableArray<RNNativeScene *> *currentScenes;

@@ -21,8 +21,7 @@
     BOOL _dismissed;
 }
 
-- (instancetype)initWithBridge:(RCTBridge *)bridge
-{
+- (instancetype)initWithBridge:(RCTBridge *)bridge {
     if (self = [super init]) {
         _transition = RNNativeSceneTransitionDefault;
         _closing = NO;
@@ -36,6 +35,8 @@
     return self;
 }
 
+#pragma mark - Public
+
 - (void)registerListener:(id<RNNativeSceneListener>)listener {
     [_listeners addPointer:(__bridge void *)(listener)];
     [listener scene:self didUpdateStatus:_status];
@@ -48,10 +49,15 @@
     }
 }
 
+#pragma mark - RCTInvalidating
+
+- (void)invalidate {
+    _controller = nil;
+}
+
 #pragma mark - React Native
 
-- (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
-{
+- (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
     [super insertReactSubview:subview atIndex:atIndex];
     if ([subview isKindOfClass:[RNNativeStackHeader class]]
         && _controller.navigationController != nil
@@ -61,8 +67,7 @@
     }
 }
 
-- (void)removeReactSubview:(UIView *)subview
-{
+- (void)removeReactSubview:(UIView *)subview {
     [super removeReactSubview:subview];
     if ([subview isKindOfClass:[RNNativeStackHeader class]]
         && _controller.navigationController != nil
@@ -228,8 +233,7 @@
     }
 }
 
-- (BOOL)isMountedUnderScreenOrReactRoot
-{
+- (BOOL)isMountedUnderScreenOrReactRoot {
     for (UIView *parent = self.superview; parent != nil; parent = parent.superview) {
         if ([parent isKindOfClass:[RCTRootView class]] || [parent isKindOfClass:[RNNativeScene class]]) {
             return YES;
