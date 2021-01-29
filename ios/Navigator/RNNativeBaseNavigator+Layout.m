@@ -15,38 +15,25 @@
 @implementation RNNativeBaseNavigator (Layout)
 
 - (void)addScene:(RNNativeScene *)scene {
-    [self addScene:scene index:0 split:NO primarySceneWidth:0];
-}
-
-- (void)addScene:(RNNativeScene *)scene index:(NSInteger)index split:(BOOL)split primarySceneWidth:(CGFloat)primarySceneWidth {
-    UIViewController *targetViewController;
-    if (scene.splitFullScreen) {
-        targetViewController = [self rnn_nearestSplitNavigatorController] ?: self.viewController;
-    } else {
-        targetViewController = self.viewController;
-    }
-    
     UIView *superView = [scene superview];
-    if (superView && superView != targetViewController.view) {
+    if (superView && superView != self.viewController.view) {
         [scene removeFromSuperview];
         superView = nil;
     }
-    
     UIViewController *parentViewController = [scene.controller parentViewController];
-    if (parentViewController && parentViewController != targetViewController) {
+    if (parentViewController && parentViewController != self.viewController) {
         [scene.controller removeFromParentViewController];
         parentViewController = nil;
     }
     
     // add view
     if (!parentViewController) {
-        [targetViewController addChildViewController:scene.controller];
+        [self.viewController addChildViewController:scene.controller];
     }
-    
     if (superView) {
-        [targetViewController.view bringSubviewToFront:scene];
+        [self.viewController.view bringSubviewToFront:scene];
     } else {
-        [targetViewController.view addSubview:scene];
+        [self.viewController.view addSubview:scene];
     }
 }
 

@@ -143,12 +143,33 @@ function SplitFullScreen(props: NavigationInjectedProps) {
       <Text>fullScreen: {fullScreen ? 'true' : 'false'}</Text>
       <Switch
         value={fullScreen}
-        onValueChange={() =>
+        onValueChange={() => {
+          setParams({
+            fullScreen: !fullScreen,
+          });
+        }}
+      />
+      <Switch
+        style={{alignSelf: 'flex-start'}}
+        value={fullScreen}
+        onValueChange={() => {
           setParams({
             fullScreen: !fullScreen,
           })
-        }
+        }}
       />
+      <TouchableOpacity
+        style={{alignSelf: 'flex-start', justifyContent:'center', width: 150, height: 50, backgroundColor: 'red'}}
+        onPress={
+          () => {
+            setParams({
+              fullScreen: !fullScreen,
+            })
+          }
+        }
+      >
+      <Text>toggle full screen</Text>
+      </TouchableOpacity>
     </View>
   );
 }

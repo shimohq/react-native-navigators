@@ -9,9 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RNNativeSceneShadowView;
+
 @interface RNNativeCardNavigatorShadowView : RCTShadowView
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
+
+- (void)updateShadowView:(RNNativeSceneShadowView *)shadowView;
 
 @end
 

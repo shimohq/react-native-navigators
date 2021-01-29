@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RNNativeBaseNavigator (Layout)
 
 - (void)addScene:(RNNativeScene *)scene;
-- (void)addScene:(RNNativeScene *)scene index:(NSInteger)index split:(BOOL)split primarySceneWidth:(CGFloat)primarySceneWidth;
 
 - (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes;
 - (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes split:(BOOL)split;
