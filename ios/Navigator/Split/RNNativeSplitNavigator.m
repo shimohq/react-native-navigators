@@ -255,13 +255,9 @@
     CGFloat width = CGRectGetWidth(frame);
     CGFloat height = CGRectGetHeight(frame);
     
-    CGFloat endY = 0;
-    CGFloat endX;
-    if (split && !fullScreen) {
-        endX = index == 0 ? 0 : primarySceneWidth;
-    } else {
-        endX = 0;
-    }
+    CGRect endFrame = [self getEndFrameWithFrame:frame index:index fullScreen:fullScreen split:split primarySceneWidth:primarySceneWidth];
+    CGFloat endY = CGRectGetMinY(endFrame);
+    CGFloat endX = CGRectGetMinX(endFrame);
     
     frame.origin.x = endX;
     frame.origin.y = endY;
