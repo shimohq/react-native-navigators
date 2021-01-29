@@ -8,7 +8,6 @@
 #import "RNNativeCardNavigator.h"
 #import "RNNativeCardNavigatorController.h"
 #import "RNNativeScene.h"
-#import "RNNativeNavigatorUtils.h"
 #import "RNNativeCardNavigatorShadowView.h"
 #import "RNNativeSceneShadowView.h"
 
