@@ -65,7 +65,7 @@
                 RNNativeScene *scene = (RNNativeScene *)view;
                 if (scene.splitFullScreen) {
                     if (CGRectContainsPoint(scene.frame, point)) {
-                        result = scene;
+                        result = [scene hitTest:[self convertPoint:point toView:scene] withEvent:event];
                     }
                     break;
                 }
