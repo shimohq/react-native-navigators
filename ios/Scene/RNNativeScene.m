@@ -49,12 +49,6 @@
     }
 }
 
-#pragma mark - RCTInvalidating
-
-- (void)invalidate {
-    _controller = nil;
-}
-
 #pragma mark - React Native
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
