@@ -1,9 +1,8 @@
-import React, { memo, createContext } from 'react';
+import React, { memo, createContext, useContext } from 'react';
 import { NavigationRoute, NavigationParams } from 'react-navigation';
 
 import {
   NativeNavigationDescriptor,
-  NativeNavigationOptions,
   NativeNavigatorTransitions,
   NativeNavigatorHeaderModes,
   NativeNavigatorModes
@@ -24,9 +23,11 @@ export interface NativeSceneProps {
   onDidBlur: (route: NavigationRoute, dismissed: boolean) => void;
 }
 
-export const NativeNavigationDescriptorContext = createContext<{
-  options: NativeNavigationOptions;
-} | null>(null);
+// 'willBlur' event won't emit during the closing transition.
+// NativeNavigationClosingStateContext is convenient for some cases when you want to get the closing state for a scene.
+export const NativeNavigationClosingStateContext = createContext<boolean>(
+  false
+);
 
 export default memo(function NativeScene(props: NativeSceneProps) {
   const {
@@ -39,6 +40,8 @@ export default memo(function NativeScene(props: NativeSceneProps) {
     onDidBlur
   } = props;
   const { key } = route;
+
+  const closingContextState = useContext(NativeNavigationClosingStateContext);
 
   if (!descriptor) {
     return null;
@@ -79,11 +82,16 @@ export default memo(function NativeScene(props: NativeSceneProps) {
       route={route}
     >
       <NativeStackSceneContainer>
-        <NativeSceneView
-          screenProps={screenProps}
-          navigation={navigation}
-          component={descriptor.getComponent()}
-        />
+        <NativeNavigationClosingStateContext.Provider
+          value={closing || closingContextState}
+        >
+          <NativeSceneView
+            screenProps={screenProps}
+            navigation={navigation}
+            component={descriptor.getComponent()}
+          />
+        </NativeNavigationClosingStateContext.Provider>
+
         {headerMode === NativeNavigatorHeaderModes.Auto ? (
           <NativeHeader options={options} route={route} />
         ) : null}
