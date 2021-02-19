@@ -204,10 +204,22 @@
             [insertedScenes addObject:scene];
         }
     }
+    
     if (removedScenes.count == 0 && insertedScenes.count == 0) {
-        // 无更新
-        [self setUpdatingScenes:NO];
-        return;
+        BOOL orderChanged = NO;
+        // 检查顺序是否产生变化
+        for (int i = 0; i < _currentScenes.count; i++) {
+            if (_currentScenes[i] != nextScenes[i]) {
+                orderChanged = YES;
+                break;
+            }
+        }
+        
+        if (!orderChanged) {
+            // 无更新
+            [self setUpdatingScenes:NO];
+            return;
+        }
     }
     RNNativeScene *currentTopScene = [_currentScenes lastObject];
     RNNativeScene *nextTopScene = [nextScenes lastObject];
