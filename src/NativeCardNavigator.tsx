@@ -16,10 +16,10 @@ const styles = StyleSheet.create({
 
 export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
   return (
-    <RNNativeStackNavigator style={styles.navigator}>
+    <RNNativeCardNavigator style={styles.navigator}>
       {props.children}
-    </RNNativeStackNavigator>
+    </RNNativeCardNavigator>
   );
 }
 
-const RNNativeStackNavigator = requireNativeComponent('RNNativeStackNavigator');
+const RNNativeCardNavigator = requireNativeComponent('RNNativeCardNavigator');

@@ -1,18 +1,19 @@
-import React, { PureComponent, ComponentType } from 'react';
+import React, { PureComponent } from 'react';
 import {
   NavigationRoute,
   StackActions,
-  NavigationActions,
-  NavigationInjectedProps
+  NavigationActions
 } from 'react-navigation';
 
 import {
   NativeNavigatorsProps,
   NativeNavigationDescriptorMap,
-  NativeNavigatorModes,
-  NativeNavigatorSplitRules
+  NativeNavigatorModes
 } from './types';
 import NativeStackNavigator from './NativeStackNavigator';
+import NativeCardNavigator from './NativeCardNavigator';
+import NativeSplitNavigator from './NativeSplitNavigator';
+import NativeSplitNavigatorOptionsWrapper from './NativeSplitNavigatorOptionsWrapper';
 import NativeScenes from './NativeScenes';
 
 interface NativeStackScenesState {
@@ -135,52 +136,37 @@ export default class NativeNavigators extends PureComponent<
   public render() {
     const { navigation, navigationConfig } = this.props;
     const { closingRouteKey, routes, descriptors, screenProps } = this.state;
-    const mode: NativeNavigatorModes =
-      navigationConfig.mode || NativeNavigatorModes.Stack;
-
-    let splitRules: NativeNavigatorSplitRules | undefined =
-      navigationConfig.splitRules;
-
-    if (mode !== NativeNavigatorModes.Split && splitRules) {
-      console.warn(
-        `Navigation config \`splitRules\` is not supported for \`${mode}\` navigator.`
-      );
-      splitRules = undefined;
-    } else if (mode === NativeNavigatorModes.Split && !splitRules) {
-      console.error(
-        `Navigation config \`splitRules\` is required for \`${mode}\` navigator.`
-      );
-    }
-
-    let splitPlaceholder: ComponentType<NavigationInjectedProps> | undefined =
-      navigationConfig.splitPlaceholder;
-    if (mode !== NativeNavigatorModes.Split && splitPlaceholder) {
-      console.warn(
-        `Navigation config \`splitPlaceholder\` is not supported for \`${mode}\` navigator.`
-      );
-      splitRules = undefined;
-    }
-
-    return (
-      <NativeStackNavigator
-        mode={mode}
+    const scenes = (
+      <NativeScenes
+        mode={navigationConfig.mode}
+        headerMode={navigationConfig.headerMode}
+        routes={routes}
+        descriptors={descriptors}
         navigation={navigation}
-        splitRules={splitRules}
-        splitPlaceholder={splitPlaceholder}
-      >
-        <NativeScenes
-          mode={mode}
-          headerMode={navigationConfig.headerMode}
-          routes={routes}
-          descriptors={descriptors}
-          navigation={navigation}
-          screenProps={screenProps}
-          onOpenRoute={this.handleOpenRoute}
-          onCloseRoute={this.handleCloseRoute}
-          onDismissRoute={this.handleDismissRoute}
-          closingRouteKey={closingRouteKey}
-        />
-      </NativeStackNavigator>
+        screenProps={screenProps}
+        onOpenRoute={this.handleOpenRoute}
+        onCloseRoute={this.handleCloseRoute}
+        onDismissRoute={this.handleDismissRoute}
+        closingRouteKey={closingRouteKey}
+      />
     );
+
+    if (navigationConfig.mode === NativeNavigatorModes.Split) {
+      return (
+        <NativeSplitNavigatorOptionsWrapper
+          options={navigationConfig.defaultNavigatorOptions}
+        >
+          {options => (
+            <NativeSplitNavigator options={options}>
+              {scenes}
+            </NativeSplitNavigator>
+          )}
+        </NativeSplitNavigatorOptionsWrapper>
+      );
+    } else if (navigationConfig.mode === NativeNavigatorModes.Card) {
+      return <NativeCardNavigator>{scenes}</NativeCardNavigator>;
+    } else {
+      return <NativeStackNavigator>{scenes}</NativeStackNavigator>;
+    }
   }
 }

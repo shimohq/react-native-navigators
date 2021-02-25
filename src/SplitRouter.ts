@@ -8,10 +8,12 @@ import {
   NavigationState
 } from 'react-navigation';
 
+import { NativeNavigationRouterConfig } from './types';
+
 export default function SplitRouter(
   routeConfigs: NavigationRouteConfigMap<any, any>,
   config?: NavigationTabRouterConfig
-): NavigationRouter {
+): NavigationRouter<NavigationState, NativeNavigationRouterConfig> {
   const stackRouter = StackRouter(routeConfigs, config);
   const { getStateForAction } = stackRouter;
 

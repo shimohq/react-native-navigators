@@ -7,14 +7,14 @@ import {
 import NativeNavigators from './NativeNavigators';
 import SplitRouter from './SplitRouter';
 import {
-  NavigationNativeRouterConfig,
+  NativeNavigationRouterConfig,
   NativeNavigationOptions,
   NativeNavigatorModes
 } from './types';
 
 export function createNativeNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: NavigationNativeRouterConfig
+  stackConfig: NativeNavigationRouterConfig
 ) {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, stackConfig);
@@ -22,7 +22,7 @@ export function createNativeNavigator(
 
 export function createStackNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: Omit<NavigationNativeRouterConfig, 'mode' | 'splitRules'>
+  stackConfig: Omit<NativeNavigationRouterConfig, 'mode'>
 ) {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {
@@ -33,10 +33,7 @@ export function createStackNavigator(
 
 export function createCardNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: Omit<
-    NavigationNativeRouterConfig,
-    'headerMode' | 'mode' | 'splitRules'
-  >
+  stackConfig: Omit<NativeNavigationRouterConfig, 'headerMode' | 'mode'>
 ) {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {
@@ -47,11 +44,11 @@ export function createCardNavigator(
 
 export function createSplitNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  stackConfig: Omit<NavigationNativeRouterConfig, 'headerMode' | 'mode'>
+  splitConfig: Omit<NativeNavigationRouterConfig, 'headerMode' | 'mode'>
 ) {
-  const router = SplitRouter(routeConfigMap, stackConfig);
+  const router = SplitRouter(routeConfigMap, splitConfig);
   return createNavigator(NativeNavigators, router, {
-    ...stackConfig,
+    ...splitConfig,
     mode: NativeNavigatorModes.Split
   });
 }

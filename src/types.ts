@@ -1,4 +1,4 @@
-import { ReactNode, ComponentType } from 'react';
+import { ReactNode, ElementType } from 'react';
 import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import {
   NavigationParams,
@@ -12,7 +12,7 @@ export interface NativeNavigationOptions {
   translucent?: boolean;
   transparent?: boolean;
   cardStyle?: StyleProp<ViewStyle>;
-  splitFullScreen?: boolean; // Options for secondary scene in split navigator
+  isSplitPrimary?: boolean;
   gestureEnabled?: boolean;
   headerLeft?: ReactNode;
   headerCenter?: ReactNode;
@@ -34,16 +34,31 @@ export type NativeNavigatorSplitRules = Array<{
   primarySceneWidth: number /* computed primary scene width */;
 }>;
 
-export interface NavigationNativeRouterConfig {
-  headerMode?: NativeNavigatorHeaderModes;
+export type NativeNavigationRouterConfig =
+  | {
+      mode: NativeNavigatorModes.Card | NativeNavigatorModes.Stack;
+      headerMode?: NativeNavigatorHeaderModes;
+      initialRouteName?: string;
+      defaultScreenOptions?: NavigationScreenConfig<
+        NativeNavigationOptions,
+        any
+      >;
+    }
+  | {
+      mode: NativeNavigatorModes.Split;
+      headerMode?: NativeNavigatorHeaderModes;
+      initialRouteName?: string;
+      defaultScreenOptions?: NavigationScreenConfig<
+        NativeNavigationOptions,
+        any
+      >;
+      defaultNavigatorOptions?: NativeNavigationSplitOptions;
+    };
+
+export interface NativeNavigationSplitOptions {
+  isSplitFullScreen?: boolean;
   splitRules?: NativeNavigatorSplitRules;
-  splitPlaceholder?: ComponentType<NavigationInjectedProps>;
-  mode?: NativeNavigatorModes;
-  initialRouteName?: string;
-  defaultNavigationOptions?: NavigationScreenConfig<
-    NativeNavigationOptions,
-    any
-  >;
+  splitPlaceholder?: ElementType<{}>;
 }
 
 export enum NativeNavigationStatusBarStyle {
@@ -82,32 +97,13 @@ export interface NativeNavigationDescriptorMap {
 }
 
 export interface NativeNavigatorsProps extends NavigationInjectedProps {
-  navigationConfig: NavigationNativeRouterConfig;
+  navigationConfig: NativeNavigationRouterConfig;
   screenProps?: any;
   descriptors: NativeNavigationDescriptorMap;
 }
 
 export enum NativeNavigationHeaderTypes {
   Center = 'center',
-  Left = 'left',
-  Right = 'right'
-}
-
-export interface NativeNavigatorSize {
-  width: number;
-  height: number;
-}
-
-export interface NativeNavigatorRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export enum NativeNavigatorDirection {
-  Up = 'up',
-  Down = 'down',
   Left = 'left',
   Right = 'right'
 }

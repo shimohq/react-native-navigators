@@ -1,19 +1,17 @@
-import React, { ComponentType } from 'react';
+import React, { ElementType } from 'react';
 import { requireNativeComponent, StyleSheet } from 'react-native';
 
-import { NavigationInjectedProps } from 'react-navigation';
-
 export type NativeSplitPlaceholderProps = {
-  component: ComponentType<NavigationInjectedProps>;
-} & NavigationInjectedProps;
+  component: ElementType<{}>;
+};
 
 export default function NativeSplitPlaceholder(
   props: NativeSplitPlaceholderProps
 ) {
-  const { component: Component, navigation } = props;
+  const { component: Component } = props;
   return (
     <RNNativeSplitPlaceholder style={StyleSheet.absoluteFill}>
-      <Component navigation={navigation} />
+      <Component />
     </RNNativeSplitPlaceholder>
   );
 }

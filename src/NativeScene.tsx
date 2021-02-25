@@ -72,7 +72,7 @@ export default memo(function NativeScene(props: NativeSceneProps) {
       gestureEnabled={options.gestureEnabled !== false}
       translucent={options.translucent === true}
       transparent={options.transparent === true}
-      splitFullScreen={options.splitFullScreen === true}
+      isSplitPrimary={options.isSplitPrimary === true}
       style={options.cardStyle}
       statusBarStyle={options.statusBarStyle}
       statusBarHidden={options.statusBarHidden}
@@ -91,7 +91,6 @@ export default memo(function NativeScene(props: NativeSceneProps) {
             component={descriptor.getComponent()}
           />
         </NativeNavigationClosingStateContext.Provider>
-
         {headerMode === NativeNavigatorHeaderModes.Auto ? (
           <NativeHeader options={options} route={route} />
         ) : null}
