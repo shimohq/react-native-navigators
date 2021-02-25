@@ -4,18 +4,20 @@ import { NavigationInjectedProps } from 'react-navigation';
 
 import styles from '../styles';
 
-export default function SplitPrimary(props: NavigationInjectedProps) {
+function SplitPrimary(props: NavigationInjectedProps) {
   return (
-    <View style={{ flex: 1, borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: 'red', borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Primary Scene</Text>
       <TouchableOpacity
-        onPress={() => props.navigation.navigate('secondary')}>
-        <Text style={styles.link}> Navigate Secondary </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate('splitFeatures')}>
-        <Text style={styles.link}> Navigate Features </Text>
+        onPress={() => props.navigation.goBack()}>
+        <Text style={styles.link}> Go Back </Text>
       </TouchableOpacity>
     </View>
   );
 }
+
+SplitPrimary.navigationOptions = {
+  isSplitPrimary: true
+};
+
+export default SplitPrimary;

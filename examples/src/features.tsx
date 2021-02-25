@@ -15,7 +15,7 @@ import {
 } from 'react-native-navigators';
 
 import styles from './styles';
-import {NativeNavigationStatusBarStyle} from 'react-native-navigators/lib';
+import {NativeNavigationStatusBarStyle} from 'react-native-navigators';
 
 function InputFocus(props: NavigationInjectedProps) {
   return (
@@ -214,20 +214,6 @@ export default createNativeNavigator(
           ),
           statusBarStyle: props.navigation.getParam('statusBarStyle'),
           statusBarHidden: props.navigation.getParam('statusBarHidden'),
-        };
-      },
-    },
-    splitFullScreen: {
-      screen: SplitFullScreen,
-      navigationOptions: (props: NavigationInjectedProps): NativeNavigationOptions => {
-        return {
-          headerLeft: (
-            <TouchableOpacity onPress={() => props.navigation.goBack()}>
-              <Text style={styles.link}>Back</Text>
-            </TouchableOpacity>
-          ),
-          splitFullScreen: props.navigation.getParam('fullScreen'),
-          statusBarHidden: props.navigation.getParam('statusBarHidden')
         };
       },
     }

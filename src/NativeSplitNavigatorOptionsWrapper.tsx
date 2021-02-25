@@ -33,7 +33,7 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [splitRules, setSplitRules] = useState(options?.splitRules);
   const [splitPlaceholder, setSplitPlaceholder] = useState<
     ElementType<{}> | undefined
-  >(options?.splitPlaceholder);
+  >(() => options?.splitPlaceholder);
 
   const setOptions = useCallback(
     (options: Partial<NativeNavigationSplitOptions>) => {

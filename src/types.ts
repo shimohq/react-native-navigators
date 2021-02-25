@@ -44,16 +44,15 @@ export type NativeNavigationRouterConfig =
         any
       >;
     }
-  | {
-      mode: NativeNavigatorModes.Split;
-      headerMode?: NativeNavigatorHeaderModes;
-      initialRouteName?: string;
-      defaultScreenOptions?: NavigationScreenConfig<
-        NativeNavigationOptions,
-        any
-      >;
-      defaultNavigatorOptions?: NativeNavigationSplitOptions;
-    };
+  | NativeSplitNavigationRouterConfig;
+
+export interface NativeSplitNavigationRouterConfig {
+  mode: NativeNavigatorModes.Split;
+  headerMode?: NativeNavigatorHeaderModes;
+  initialRouteName?: string;
+  defaultScreenOptions?: NavigationScreenConfig<NativeNavigationOptions, any>;
+  defaultNavigatorOptions?: NativeNavigationSplitOptions;
+}
 
 export interface NativeNavigationSplitOptions {
   isSplitFullScreen?: boolean;

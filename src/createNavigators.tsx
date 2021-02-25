@@ -8,6 +8,7 @@ import NativeNavigators from './NativeNavigators';
 import SplitRouter from './SplitRouter';
 import {
   NativeNavigationRouterConfig,
+  NativeSplitNavigationRouterConfig,
   NativeNavigationOptions,
   NativeNavigatorModes
 } from './types';
@@ -44,7 +45,7 @@ export function createCardNavigator(
 
 export function createSplitNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
-  splitConfig: Omit<NativeNavigationRouterConfig, 'headerMode' | 'mode'>
+  splitConfig: Omit<NativeSplitNavigationRouterConfig, 'headerMode' | 'mode'>
 ) {
   const router = SplitRouter(routeConfigMap, splitConfig);
   return createNavigator(NativeNavigators, router, {

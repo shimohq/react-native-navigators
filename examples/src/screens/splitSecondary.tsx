@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, Switch } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { Text, View, Switch, TouchableOpacity } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
-import { NativeNavigationOptions } from 'react-native-navigators';
+import { NativeSplitNavigatorOptionsContext } from 'react-native-navigators';
 
-function SplitSecondary(props: NavigationInjectedProps) {
+import styles from '../styles';
+
+export default function SplitSecondary(props: NavigationInjectedProps) {
   const [fullscreen, setFullscreen] = useState(false);
-
+  const { setOptions } = useContext(NativeSplitNavigatorOptionsContext);
 
   useEffect(() => {
-    props.navigation.setParams({
-      fullscreen
+    setOptions({
+      isSplitFullScreen: fullscreen
     });
   }, [fullscreen]);
 
@@ -23,14 +25,12 @@ function SplitSecondary(props: NavigationInjectedProps) {
             setFullscreen(!fullscreen)
           }
         />
+
+      <TouchableOpacity
+        onPress={() => props.navigation.goBack()}>
+        <Text style={styles.link}> Go Back </Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
-SplitSecondary.navigationOptions = (props: NavigationInjectedProps): NativeNavigationOptions => {
-  return {
-    splitFullScreen: props.navigation.getParam('fullscreen')
-  }
-}
-
-export default SplitSecondary;
