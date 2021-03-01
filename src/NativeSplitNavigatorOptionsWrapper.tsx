@@ -2,7 +2,6 @@ import React, {
   ReactElement,
   useState,
   createContext,
-  ElementType,
   useMemo,
   useCallback
 } from 'react';
@@ -28,12 +27,12 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const { children, options } = props;
 
   const [isSplitFullScreen, setIsSplitFullScreen] = useState(
-    options?.isSplitFullScreen
+    () => options?.isSplitFullScreen
   );
-  const [splitRules, setSplitRules] = useState(options?.splitRules);
-  const [splitPlaceholder, setSplitPlaceholder] = useState<
-    ElementType<{}> | undefined
-  >(() => options?.splitPlaceholder);
+  const [splitRules, setSplitRules] = useState(() => options?.splitRules);
+  const [splitPlaceholder, setSplitPlaceholder] = useState(
+    () => options?.splitPlaceholder
+  );
 
   const setOptions = useCallback(
     (options: Partial<NativeNavigationSplitOptions>) => {
