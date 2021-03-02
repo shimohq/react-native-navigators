@@ -10,19 +10,19 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 public class DidFocusEvent extends Event<DidFocusEvent> {
 
-    public static final String EVENT_NAME = "onDidFocus";
+  public static final String EVENT_NAME = "onDidFocus";
 
-    public DidFocusEvent(int viewTag) {
-        super(viewTag);
-    }
+  public DidFocusEvent(int viewTag) {
+    super(viewTag);
+  }
 
-    @Override
-    public String getEventName() {
-        return EVENT_NAME;
-    }
+  @Override
+  public String getEventName() {
+    return EVENT_NAME;
+  }
 
-    @Override
-    public void dispatch(RCTEventEmitter rctEventEmitter) {
-        rctEventEmitter.receiveEvent(getViewTag(), getEventName(), Arguments.createMap());
-    }
+  @Override
+  public void dispatch(RCTEventEmitter rctEventEmitter) {
+    rctEventEmitter.receiveEvent(getViewTag(), getEventName(), Arguments.createMap());
+  }
 }

@@ -18,11 +18,11 @@ public class RNNavigatorsPackage implements ReactPackage {
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
     return Arrays.<ViewManager>asList(
-            new SceneCardManager(),
-            new SceneManager(),
-            new SceneStackManager(),
-            new SplitSceneManager(),
-            new SplitPlaceholderManager()
+      new SceneCardManager(),
+      new SceneManager(),
+      new SceneStackManager(),
+      new SplitSceneManager(),
+      new SplitPlaceholderManager()
     );
   }
 }

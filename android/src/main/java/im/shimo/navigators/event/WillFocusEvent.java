@@ -10,19 +10,19 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 public class WillFocusEvent extends Event<WillFocusEvent> {
 
-    public static final String EVENT_NAME = "onWillFocus";
+  public static final String EVENT_NAME = "onWillFocus";
 
-    public WillFocusEvent(int viewTag) {
-        super(viewTag);
-    }
+  public WillFocusEvent(int viewTag) {
+    super(viewTag);
+  }
 
-    @Override
-    public String getEventName() {
-        return EVENT_NAME;
-    }
+  @Override
+  public String getEventName() {
+    return EVENT_NAME;
+  }
 
-    @Override
-    public void dispatch(RCTEventEmitter rctEventEmitter) {
-        rctEventEmitter.receiveEvent(getViewTag(), getEventName(), Arguments.createMap());
-    }
+  @Override
+  public void dispatch(RCTEventEmitter rctEventEmitter) {
+    rctEventEmitter.receiveEvent(getViewTag(), getEventName(), Arguments.createMap());
+  }
 }

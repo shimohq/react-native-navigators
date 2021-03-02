@@ -10,19 +10,19 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 public class WillBlurEvent extends Event<WillBlurEvent> {
 
-    public static final String EVENT_NAME = "onWillBlur";
+  public static final String EVENT_NAME = "onWillBlur";
 
-    public WillBlurEvent(int viewTag) {
-        super(viewTag);
-    }
+  public WillBlurEvent(int viewTag) {
+    super(viewTag);
+  }
 
-    @Override
-    public String getEventName() {
-        return EVENT_NAME;
-    }
+  @Override
+  public String getEventName() {
+    return EVENT_NAME;
+  }
 
-    @Override
-    public void dispatch(RCTEventEmitter rctEventEmitter) {
-        rctEventEmitter.receiveEvent(getViewTag(), getEventName(), Arguments.createMap());
-    }
+  @Override
+  public void dispatch(RCTEventEmitter rctEventEmitter) {
+    rctEventEmitter.receiveEvent(getViewTag(), getEventName(), Arguments.createMap());
+  }
 }

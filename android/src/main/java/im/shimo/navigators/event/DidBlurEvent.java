@@ -11,23 +11,23 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 public class DidBlurEvent extends Event<DidBlurEvent> {
 
-    public static final String EVENT_NAME = "onDidBlur";
-    private final boolean mIsDismissed;
+  public static final String EVENT_NAME = "onDidBlur";
+  private final boolean mIsDismissed;
 
-    public DidBlurEvent(int viewTag, boolean isDismissed) {
-        super(viewTag);
-        mIsDismissed = isDismissed;
-    }
+  public DidBlurEvent(int viewTag, boolean isDismissed) {
+    super(viewTag);
+    mIsDismissed = isDismissed;
+  }
 
-    @Override
-    public String getEventName() {
-        return EVENT_NAME;
-    }
+  @Override
+  public String getEventName() {
+    return EVENT_NAME;
+  }
 
-    @Override
-    public void dispatch(RCTEventEmitter rctEventEmitter) {
-        final WritableMap map = Arguments.createMap();
-        map.putBoolean("dismissed", mIsDismissed);
-        rctEventEmitter.receiveEvent(getViewTag(), getEventName(), map);
-    }
+  @Override
+  public void dispatch(RCTEventEmitter rctEventEmitter) {
+    final WritableMap map = Arguments.createMap();
+    map.putBoolean("dismissed", mIsDismissed);
+    rctEventEmitter.receiveEvent(getViewTag(), getEventName(), map);
+  }
 }

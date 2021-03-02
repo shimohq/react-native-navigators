@@ -92,7 +92,7 @@ public abstract class SceneContainer extends ViewGroup {
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
     final ReactContext reactContext = (ReactContext) getContext();
-    mRect.set(getLeft(), getTop(), w,  h);
+    mRect.set(getLeft(), getTop(), w, h);
     Log.d(TAG, "onSizeChanged() called with: mRect = [" + mRect + "], h = [" + h + "], oldw = [" + oldw + "], oldh = [" + oldh + "]");
     reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
   }

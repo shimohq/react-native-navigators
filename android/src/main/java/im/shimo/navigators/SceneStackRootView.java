@@ -11,18 +11,16 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 public class SceneStackRootView extends CoordinatorLayout {
 
-    private Scene mScene;
+  private Scene mScene;
 
-    public SceneStackRootView(@NonNull Context context) {
-        super(context);
+  public SceneStackRootView(@NonNull Context context) {
+    super(context);
 //        mScene = new Scene((ReactContext) context);
 //        addView(mScene);
-    }
+  }
 
 
-
-
-    public Scene getScene() {
-        return mScene;
-    }
+  public Scene getScene() {
+    return mScene;
+  }
 }

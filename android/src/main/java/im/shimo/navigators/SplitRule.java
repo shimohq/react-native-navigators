@@ -5,8 +5,6 @@ import android.content.Context;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
-import java.util.ArrayList;
-
 class SplitRule {
 
   int primarySceneWidth;
@@ -14,7 +12,7 @@ class SplitRule {
   int max;
 
 
-  static SplitRule form(ReadableMap rule ,Context context){
+  static SplitRule form(ReadableMap rule, Context context) {
     int primarySceneWidth = Utils.dpToPx(context, (float) rule.getDouble("primarySceneWidth"));
     final ReadableArray navigatorWidthRange = rule.getArray("navigatorWidthRange");
     int min = Utils.dpToPx(context, (float) navigatorWidthRange.getDouble(0));

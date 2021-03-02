@@ -1,13 +1,10 @@
 package im.shimo.navigators;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -44,7 +41,7 @@ public class SplitSceneManager extends ViewGroupManager<SplitScene> {
   }
 
   @ReactProp(name = "isSplitFullScreen")
-  public void setIsSplitFullScreen(SplitScene scene, boolean isSplitFullScreen){
+  public void setIsSplitFullScreen(SplitScene scene, boolean isSplitFullScreen) {
     scene.setSplitFullScreen(isSplitFullScreen);
   }
 
@@ -65,7 +62,6 @@ public class SplitSceneManager extends ViewGroupManager<SplitScene> {
   public int getChildCount(SplitScene parent) {
     return parent.getSceneCount();
   }
-
 
 
   @Override

@@ -1,8 +1,6 @@
 package im.shimo.navigators;
 
-import android.graphics.Rect;
 import android.text.TextUtils;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -12,11 +10,6 @@ import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.yoga.YogaEdge;
-import com.facebook.yoga.YogaMeasureFunction;
-import com.facebook.yoga.YogaMeasureMode;
-import com.facebook.yoga.YogaMeasureOutput;
-import com.facebook.yoga.YogaNode;
 
 import java.util.Map;
 
@@ -137,7 +130,7 @@ public class SceneManager extends ViewGroupManager<Scene> {
   }
 
   @ReactProp(name = "isSplitPrimary")
-  public void setIsSplitPrimary(Scene view, boolean isSplitPrimary){
+  public void setIsSplitPrimary(Scene view, boolean isSplitPrimary) {
     view.setIsSplitPrimary(isSplitPrimary);
   }
 
