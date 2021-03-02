@@ -1,7 +1,10 @@
 package im.shimo.navigators;
 
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,47 +19,133 @@ public class SplitScene extends SceneContainer {
 
   private static final String TAG = "SplitScene";
 
-  private SplitRule DEFAULT_RULE = new SplitRule(LayoutParams.MATCH_PARENT, 0, Integer.MAX_VALUE);
+  private static final SplitRule DEFAULT_RULE = new SplitRule(LayoutParams.MATCH_PARENT, 0, Integer.MAX_VALUE);
 
   private ArrayList<SplitRule> mRules;
   private SplitRule mCurrentRule = DEFAULT_RULE;
-  private Scene mPrimaryScene;
   private SplitPlaceholder mSplitPlaceholder;
-  private boolean mIsSplitMode = false;
+
+
+  private static final int SPLIT_MODE_INVALID = 0;
+  private static final int SPLIT_MODE_ON = 669;
+  private static final int SPLIT_MODE_OFF = 688;
+  private int mIsSplitMode = SPLIT_MODE_INVALID;
+  private boolean mIsFullScreen;
+
+  private final InnerSceneContainer mPrimaryContainer;
+  private final InnerSceneContainer mSecondaryContainer;
+  private final ArrayList<Scene> mSceneList = new ArrayList<>();
 
 
   public SplitScene(Context context) {
     super(context);
+    mPrimaryContainer = new InnerSceneContainer(context);
+    mSecondaryContainer = new InnerSceneContainer(context);
+    addView(mPrimaryContainer);
+    addView(mSecondaryContainer);
   }
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    if (!mIsSplitMode) {
+    if (!isSplitModeOn()) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     } else {
       setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),
         getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));
       for (int i = 0, size = getChildCount(); i < size; i++) {
         View child = getChildAt(i);
-        if (child == mPrimaryScene) {
-          child.measure(MeasureSpec.makeMeasureSpec(
-            mCurrentRule.primarySceneWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
-        } else {
-          if (child instanceof Scene) {
-            if (child.getLayoutParams().width < 0) {
-              int childWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - mCurrentRule.primarySceneWidth;
-              child.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
-            } else {
-              child.measure(MeasureSpec.makeMeasureSpec(
-                child.getLayoutParams().width, MeasureSpec.EXACTLY), heightMeasureSpec);
-            }
-
+        LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+        if (child instanceof Scene) {
+          if (layoutParams.width < 0) {
+            int childWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - mCurrentRule.primarySceneWidth;
+            child.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
+          } else {
+            child.measure(MeasureSpec.makeMeasureSpec(
+              layoutParams.width, MeasureSpec.EXACTLY), heightMeasureSpec);
           }
+        } else {
+          if (child == mPrimaryContainer) {
+            child.measure(MeasureSpec.makeMeasureSpec(
+              mCurrentRule.primarySceneWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
+          } else {
+            int childWidth = getMeasuredWidth() - layoutParams.leftMargin - layoutParams.rightMargin
+              - getPaddingLeft() - getPaddingRight() - mCurrentRule.primarySceneWidth;
+            child.measure(MeasureSpec.makeMeasureSpec(
+              childWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
+          }
+
         }
       }
     }
+  }
 
 
+  private void setSplitMode(boolean isSplitMode) {
+    if (isSplitMode && isSplitModeOn()) {
+      return;
+    }
+    if (!isSplitMode && isSplitModeOff()) {
+      return;
+    }
+    mIsSplitMode = isSplitMode ? SPLIT_MODE_ON : SPLIT_MODE_OFF;
+
+    if (isSplitModeOn()) {
+      mScenes.clear();
+      mStack.clear();
+
+      for (Scene scene : mSceneList) {
+        removeView(scene);
+        if (scene.isSplitPrimary()) {
+          mPrimaryContainer.mScenes.add(scene);
+          mPrimaryContainer.mStack.add(scene);
+          mPrimaryContainer.addView(scene);
+          scene.setContainer(mPrimaryContainer);
+        } else {
+          mSecondaryContainer.mScenes.add(scene);
+          mSecondaryContainer.mStack.add(scene);
+          mSecondaryContainer.addView(scene);
+          scene.setContainer(mSecondaryContainer);
+        }
+      }
+
+
+    }
+
+    if (isSplitModeOff()) {
+      mPrimaryContainer.clear();
+      mSecondaryContainer.clear();
+
+      for (Scene scene : mSceneList) {
+        scene.setContainer(this);
+        mScenes.add(scene);
+        mStack.add(scene);
+        addView(scene);
+      }
+
+    }
+
+  }
+
+  private boolean isSplitModeOn() {
+    return mIsSplitMode == SPLIT_MODE_ON;
+  }
+
+  private boolean isSplitModeOff() {
+    return mIsSplitMode == SPLIT_MODE_OFF;
+  }
+
+  @Override
+  protected void onUpdate() {
+    if (isSplitModeOn() && mSceneList.size() > 0 && (mPrimaryContainer.getSceneCount() == 0 || mSecondaryContainer.getSceneCount() == 0)) {
+      for (Scene scene : mSceneList) {
+        if (scene.isSplitPrimary()) {
+          mPrimaryContainer.addScene(scene, mPrimaryContainer.getSceneCount());
+        } else {
+          mSecondaryContainer.addScene(scene, mSecondaryContainer.getSceneCount());
+        }
+      }
+    }
+    super.onUpdate();
   }
 
   @Override
@@ -66,20 +155,20 @@ public class SplitScene extends SceneContainer {
         break;
       case SLIDE_FROM_RIGHT:
         anim[0] = R.anim.slide_in_right;
-        anim[1] = mIsSplitMode ? R.anim.no_anim : R.anim.slide_out_left_p50;
+        anim[1] = R.anim.slide_out_left_p50;
         break;
       case SLIDE_FROM_LEFT:
         anim[0] = R.anim.slide_in_left;
-        anim[1] = mIsSplitMode ? R.anim.no_anim : R.anim.slide_out_right_p50;
+        anim[1] = R.anim.slide_out_right_p50;
         break;
       case SLIDE_FROM_TOP:
-        anim[0] = R.anim.slide_in_top;
+        anim[0] = scene == mSplitPlaceholder ? R.anim.no_anim : R.anim.slide_in_top;
         anim[1] = R.anim.no_anim;
         break;
       default:
       case DEFAULT:
       case SLIDE_FROM_BOTTOM:
-        anim[0] = R.anim.slide_in_bottom;
+        anim[0] = scene == mSplitPlaceholder ? R.anim.no_anim : R.anim.slide_in_bottom;
         anim[1] = R.anim.no_anim;
         break;
     }
@@ -91,11 +180,11 @@ public class SplitScene extends SceneContainer {
       case NONE:
         break;
       case SLIDE_FROM_RIGHT:
-        anim[0] = mIsSplitMode ? R.anim.no_anim :R.anim.slide_in_left_p50;
+        anim[0] = R.anim.slide_in_left_p50;
         anim[1] = R.anim.slide_out_right;
         break;
       case SLIDE_FROM_LEFT:
-        anim[0] = mIsSplitMode ? R.anim.no_anim :R.anim.slide_in_right_p50;
+        anim[0] = R.anim.slide_in_right_p50;
         anim[1] = R.anim.slide_out_left;
         break;
       case SLIDE_FROM_TOP:
@@ -113,19 +202,17 @@ public class SplitScene extends SceneContainer {
 
   @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-
     for (int i = 0, count = getChildCount(); i < count; i++) {
       View child = getChildAt(i);
       if (child.getVisibility() != GONE) {
-        LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
         int childWidth = child.getMeasuredWidth();
         int childHeight = child.getMeasuredHeight();
-        int childLeft = left + layoutParams.leftMargin;
-        if (mIsSplitMode) {
-          if (child != mPrimaryScene && mPrimaryScene != null) {
-            if (!((Scene) child).isFullScreen()) {
-              childLeft += mPrimaryScene.getMeasuredWidth();
-            }
+        int childLeft = left;
+        if (isSplitModeOn()) {
+          if (child == mSecondaryContainer) {
+            LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+            childLeft += mCurrentRule.primarySceneWidth + layoutParams.leftMargin
+              + layoutParams.rightMargin;
           }
         }
         child.layout(childLeft, top, childLeft + childWidth, top + childHeight);
@@ -137,21 +224,74 @@ public class SplitScene extends SceneContainer {
 
   @Override
   protected void addScene(Scene scene, int index) {
-    super.addScene(scene, index);
     if (mSplitPlaceholder == null && scene instanceof SplitPlaceholder) {
       mSplitPlaceholder = (SplitPlaceholder) scene;
-    } else if (mPrimaryScene == null) {
-      mPrimaryScene = scene;
     }
+    if (isSplitModeOn()) {
+      if (scene.isSplitPrimary()) {
+        mPrimaryContainer.addScene(scene, mPrimaryContainer.getSceneCount());
+      } else {
+        mSecondaryContainer.addScene(scene, mSecondaryContainer.getSceneCount());
+      }
+      markUpdated();
+    } else if (mIsSplitMode == SPLIT_MODE_OFF) {
+      scene.setVisibility(INVISIBLE);
+      addView(scene, getChildCount());
+      mScenes.add(index, scene);
+      scene.setContainer(this);
+      markUpdated();
+    }
+    if (mIsSplitMode == SPLIT_MODE_INVALID) {
+      markUpdated();
+    }
+    mSceneList.add(scene);
+  }
+
+  @Override
+  protected int getSceneCount() {
+    return mSceneList.size();
+  }
+
+  @Override
+  protected Scene getSceneAt(int index) {
+    return mSceneList.get(index);
+  }
+
+  @Override
+  protected void removeSceneAt(int index) {
+    if (!isSplitModeOn()) {
+      super.removeSceneAt(index);
+    } else {
+      Scene scene = mSceneList.get(index);
+      int i;
+      if (scene.isSplitPrimary()) {
+        i = mPrimaryContainer.indexOfScene(scene);
+        if (i >= 0) {
+          mPrimaryContainer.removeSceneAt(i);
+        } else {
+          Log.w(TAG, "scene: " + Integer.toHexString(scene.getId()) +
+            " isSplitPrimary = " + scene.isSplitPrimary() + " but not in mPrimaryContainer");
+        }
+      } else {
+        i = mSecondaryContainer.indexOfScene(scene);
+        if (i >= 0) {
+          mSecondaryContainer.removeSceneAt(i);
+        } else {
+          Log.w(TAG, "scene: " + Integer.toHexString(scene.getId()) +
+            "isSplitPrimary = " + scene.isSplitPrimary() + " but not in mSecondaryContainer");
+        }
+      }
+    }
+    mSceneList.remove(index);
   }
 
   @Override
   protected boolean isShow(ArrayList<Scene> scenes, int index, int size) {
     final Scene scene = scenes.get(index);
-    if (mIsSplitMode && scene == mSplitPlaceholder) {
+    if (isSplitModeOn() && scene == mSplitPlaceholder) {
       return true;
     }
-    if (scene == mPrimaryScene) {
+    if (scene.isSplitPrimary()) {
       return true;
     }
     return super.isShow(scenes, index, size);
@@ -159,10 +299,10 @@ public class SplitScene extends SceneContainer {
 
   @Override
   protected Scene getTopScene(ArrayList<Scene> scenes) {
-    if (mIsSplitMode) {
+    if (isSplitModeOn()) {
       for (int i = scenes.size() - 1; i >= 0; i--) {
         final Scene scene = scenes.get(i);
-        if (scene == mPrimaryScene || scene == mSplitPlaceholder) {
+        if (scene.isSplitPrimary() || scene == mSplitPlaceholder) {
           continue;
         }
         return scene;
@@ -186,20 +326,22 @@ public class SplitScene extends SceneContainer {
         break;
       }
     }
+    boolean isSplitMode;
     if (current != null) {
       mCurrentRule = current;
-      mIsSplitMode = true;
+      isSplitMode = true;
     } else {
       mCurrentRule = DEFAULT_RULE;
-      mIsSplitMode = false;
-    }
-    if (mSplitPlaceholder !=null){
-      mSplitPlaceholder.setVisibility(mIsSplitMode?VISIBLE :GONE);
+      isSplitMode = false;
     }
 
-
+    setSplitMode(isSplitMode);
+    if (mSplitPlaceholder != null) {
+      mSplitPlaceholder.setVisibility(isSplitModeOn() ? VISIBLE : GONE);
+    }
     post(this::requestLayout);
   }
+
 
   public void setSplitRules(@NonNull ReadableArray rules) {
     mRules = new ArrayList<>();
@@ -208,6 +350,32 @@ public class SplitScene extends SceneContainer {
       final ReadableMap map = rules.getMap(i);
       mRules.add(SplitRule.form(map, context));
     }
+  }
+
+  public void setSplitFullScreen(boolean isFullScreen) {
+    if (mIsFullScreen == isFullScreen) return;
+    mIsFullScreen = isFullScreen;
+
+    int formLeft = mSecondaryContainer.getLeft();
+    int left = 0;
+    if (!mIsFullScreen) {
+      left = mCurrentRule.primarySceneWidth;
+    }
+
+    ValueAnimator valueAnimator = ValueAnimator.ofPropertyValuesHolder(
+      PropertyValuesHolder.ofInt("left", left, mSecondaryContainer.getLeft())
+    );
+    valueAnimator.setDuration(300);
+    valueAnimator.addUpdateListener((ValueAnimator animation) -> {
+      int l = (Integer) animation.getAnimatedValue("left");
+      ViewGroup.LayoutParams layoutParams = mSecondaryContainer.getLayoutParams();
+      if (layoutParams instanceof MarginLayoutParams) {
+        ((MarginLayoutParams) layoutParams).leftMargin = -l;
+        mSecondaryContainer.setLayoutParams(layoutParams);
+      }
+    });
+    valueAnimator.start();
+
   }
 
   public SplitRule getCurrentRule() {
@@ -245,6 +413,32 @@ public class SplitScene extends SceneContainer {
 
     public LayoutParams(ViewGroup.LayoutParams source) {
       super(source);
+    }
+
+    @Override
+    public String toString() {
+      return "LayoutParams{" +
+        "bottomMargin=" + bottomMargin +
+        ", leftMargin=" + leftMargin +
+        ", rightMargin=" + rightMargin +
+        ", topMargin=" + topMargin +
+        ", height=" + height +
+        ", layoutAnimationParameters=" + layoutAnimationParameters +
+        ", width=" + width +
+        '}';
+    }
+  }
+
+  static class InnerSceneContainer extends SceneStack {
+
+    public InnerSceneContainer(Context context) {
+      super(context);
+    }
+
+    void clear() {
+      mScenes.clear();
+      mStack.clear();
+      removeAllViews();
     }
 
   }

@@ -4,6 +4,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 
@@ -29,7 +30,17 @@ public class SceneCardManager extends ViewGroupManager<SceneCard> {
         return new SceneCard(reactContext);
     }
 
-    @Override
+  @Override
+  public LayoutShadowNode createShadowNodeInstance() {
+    return new SceneShadowNode();
+  }
+
+  @Override
+  public Class<? extends LayoutShadowNode> getShadowNodeClass() {
+    return SceneShadowNode.class;
+  }
+
+  @Override
     public void addView(SceneCard parent, View child, int index) {
         if (!(child instanceof Scene)) {
             throw new IllegalArgumentException("Attempt attach child that is not of type RNScenes");

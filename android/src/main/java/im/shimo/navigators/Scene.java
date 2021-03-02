@@ -1,7 +1,5 @@
 package im.shimo.navigators;
 
-import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Paint;
@@ -10,9 +8,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -72,7 +70,7 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
   private boolean mDismissed = false;
   private List<OnSceneStatusChangeListener> mOnSceneStatusChangeListeners;
   private StatusBarManager mStatusBarManager;
-  private boolean mIsFullScreen;
+  private boolean mIsSplitPrimary;
 
   public Scene(ReactContext context) {
     super(context);
@@ -86,11 +84,19 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    if (changed) {
-      mRect.set(l, t, r, b);
-      final ReactContext reactContext = (ReactContext) getContext();
-      reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
-    }
+//    if (changed) {
+//      mRect.set(l, t, r, b);
+//      final ReactContext reactContext = (ReactContext) getContext();
+//      reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
+//    }
+  }
+
+  @Override
+  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+    mRect.set(0, 0, w, h);
+    final ReactContext reactContext = (ReactContext) getContext();
+    reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
   }
 
   @Override
@@ -321,54 +327,26 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
     }
   }
 
-  protected Scene findRootSplitSceneChildScene() {
-    Scene scene = this;
-    ViewParent viewParent = getParent();
-    while (viewParent instanceof ViewGroup) {
-      viewParent = ((ViewGroup) viewParent).getParent();
-      if (viewParent instanceof Scene) {
-        if (((Scene) viewParent).mContainer instanceof SplitScene) {
-          scene = (Scene) viewParent;
-        }
+  protected SplitScene findNearestSplitScene(ViewGroup view) {
+    if (view instanceof Scene && ((Scene) view).mContainer instanceof SplitScene) {
+      return (SplitScene) ((Scene) view).mContainer;
+    } else {
+      ViewParent parent = view.getParent();
+      if (parent instanceof ViewGroup) {
+        return findNearestSplitScene((ViewGroup) parent);
+      } else {
+        return null;
       }
     }
-    return scene;
+
   }
 
-  public void setSplitFullScreen(boolean isFullScreen) {
-    if (mIsFullScreen == isFullScreen) return;
-    mIsFullScreen = isFullScreen;
-    Scene scene = findRootSplitSceneChildScene();
-    if (this != scene) {
-      scene.setSplitFullScreen(isFullScreen);
-      return;
-    }
-    if (!(mContainer instanceof SplitScene)) return;
-
-    int left = mContainer.getPaddingLeft() + mContainer.getLeft();
-    if (!isFullScreen) {
-      left += ((SplitScene) mContainer).getCurrentRule().primarySceneWidth;
-    }
-
-    ValueAnimator valueAnimator = ValueAnimator.ofPropertyValuesHolder(
-      PropertyValuesHolder.ofInt("left", getLeft(), left),
-      PropertyValuesHolder.ofInt("right", getRight(), getRight())
-    );
-    valueAnimator.setDuration(300);
-    valueAnimator.addUpdateListener((ValueAnimator animation) -> {
-      final LayoutParams layoutParams = getLayoutParams();
-      int l = (Integer) animation.getAnimatedValue("left");
-      int width = ((Integer) animation.getAnimatedValue("right")) - l;
-      setLeft(l);
-      layoutParams.width = width;
-      setLayoutParams(layoutParams);
-    });
-    valueAnimator.start();
+  public void setIsSplitPrimary(boolean isSplitPrimary) {
+    mIsSplitPrimary = isSplitPrimary;
   }
 
-
-  public boolean isFullScreen() {
-    return mIsFullScreen;
+  public boolean isSplitPrimary() {
+    return mIsSplitPrimary;
   }
 
   public enum SceneStatus {

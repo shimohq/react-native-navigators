@@ -1,6 +1,8 @@
 package im.shimo.navigators;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -8,8 +10,10 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.core.ChoreographerCompat;
 import com.facebook.react.modules.core.ReactChoreographer;
+import com.facebook.react.uimanager.UIManagerModule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -82,9 +86,18 @@ public abstract class SceneContainer extends ViewGroup {
     }
   }
 
+  private Rect mRect = new Rect();
 
+  @Override
+  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+    final ReactContext reactContext = (ReactContext) getContext();
+    mRect.set(getLeft(), getTop(), w,  h);
+    Log.d(TAG, "onSizeChanged() called with: mRect = [" + mRect + "], h = [" + h + "], oldw = [" + oldw + "], oldh = [" + oldh + "]");
+    reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
+  }
 
-//    @SuppressWarnings("unchecked")
+  //    @SuppressWarnings("unchecked")
 //    protected T adapt(Scene scene) {
 //        SceneFragment sceneFragment = new SceneFragment();
 //        sceneFragment.setSceneView(scene);
@@ -112,12 +125,14 @@ public abstract class SceneContainer extends ViewGroup {
     addView(scene, index);
     mScenes.add(index, scene);
     scene.setContainer(this);
+    Log.d(TAG, "addScene() called with: scene = [" + scene + "], index = [" + index + "], size :" + mScenes.size());
     markUpdated();
   }
 
   protected void removeSceneAt(int index) {
     mScenes.get(index).setContainer(null);
     mScenes.remove(index);
+    Log.d(TAG, "removeSceneAt() called with: index = [" + index + "], size :" + mScenes.size());
     markUpdated();
   }
 
@@ -128,6 +143,10 @@ public abstract class SceneContainer extends ViewGroup {
 
   protected Scene getSceneAt(int index) {
     return mScenes.get(index);
+  }
+
+  protected int indexOfScene(Scene scene) {
+    return mScenes.indexOf(scene);
   }
 
   @Override

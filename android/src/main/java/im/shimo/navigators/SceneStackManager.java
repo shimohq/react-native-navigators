@@ -5,6 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 
@@ -21,9 +22,17 @@ public class SceneStackManager extends ViewGroupManager<SceneStack> {
         return REACT_CLASS;
     }
 
+  @Override
+  public LayoutShadowNode createShadowNodeInstance() {
+    return new SceneShadowNode();
+  }
 
+  @Override
+  public Class<? extends LayoutShadowNode> getShadowNodeClass() {
+    return SceneShadowNode.class;
+  }
 
-    @NonNull
+  @NonNull
     @Override
     protected SceneStack createViewInstance(@NonNull ThemedReactContext reactContext) {
         return new SceneStack(reactContext);

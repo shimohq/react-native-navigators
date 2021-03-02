@@ -1,5 +1,6 @@
 package im.shimo.navigators;
 
+import android.graphics.Rect;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -11,6 +12,11 @@ import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.yoga.YogaEdge;
+import com.facebook.yoga.YogaMeasureFunction;
+import com.facebook.yoga.YogaMeasureMode;
+import com.facebook.yoga.YogaMeasureOutput;
+import com.facebook.yoga.YogaNode;
 
 import java.util.Map;
 
@@ -27,6 +33,39 @@ public class SceneManager extends ViewGroupManager<Scene> {
   protected static final String REACT_CLASS = "RNNativeScene";
   private static final String TAG = "SceneManager";
   private StatusBarManager mStatusBarManager;
+
+//  static class SceneShadowNode extends LayoutShadowNode implements YogaMeasureFunction {
+//
+//    private SceneShadowNode(){
+//      //setMeasureFunction(this);
+//    }
+//
+//    @Override
+//    public long measure(YogaNode node, float width, YogaMeasureMode widthMode, float height,
+//                        YogaMeasureMode heightMode) {
+////      if (!mMeasured) {
+////        Scene scene = new Scene(getThemedContext());
+////        final int spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+////        scene.measure(spec, spec);
+////        mWidth = scene.getMeasuredWidth();
+////        mHeight = scene.getMeasuredHeight();
+////        mMeasured = true;
+////      }
+//
+//      return YogaMeasureOutput.make(width, width);
+//    }
+//
+//    @Override
+//    public void setLocalData(Object data) {
+//      if (data instanceof Rect){
+//        setPosition(YogaEdge.START.intValue(), ((Rect) data).left);
+//        setPosition(YogaEdge.TOP.intValue(), ((Rect) data).top);
+//        setStyleWidth(((Rect) data).width());
+//        setStyleHeight(((Rect) data).height());
+//      }
+//    }
+//  }
+
 
   @NonNull
   @Override
@@ -97,6 +136,11 @@ public class SceneManager extends ViewGroupManager<Scene> {
   public void gestureEnabled(Scene view, boolean enable) {
   }
 
+  @ReactProp(name = "isSplitPrimary")
+  public void setIsSplitPrimary(Scene view, boolean isSplitPrimary){
+    view.setIsSplitPrimary(isSplitPrimary);
+  }
+
   //隐藏 Blur -> Focus
   //显示 Focus -> Blur
 
@@ -109,10 +153,6 @@ public class SceneManager extends ViewGroupManager<Scene> {
     view.setClosing(closing);
   }
 
-  @ReactProp(name = "splitFullScreen")
-  public void splitFullScreen(Scene view, boolean split){
-    view.setSplitFullScreen(split);
-  }
 
   /**
    * 是否透明
@@ -154,31 +194,4 @@ public class SceneManager extends ViewGroupManager<Scene> {
     );
   }
 
-  @Override
-  public void removeViewAt(Scene parent, int index) {
-    super.removeViewAt(parent, index);
-//        View view = parent.getChildAt(index);
-//        if (view instanceof SceneStackHeader) {
-//            ViewParent sceneParent = parent.getParent();
-//            if (sceneParent instanceof SceneStack) {
-////                ((SceneStack) sceneParent).removeHeader();
-//            }
-//        } else {
-//            parent.removeView(view);
-//        }
-  }
-
-
-  @Override
-  public void addView(Scene parent, View child, int index) {
-    super.addView(parent, child, index);
-//        if (child instanceof SceneStackHeader) {
-//            ViewParent sceneParent = parent.getParent();
-//            if (sceneParent instanceof SceneStack) {
-////                ((SceneStack) sceneParent).setHeader(((SceneStackHeader) child));
-//            }
-//        } else {
-//            super.addView(parent, child, index);
-//        }
-  }
 }

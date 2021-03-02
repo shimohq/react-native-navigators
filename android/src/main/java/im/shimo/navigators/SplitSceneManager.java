@@ -43,6 +43,11 @@ public class SplitSceneManager extends ViewGroupManager<SplitScene> {
     splitScene.setSplitRules(rules);
   }
 
+  @ReactProp(name = "isSplitFullScreen")
+  public void setIsSplitFullScreen(SplitScene scene, boolean isSplitFullScreen){
+    scene.setSplitFullScreen(isSplitFullScreen);
+  }
+
   @Override
   public void addView(SplitScene parent, View child, int index) {
     if (!(child instanceof Scene)) {
