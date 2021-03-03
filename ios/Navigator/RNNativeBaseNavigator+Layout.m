@@ -8,7 +8,6 @@
 #import "RNNativeBaseNavigator+Layout.h"
 #import "RNNativeSceneController.h"
 #import "RNNativeScene.h"
-#import "RNNativeSplitNavigator.h"
 
 #import "UIView+RNNativeNavigator.h"
 
@@ -38,19 +37,11 @@
 }
 
 - (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes {
-    [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes split:NO];
-}
-
-- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes split:(BOOL)split {
     for (RNNativeScene *scene in removedScenes) {
         [self removeScene:scene];
     }
     // 顶部两层 scene 必须显示，否则手势返回不好处理
     for (NSInteger index = 0, size = nextScenes.count; index < size - 2; index++) {
-        // 分屏状态第一页必须显示
-        if (split && index == 0) {
-            continue;
-        }
         RNNativeScene *scene = nextScenes[index];
         RNNativeScene *nextScene = nextScenes[index + 1];
         if (!nextScene.transparent) { // 上层 scene 不透明时移除

@@ -36,6 +36,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        _splitFullScreen = NO;
         _splitRules = nil;
         _rules = [RNNativeSplitUtils parseSplitRules:_splitRules];
         _navigatorWidth = CGRectGetWidth(self.layoutMetrics.frame);
@@ -72,6 +73,8 @@
     }
     _navigatorWidth = navigatorWidth;
     [self setPrimarySceneWidth:[RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
+    
+    // update
     [self updateSubShadowViews];
 }
 
@@ -82,7 +85,33 @@
     _splitRules = splitRules;
     _rules = [RNNativeSplitUtils parseSplitRules:_splitRules];
     [self setPrimarySceneWidth:[RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth]];
+    
+    // update
+    [self updateSubShadowViews];
 }
+
+- (void)setSplitFullScreen:(BOOL)splitFullScreen {
+    if (_splitFullScreen == splitFullScreen) {
+        return;
+    }
+    _splitFullScreen = splitFullScreen;
+    
+    RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
+                                                                                                 delay:0.0
+                                                                                              property:@"fullScreen"
+                                                                                         springDamping:0.0
+                                                                                       initialVelocity:0.0
+                                                                                         animationType:RCTAnimationTypeEaseInEaseOut];
+    RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {}];
+    RCTExecuteOnMainQueue(^{
+        [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
+    });
+    
+    // 最顶层场景动画结束后更新其它场景
+    [self updateSubShadowViews];
+}
+
+#pragma mark - Setter - Compute Result
 
 - (void)setPrimarySceneWidth:(CGFloat)primarySceneWidth {
     if (_primarySceneWidth == primarySceneWidth) {
@@ -101,39 +130,24 @@
         return;
     }
     if ([subview isKindOfClass:[RNNativeSplitPlaceholderShadowView class]]) {
-        [subview setDisplay: self.split ? YGDisplayFlex : YGDisplayNone];
-        [self updateShadowView:subview index:1 fullScreen:NO split:self.split primarySceneWidth:self.primarySceneWidth];
+        [self updateSplitPlaceholderShadowView:(RNNativeSplitPlaceholderShadowView *)subview];
     } else if ([subview isKindOfClass:[RNNativeSceneShadowView class]]) {
         RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView*)subview;
         sceneShadowView.delegate = self;
-        NSInteger sceneIndex = 0;
-        for (NSInteger index = 0; index < atIndex; index++) {
-            RCTShadowView *shadowView = self.reactSubviews[index];
-            if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
-                sceneIndex++;
-            }
-        }
-        [self updateShadowView:sceneShadowView index:sceneIndex fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+        [self updateSceneShadowView:sceneShadowView];
     }
 }
 
 #pragma mark - RNNativeSceneShadowViewDelegate
 
-- (void)didSplitFullScrennChanged:(RNNativeSceneShadowView *)sceneShadowView {
-    NSInteger sceneIndex = -1;
-    for (NSInteger index = 0, size = self.reactSubviews.count; index < size; index++) {
-        RCTShadowView *shadowView = self.reactSubviews[index];
-        if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
-            sceneIndex++;
-        }
-        if (sceneShadowView == shadowView) {
-            break;
-        }
+- (void)didSplitPrimaryChanged:(RNNativeSceneShadowView *)sceneShadowView {
+    if (![self.reactSubviews containsObject:sceneShadowView]) {
+        return;
     }
     
     RCTLayoutAnimation *layoutAnimation = [[RCTLayoutAnimation alloc] initWithDuration:RNNativeNavigateDuration
                                                                                                  delay:0.0
-                                                                                              property:@"fullScreen"
+                                                                                              property:@"splitPrimary"
                                                                                          springDamping:0.0
                                                                                        initialVelocity:0.0
                                                                                          animationType:RCTAnimationTypeEaseInEaseOut];
@@ -141,8 +155,7 @@
     RCTExecuteOnMainQueue(^{
         [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
     });
-    
-    [self updateShadowView:sceneShadowView index:sceneIndex fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+    [self updateSceneShadowView:sceneShadowView];
 }
 
 #pragma mark - Private
@@ -154,15 +167,11 @@
     // INFO 必须要切线程，否则会报 dirtyNode 错误
     RCTExecuteOnMainQueue(^{
         RCTExecuteOnUIManagerQueue(^{
-            NSInteger index = -1;
             for (RCTShadowView *shadowView in self.reactSubviews) {
                 if ([shadowView isKindOfClass:[RNNativeSplitPlaceholderShadowView class]]) {
-                    [shadowView setDisplay:self.split ? YGDisplayFlex : YGDisplayNone];
-                    [self updateShadowView:shadowView index:1 fullScreen:NO split:self.split primarySceneWidth:self.primarySceneWidth];
+                    [self updateSplitPlaceholderShadowView:(RNNativeSplitPlaceholderShadowView *)shadowView];
                 } else if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
-                    index++;
-                    RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)shadowView;
-                    [self updateShadowView:sceneShadowView index:index fullScreen:sceneShadowView.splitFullScreen split:self.split primarySceneWidth:self.primarySceneWidth];
+                    [self updateSceneShadowView:(RNNativeSceneShadowView *)shadowView];
                 }
             }
             [self.bridge.uiManager setNeedsLayout];
@@ -170,24 +179,43 @@
     });
 }
 
+- (void)updateSceneShadowView:(RNNativeSceneShadowView *)shadowView {
+    [self updateShadowView:shadowView primary:shadowView.splitPrimary placeHolder:NO];
+}
+
+- (void)updateSplitPlaceholderShadowView:(RNNativeSplitPlaceholderShadowView *)shadowView {
+    [self updateShadowView:shadowView primary:NO placeHolder:YES];
+}
+
 - (void)updateShadowView:(RCTShadowView *)shadowView
-                   index:(NSInteger)index
-              fullScreen:(BOOL)fullScreen
-                   split:(BOOL)split
-       primarySceneWidth:(CGFloat)primarySceneWidth {
-    if (split && !fullScreen) {
-        if (index == 0) {
+                 primary:(BOOL)primary
+             placeHolder:(BOOL)placeHolder {
+    // update whether show
+    if (placeHolder) {
+        [shadowView setDisplay:self.split ? YGDisplayFlex : YGDisplayNone];
+    }
+    
+    // update layout
+    if (self.split) {
+        if (primary) { // 左边屏幕
             [shadowView setLeft:YGValueZero];
             [shadowView setRight:YGValueUndefined];
-            [shadowView setWidth:(YGValue){primarySceneWidth,YGUnitPoint}];
-        } else {
-            [shadowView setLeft:(YGValue){primarySceneWidth,YGUnitPoint}];
-            [shadowView setWidth:(YGValue){_navigatorWidth - primarySceneWidth,YGUnitPoint}];
-            [shadowView setRight:YGValueUndefined];
+            [shadowView setWidth:(YGValue){self.primarySceneWidth,YGUnitPoint}];
+        } else { // 右边屏幕
+            if (self.splitFullScreen && !placeHolder) {
+                // 全屏且非 placeHolder 的 scene 全屏展示
+                [shadowView setLeft:YGValueZero];
+                [shadowView setWidth:(YGValue){self.navigatorWidth, YGUnitPoint}];
+                [shadowView setRight:YGValueUndefined];
+            } else {
+                [shadowView setLeft:(YGValue){self.primarySceneWidth,YGUnitPoint}];
+                [shadowView setWidth:(YGValue){self.navigatorWidth - self.primarySceneWidth,YGUnitPoint}];
+                [shadowView setRight:YGValueUndefined];
+            }
         }
     } else {
         [shadowView setLeft:YGValueZero];
-        [shadowView setWidth:(YGValue){_navigatorWidth, YGUnitPoint}];
+        [shadowView setWidth:(YGValue){self.navigatorWidth, YGUnitPoint}];
         [shadowView setRight:YGValueUndefined];
     }
 }

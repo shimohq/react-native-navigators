@@ -12,6 +12,22 @@ function SplitPrimary(props: NavigationInjectedProps) {
         onPress={() => props.navigation.goBack()}>
         <Text style={styles.link}> Go Back </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate('primary1')}>
+        <Text style={styles.link}> Navigate Split Primary1 </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate('primary2')}>
+        <Text style={styles.link}> Navigate Split Primary2 </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate('secondary1')}>
+        <Text style={styles.link}> Navigate Secondary1 </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate('secondary2')}>
+        <Text style={styles.link}> Navigate Secondary2 </Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -43,22 +43,10 @@
     return self;
 }
 
-- (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
-                           action:(RNNativeStackNavigatorAction)action
-                       nextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                    removedScenes:(NSArray<RNNativeScene *> *)removedScenes
-                   insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
-                  beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
-                    endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
     @throw [NSException exceptionWithName:NSInternalInconsistencyException
                                    reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
                                  userInfo:nil];
-}
-
-- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    @throw [NSException exceptionWithName:NSInternalInconsistencyException
-      reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
-    userInfo:nil];
 }
 
 - (void)layoutSubviews {
@@ -168,7 +156,7 @@
         RCTExecuteOnUIManagerQueue(^{
             RCTExecuteOnMainQueue(^{
                 self->_needUpdate = NO;
-    
+                
                 NSMutableArray<RNNativeScene *> *nextScenes = [NSMutableArray new];
                 for (UIView *view in self.nextViews) {
                     if ([view isKindOfClass:[RNNativeScene class]]) {
@@ -192,15 +180,25 @@
     NSArray<RNNativeScene *> *nextScenes = [NSArray arrayWithArray:_needUpdateScenes];
     _needUpdateScenes = nil;
     
+    [self updateSceneWithCurrentScenes:_currentScenes NextScenes:nextScenes comoplete:^{
+        [self setUpdatingScenes:NO];
+    }];
+    
+    [_currentScenes setArray:nextScenes];
+}
+
+- (void)updateSceneWithCurrentScenes:(NSArray<RNNativeScene *> *)currentScenes
+                          NextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                           comoplete:(RNNativeNavigatorUpdateCompleteBlock)comoplete {
     NSMutableArray<RNNativeScene *> *removedScenes = [NSMutableArray new];
     NSMutableArray<RNNativeScene *> *insertedScenes = [NSMutableArray new];
-    for (RNNativeScene *scene in _currentScenes) {
+    for (RNNativeScene *scene in currentScenes) {
         if (![nextScenes containsObject:scene]) {
             [removedScenes addObject:scene];
         }
     }
     for (RNNativeScene *scene in nextScenes) {
-        if (![_currentScenes containsObject:scene]) {
+        if (![currentScenes containsObject:scene]) {
             [insertedScenes addObject:scene];
         }
     }
@@ -208,30 +206,31 @@
     if (removedScenes.count == 0 && insertedScenes.count == 0) {
         BOOL orderChanged = NO;
         // 检查顺序是否产生变化
-        for (int i = 0; i < _currentScenes.count; i++) {
-            if (_currentScenes[i] != nextScenes[i]) {
+        for (int i = 0; i < currentScenes.count; i++) {
+            if (currentScenes[i] != nextScenes[i]) {
                 orderChanged = YES;
                 break;
             }
         }
-        
         if (!orderChanged) {
             // 无更新
-            [self setUpdatingScenes:NO];
+            comoplete();
             return;
         }
     }
-    RNNativeScene *currentTopScene = [_currentScenes lastObject];
+    
+    RNNativeScene *currentTopScene = [currentScenes lastObject];
     RNNativeScene *nextTopScene = [nextScenes lastObject];
     
     RNNativeStackNavigatorAction action = RNNativeStackNavigatorActionNone;
     RNNativeSceneTransition transition = RNNativeSceneTransitionNone;
+    
     // 当前列表为空时，无动画
     // 即将显示的顶层 scene 在当前列表中，且当前显示的顶层 scene 在即将显示的列表中，无动画
     // 当前和即将显示的顶层 scene 为同一个，无动画
     if (currentTopScene && currentTopScene != nextTopScene) {
         // 当前和即将显示的顶层 scene 不是同一个，有动画
-        if (nextTopScene && ![_currentScenes containsObject:nextTopScene]) {
+        if (nextTopScene && ![currentScenes containsObject:nextTopScene]) {
             // 即将显示的顶层 scene 不在当前列表中，取即将显示的顶层 scene 的显示动画
             action = RNNativeStackNavigatorActionShow;
             transition = nextTopScene.transition;
@@ -248,60 +247,70 @@
         if (![removedScenes containsObject:currentTopScene]) {
             [currentTopScene resignFirstResponder];
         }
-        if ([_currentScenes containsObject:nextTopScene]) {
+        if ([currentScenes containsObject:nextTopScene]) {
             [nextTopScene becomeFirstResponder];
         }
     }
-  
+    
     [self updateSceneWithTransition:transition
                              action:action
+                      currentScenes:currentScenes
                          nextScenes:nextScenes
                       removedScenes:removedScenes
                      insertedScenes:insertedScenes
-                    beginTransition:^(BOOL updateStatus, NSArray<RNNativeScene *> *primaryScenes) {
+                    beginTransition:^(BOOL updateStatus) {
         if (updateStatus) {
-            [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes action:action];
+            [self willUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
         }
-    } endTransition:^(BOOL updateStatus, NSArray<RNNativeScene *> *primaryScenes) {
+    } endTransition:^(BOOL updateStatus) {
         if (updateStatus) {
-            [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes action:action];
+            [self didUpdateStatusWithNextScenes:nextScenes removedScenes:removedScenes action:action];
         }
-        [self setUpdatingScenes:NO];
+        comoplete();
     }];
-    [_currentScenes setArray:nextScenes];
+}
+
+- (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
+                           action:(RNNativeStackNavigatorAction)action
+                    currentScenes:(NSArray<RNNativeScene *> *)currentScenes
+                       nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                    removedScenes:(NSArray<RNNativeScene *> *)removedScenes
+                   insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
+                  beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
+                    endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                   reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
+                                 userInfo:nil];
 }
 
 #pragma mark - Status
 
 - (void)willUpdateStatusWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
                          removedScenes:(NSArray<RNNativeScene *> *)removedScenes
-                         primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes
                                 action:(RNNativeStackNavigatorAction)action {
     if (action == RNNativeStackNavigatorActionHide) {
-        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
+        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes];
         [self willFocusWithNextScenes:nextScenes];
     } else {
         [self willFocusWithNextScenes:nextScenes];
-        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
+        [self willBlurWithNextScenes:nextScenes removedScenes:removedScenes];
     }
 }
 
 - (void)didUpdateStatusWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
                         removedScenes:(NSArray<RNNativeScene *> *)removedScenes
-                        primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes
                                action:(RNNativeStackNavigatorAction)action {
     if (action == RNNativeStackNavigatorActionHide) {
-        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
+        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes];
         [self didFocusedWithNextScenes:nextScenes];
     } else {
         [self didFocusedWithNextScenes:nextScenes];
-        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes primaryScenes:primaryScenes];
+        [self didBlurredWithNextScenes:nextScenes removedScenes:removedScenes];
     }
 }
 
 - (void)willBlurWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                 removedScenes:(NSArray<RNNativeScene *> *)removedScenes
-                 primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes {
+                 removedScenes:(NSArray<RNNativeScene *> *)removedScenes {
     // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeScene *scene = removedScenes[index];
@@ -311,16 +320,12 @@
     // nextScenes
     for (NSInteger index = 0, size = nextScenes.count; index + 1 < size; index++) {
         RNNativeScene *scene = nextScenes[index];
-        if (![primaryScenes containsObject:scene]) { // 分屏时，主 scene 不要 blur
-            [scene setStatus:RNNativeSceneStatusWillBlur];
-        }
         [scene setStatus:RNNativeSceneStatusWillBlur];
     }
 }
 
 - (void)didBlurredWithNextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                   removedScenes:(NSArray<RNNativeScene *> *)removedScenes
-                   primaryScenes:(nullable NSArray<RNNativeScene *> *)primaryScenes {
+                   removedScenes:(NSArray<RNNativeScene *> *)removedScenes {
     // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeScene *scene = removedScenes[index];
@@ -330,9 +335,7 @@
     // nextScenes
     for (NSInteger index = 0, size = nextScenes.count; index + 1 < size; index++) {
         RNNativeScene *scene = nextScenes[index];
-        if (![primaryScenes containsObject:scene]) { // 分屏时，主 scene 不要 blur
-            [scene setStatus:RNNativeSceneStatusDidBlur];
-        }
+        [scene setStatus:RNNativeSceneStatusDidBlur];
     }
 }
 

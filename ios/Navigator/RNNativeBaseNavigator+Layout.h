@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addScene:(RNNativeScene *)scene;
 
 - (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes;
-- (void)removeScenesWithRemovedScenes:(NSArray<RNNativeScene *> *)removedScenes nextScenes:(NSArray<RNNativeScene *> *)nextScenes split:(BOOL)split;
 
 @end
 

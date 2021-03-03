@@ -56,12 +56,12 @@
     self.top = (YGValue){_sceneTop, YGUnitPoint};
 }
 
-- (void)setSplitFullScreen:(BOOL)splitFullScreen {
-    if (_splitFullScreen == splitFullScreen) {
+- (void)setSplitPrimary:(BOOL)splitPrimary {
+    if (_splitPrimary == splitPrimary) {
         return;
     }
-    _splitFullScreen = splitFullScreen;
-    [self.delegate didSplitFullScrennChanged:self];
+    _splitPrimary = splitPrimary;
+    [self.delegate didSplitPrimaryChanged:self];
 }
 
 #pragma mark - RCTShadowView

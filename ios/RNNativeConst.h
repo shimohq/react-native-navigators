@@ -28,7 +28,8 @@ typedef NS_ENUM(NSInteger, RNNativeSceneStatus) {
     RNNativeSceneStatusWillFocus
 };
 
-typedef void (^RNNativeNavigatorTransitionBlock)(BOOL updateStatus, NSArray<RNNativeScene *> * _Nullable primaryScene);
+typedef void (^RNNativeNavigatorUpdateCompleteBlock)(void);
+typedef void (^RNNativeNavigatorTransitionBlock)(BOOL updateStatus);
 
 static const float RNNativeNavigateDuration = 0.3;
 

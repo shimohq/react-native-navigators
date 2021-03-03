@@ -182,16 +182,6 @@
     [_controller setStatusBarHidden:statusBarHidden];
 }
 
-- (void)setSplitFullScreen:(BOOL)splitFullScreen {
-    if (_splitFullScreen == splitFullScreen) {
-        return;
-    }
-    _splitFullScreen = splitFullScreen;
-    if ([self.delegate respondsToSelector:@selector(didFullScreenChangedWithScene:)]) {
-        [self.delegate didFullScreenChangedWithScene:self];
-    }
-}
-
 - (void)setEnableLifeCycle:(BOOL)enableLifeCycle {
     [_controller setEnableLifeCycle:enableLifeCycle];
 }

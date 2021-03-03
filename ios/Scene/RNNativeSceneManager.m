@@ -44,10 +44,11 @@ RCT_EXPORT_VIEW_PROPERTY(translucent, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(transparent, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(statusBarStyle, UIStatusBarStyle)
 RCT_EXPORT_VIEW_PROPERTY(statusBarHidden, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(splitFullScreen, BOOL)
+
+RCT_REMAP_VIEW_PROPERTY(isSplitPrimary, splitPrimary, BOOL)
 
 // for shadow view
-RCT_EXPORT_SHADOW_PROPERTY(splitFullScreen, BOOL)
+RCT_REMAP_SHADOW_PROPERTY(isSplitPrimary, splitPrimary, BOOL)
 
 @end
 
