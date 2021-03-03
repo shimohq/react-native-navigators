@@ -33,6 +33,9 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [splitPlaceholder, setSplitPlaceholder] = useState(
     () => options?.splitPlaceholder
   );
+  const [splitPrimaryRouteNames, setSplitPrimaryRouteNames] = useState(
+    () => options?.splitPrimaryRouteNames
+  );
 
   const setOptions = useCallback(
     (options: Partial<NativeNavigationSplitOptions>) => {
@@ -47,6 +50,10 @@ export default function NativeSplitNavigatorOptionsWrapper(
       if (options.hasOwnProperty('splitPlaceholder')) {
         setSplitPlaceholder(options.splitPlaceholder);
       }
+
+      if (options.hasOwnProperty('splitPrimaryRouteNames')) {
+        setSplitPrimaryRouteNames(options.splitPrimaryRouteNames);
+      }
     },
     []
   );
@@ -56,11 +63,12 @@ export default function NativeSplitNavigatorOptionsWrapper(
       options: {
         isSplitFullScreen,
         splitRules,
-        splitPlaceholder
+        splitPlaceholder,
+        splitPrimaryRouteNames
       },
       setOptions
     };
-  }, [isSplitFullScreen, splitRules, splitPlaceholder]);
+  }, [isSplitFullScreen, splitRules, splitPlaceholder, splitPrimaryRouteNames]);
 
   return (
     <NativeSplitNavigatorOptionsContext.Provider value={value}>

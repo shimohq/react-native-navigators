@@ -12,6 +12,7 @@ export interface NativeScenesProps extends NavigationInjectedProps {
   routes: NavigationRoute[];
   mode: NativeNavigatorModes;
   headerMode?: NativeNavigatorHeaderModes;
+  splitPrimaryRouteNames?: string[];
   descriptors: NativeNavigationDescriptorMap;
   screenProps?: unknown;
   onOpenRoute: (route: NavigationRoute) => void;
@@ -45,8 +46,11 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
       screenProps,
       mode,
       closingRouteKey,
-      headerMode
+      headerMode,
+      splitPrimaryRouteNames
     } = this.props;
+
+    const splitPrimaryRouteSet = new Set(splitPrimaryRouteNames);
 
     return (
       <>
@@ -55,6 +59,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
           return (
             <NativeScene
               key={route.key}
+              isSplitPrimary={splitPrimaryRouteSet.has(route.routeName)}
               closing={closingRouteKey === route.key}
               descriptor={descriptor}
               route={route}

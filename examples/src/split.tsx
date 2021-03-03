@@ -32,7 +32,8 @@ const SplitNavigator = createSplitNavigator({
         primarySceneWidth: 300
       }
     ],
-    splitPlaceholder: SplitPlaceholder
+    splitPlaceholder: SplitPlaceholder,
+    splitPrimaryRouteNames: ['index', 'primary', 'primary1', 'primary2']
   }
  
 });

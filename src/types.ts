@@ -12,7 +12,6 @@ export interface NativeNavigationOptions {
   translucent?: boolean;
   transparent?: boolean;
   cardStyle?: StyleProp<ViewStyle>;
-  isSplitPrimary?: boolean;
   gestureEnabled?: boolean;
   headerLeft?: ReactNode;
   headerCenter?: ReactNode;
@@ -57,6 +56,7 @@ export interface NativeSplitNavigationRouterConfig {
 export interface NativeNavigationSplitOptions {
   isSplitFullScreen?: boolean;
   splitRules?: NativeNavigatorSplitRules;
+  splitPrimaryRouteNames?: string[];
   splitPlaceholder?: ElementType<{}>;
 }
 
