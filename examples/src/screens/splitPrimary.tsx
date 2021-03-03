@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
+import { NativeNavigatorTransitions } from 'react-native-navigators';
 import { NavigationInjectedProps } from 'react-navigation';
 
 import styles from '../styles';
@@ -32,3 +33,9 @@ export default function SplitPrimary(props: NavigationInjectedProps) {
   );
 }
 
+SplitPrimary.navigationOptions = {
+  isSplitPrimary: true,
+  transition: NativeNavigatorTransitions.SlideFromRight
+};
+
+export default SplitPrimary;
