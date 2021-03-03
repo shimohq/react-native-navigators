@@ -5,7 +5,7 @@ import { NavigationInjectedProps } from 'react-navigation';
 
 import styles from '../styles';
 
-export default function SplitPrimary(props: NavigationInjectedProps) {
+function SplitPrimary(props: NavigationInjectedProps) {
   return (
     <View style={{ flex: 1, backgroundColor: 'red', borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Primary Scene</Text>
