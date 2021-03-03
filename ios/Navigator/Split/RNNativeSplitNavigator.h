@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RNNativeSplitNavigator : RNNativeBaseNavigator
 
 @property (nonatomic, strong) NSArray<NSDictionary *> *splitRules;
+@property (nonatomic, assign) BOOL splitFullScreen;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 

@@ -6,7 +6,6 @@
 //
 
 #import "RNNativeCardNavigatorShadowView.h"
-#import "RNNativeSplitNavigatorShadowView.h"
 #import "RNNativeSceneShadowView.h"
 #import "RNNativeCardNavigator.h"
 #import "RNNativeConst.h"
@@ -46,28 +45,13 @@
 #pragma mark - Public
 
 - (void)updateShadowView:(RNNativeSceneShadowView *)shadowView {
-    if (shadowView.splitFullScreen) {
-        RCTShadowView *taregetShadowView = [self findSplitNavigatorShadowView:self] ?: self;
-        
-        CGRect relativeFrame = [shadowView.superview measureLayoutRelativeToAncestor:taregetShadowView];
-        CGRect taregetFrame = taregetShadowView.layoutMetrics.frame;
-        
-        [shadowView setLeft:(YGValue){-CGRectGetMinX(relativeFrame),YGUnitPoint}];
-        [shadowView setWidth:(YGValue){CGRectGetWidth(taregetFrame),YGUnitPoint}];
-        [shadowView setRight:YGValueUndefined];
-        
-        [shadowView setTop:(YGValue){-CGRectGetMinY(relativeFrame),YGUnitPoint}];
-        [shadowView setHeight:(YGValue){CGRectGetHeight(taregetFrame), YGUnitPoint}];
-        [shadowView setBottom:YGValueUndefined];
-    } else {
-        [shadowView setLeft:YGValueZero];
-        [shadowView setWidth:YGValueAuto];
-        [shadowView setRight:YGValueZero];
-        
-        [shadowView setTop:YGValueZero];
-        [shadowView setHeight:YGValueAuto];
-        [shadowView setBottom:YGValueZero];
-    }
+    [shadowView setLeft:YGValueZero];
+    [shadowView setWidth:YGValueAuto];
+    [shadowView setRight:YGValueZero];
+    
+    [shadowView setTop:YGValueZero];
+    [shadowView setHeight:YGValueAuto];
+    [shadowView setBottom:YGValueZero];
 }
 
 #pragma mark - RCTShadowView
@@ -113,18 +97,6 @@
             [self.bridge.uiManager setNeedsLayout];
         });
     });
-}
-
-#pragma mark - Private
-
-- (nullable RNNativeSplitNavigatorShadowView *)findSplitNavigatorShadowView:(nullable RCTShadowView *)shadowView {
-    if (!shadowView) {
-        return nil;
-    }
-    if ([shadowView isKindOfClass:[RNNativeSplitNavigatorShadowView class]]) {
-        return (RNNativeSplitNavigatorShadowView *)shadowView;
-    }
-    return [self findSplitNavigatorShadowView:shadowView.superview];
 }
 
 @end

@@ -11,7 +11,13 @@
 @interface RNNativePanGestureHandler()
 
 @property (nonatomic, assign) CGFloat firstSceneBeginX;
+@property (nonatomic, assign) CGFloat firstSceneMinX;
+@property (nonatomic, assign) CGFloat firstSceneMaxX;
+
 @property (nonatomic, assign) CGFloat secondSceneBeginX;
+@property (nonatomic, assign) CGFloat secondSceneMinX;
+@property (nonatomic, assign) CGFloat secondSceneMaxX;
+@property (nonatomic, assign) CGFloat coverViewOriginZPosition;
 
 @end
 
@@ -25,25 +31,40 @@
         self.firstSceneBeginX = CGRectGetMinX(self.firstScene.frame);
         self.secondSceneBeginX = CGRectGetMinX(self.secondScene.frame);
         
-        if (self.primaryScene) {
-            [self.primaryScene.superview bringSubviewToFront:self.primaryScene];
-        }
-        
         [self.firstScene setStatus:RNNativeSceneStatusWillBlur];
         [self.secondScene setStatus:RNNativeSceneStatusWillFocus];
         
         CGRect secondSceneFrame = self.secondScene.frame;
         secondSceneFrame.origin.x = self.secondSceneBeginX - CGRectGetWidth(secondSceneFrame) / 3.0;
         self.secondScene.frame = secondSceneFrame;
+        
+        self.firstSceneMinX = CGRectGetMinX(self.firstScene.frame);
+        self.firstSceneMaxX = CGRectGetMaxX(self.firstScene.frame);
+        
+        self.secondSceneMinX = CGRectGetMinX(self.secondScene.frame);
+        self.secondSceneMaxX = CGRectGetMaxX(self.secondScene.frame);
+        
+        if (self.coverView) {
+            self.coverViewOriginZPosition = self.coverView.layer.zPosition;
+            self.coverView.layer.zPosition = 1000;
+        }
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
         // first scene
         CGRect firstSceneFrame = self.firstScene.frame;
-        firstSceneFrame.origin.x += point.x;
+        CGFloat firstSceneX = firstSceneFrame.origin.x + point.x;
+        if (firstSceneX < self.firstSceneBeginX || firstSceneX > self.firstSceneMaxX) {
+            return;
+        }
+        firstSceneFrame.origin.x = firstSceneX;
         self.firstScene.frame = firstSceneFrame;
         
         // second scene
         CGRect secondSceneFrame = self.secondScene.frame;
-        secondSceneFrame.origin.x += point.x / 3.0;
+        CGFloat secondSceneX = secondSceneFrame.origin.x + point.x / 3.0;
+        if (secondSceneX < self.secondSceneMinX || secondSceneX > self.secondSceneMaxX) {
+            return;
+        }
+        secondSceneFrame.origin.x = secondSceneX;
         self.secondScene.frame = secondSceneFrame;
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
         CGPoint velocity = [gesture velocityInView:gesture.view];
@@ -90,8 +111,8 @@
         
         [self.secondScene setStatus:RNNativeSceneStatusDidFocus];
         
-        if (self.primaryScene) {
-            [self.primaryScene.superview sendSubviewToBack:self.primaryScene];
+        if (self.coverView) {
+            self.coverView.layer.zPosition = self.coverViewOriginZPosition;
         }
     }];
 }
@@ -119,8 +140,8 @@
         [self.firstScene setStatus:RNNativeSceneStatusDidFocus];
         [self.secondScene setStatus:RNNativeSceneStatusDidBlur];
         
-        if (self.primaryScene) {
-            [self.primaryScene.superview sendSubviewToBack:self.primaryScene];
+        if (self.coverView) {
+            self.coverView.layer.zPosition = self.coverViewOriginZPosition;
         }
     }];
 }

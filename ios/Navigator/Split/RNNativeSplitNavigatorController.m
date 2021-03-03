@@ -42,17 +42,19 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    NSArray<RNNativeScene *> *currentScenes = [self.dataSource getCurrentScenes];
-    BOOL split = [self.dataSource isSplit];
-    if (currentScenes.count < (split ? 3 : 2)) {
+    __block NSArray<RNNativeScene *> *targetScenes = nil;;
+    [self computePanInfoWithGestureRecognizer:gestureRecognizer completion:^(NSArray<RNNativeScene *> *theTargetScenes, __kindof UIView *coverView) {
+        targetScenes = theTargetScenes;
+    }];
+    if (targetScenes.count < 2) {
         return NO;
     }
-    RNNativeScene *topScene = currentScenes.lastObject;
+    RNNativeScene *topScene = targetScenes.lastObject;
     if (!topScene.gestureEnabled) {
         return NO;
     }
-    CGPoint location = [gestureRecognizer locationInView:self.view];
     CGFloat topSceneMinX = CGRectGetMinX(topScene.frame);
+    CGPoint location = [gestureRecognizer locationInView:self.view];
     if (location.x < topSceneMinX || location.x > topSceneMinX + 120) {
         return NO;
     }
@@ -61,32 +63,79 @@
 
 #pragma mark - UIPanGestureRecognizer - Action
 
-- (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture {
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        NSArray<RNNativeScene *> *currentScenes = [self.dataSource getCurrentScenes];
-        NSInteger count = currentScenes.count;
+- (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        __block NSArray<RNNativeScene *> *targetScenes = nil;
+        __block UIView *coverView = nil;
+        [self computePanInfoWithGestureRecognizer:gestureRecognizer completion:^(NSArray<RNNativeScene *> *theTargetScenes, __kindof UIView *theCoverView) {
+            targetScenes = theTargetScenes;
+            coverView = theCoverView;
+        }];
+        
+        NSInteger count = targetScenes.count;
         if (count < 2) {
             return;
         }
-        RNNativeScene *firstScene = currentScenes[count - 1];
-        RNNativeScene *secondScene = currentScenes[count - 2];
+        
+        RNNativeScene *firstScene = targetScenes[count - 1];
+        RNNativeScene *secondScene = targetScenes[count - 2];
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
         self.panGestureHandler.firstScene = firstScene;
         self.panGestureHandler.secondScene = secondScene;
-        if ([self.dataSource isSplit]) {
-            self.panGestureHandler.primaryScene = currentScenes[0];
-        }
+        self.panGestureHandler.coverView = coverView;
         __weak typeof(self) weakSelf = self;
         self.panGestureHandler.didGoBack = ^{
             [weakSelf.delegate didRemoveController:firstScene.controller];
         };
     }
-    [self.panGestureHandler panWithGestureRecognizer:gesture];
-    if (gesture.state == UIGestureRecognizerStateEnded
-        || gesture.state == UIGestureRecognizerStateCancelled
-        || gesture.state == UIGestureRecognizerStateFailed) {
+    [self.panGestureHandler panWithGestureRecognizer:gestureRecognizer];
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded
+        || gestureRecognizer.state == UIGestureRecognizerStateCancelled
+        || gestureRecognizer.state == UIGestureRecognizerStateFailed) {
         self.panGestureHandler = nil;
     }
+}
+
+#pragma mark - Private
+
+- (void)computePanInfoWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer completion:(void (^ __nonnull)(NSArray<RNNativeScene *> * __nonnull targetScenes, __kindof UIView * __nullable coverView))completion {
+    CGPoint location = [gestureRecognizer locationInView:self.view];
+    NSArray<RNNativeScene *> *currentScenes = [self.dataSource getCurrentScenes];
+    
+    NSArray<RNNativeScene *> *targetScenes;
+    UIView *coverView = nil;
+    if ([self.dataSource isSplit]) {
+        NSMutableArray<RNNativeScene *> *primaryScenes = [NSMutableArray array];
+        NSMutableArray<RNNativeScene *> *secondaryScenes = [NSMutableArray array];
+        for (RNNativeScene *scene in currentScenes) {
+            if (scene.splitPrimary) {
+                [primaryScenes addObject:scene];
+            } else {
+                [secondaryScenes addObject:scene];
+            }
+        }
+        if ([self.dataSource isSplitFullScreen]) {
+            if (secondaryScenes.count) {
+                targetScenes = secondaryScenes;
+            } else {
+                targetScenes = primaryScenes;
+            }
+        } else {
+            if (location.x > [self.dataSource getPrimarySceneWidth]) {
+                targetScenes = secondaryScenes;
+            } else {
+                targetScenes = primaryScenes;
+            }
+        }
+        if (targetScenes == primaryScenes) {
+            coverView = secondaryScenes.count > 0 ? secondaryScenes.lastObject : [self.dataSource getSplitPlaceholder];
+        } else {
+            coverView = primaryScenes.lastObject;
+        }
+    } else {
+        targetScenes = currentScenes;
+    }
+    completion(targetScenes, coverView);
 }
 
 @end

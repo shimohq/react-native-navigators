@@ -31,10 +31,18 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
 - (void)didUpdateChildren;
 
 /**
+ 子类重写
+ */
+- (void)updateSceneWithCurrentScenes:(NSArray<RNNativeScene *> *)currentScenes
+                          NextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                           comoplete:(RNNativeNavigatorUpdateCompleteBlock)comoplete;
+
+/**
  子类必须实现
  */
 - (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
+                    currentScenes:(NSArray<RNNativeScene *> *)currentScenes
                        nextScenes:(NSArray<RNNativeScene *> *)nextScenes
                     removedScenes:(NSArray<RNNativeScene *> *)removedScenes
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes

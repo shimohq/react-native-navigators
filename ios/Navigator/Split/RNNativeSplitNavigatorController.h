@@ -20,7 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RNNativeSplitNavigatorControllerDataSource <NSObject>
 
 - (BOOL)isSplit;
+- (BOOL)isSplitFullScreen;
+- (CGFloat)getPrimarySceneWidth;
 - (NSArray<RNNativeScene *> *)getCurrentScenes;
+- (__kindof UIView *)getSplitPlaceholder;
 
 @end
 

@@ -4,16 +4,16 @@
 
 @protocol RNNativeSceneShadowViewDelegate <NSObject>
 
-- (void)didSplitFullScrennChanged:(RNNativeSceneShadowView *)sceneShadowView;
+- (void)didSplitPrimaryChanged:(RNNativeSceneShadowView *)sceneShadowView;
 
 @end
 
 @interface RNNativeSceneShadowView : RCTShadowView
 
 /**
- 分屏模式是否全屏显示
+ 分屏模式是否显示在左边的主屏幕
  */
-@property (nonatomic, assign) BOOL splitFullScreen;
+@property (nonatomic, assign) BOOL splitPrimary;
 
 /**
  Whether in StackNavigator

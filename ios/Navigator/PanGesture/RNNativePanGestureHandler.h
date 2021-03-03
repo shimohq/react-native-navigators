@@ -15,10 +15,7 @@ typedef void (^RNNativePanGestureHandlerDidGoBackBlock)(void);
 
 @interface RNNativePanGestureHandler : NSObject
 
-/**
- only for split mode
- */
-@property (nonatomic, weak) RNNativeScene *primaryScene;
+@property (nonatomic, weak) UIView *coverView;
 @property (nonatomic, weak) RNNativeScene *firstScene;
 @property (nonatomic, weak) RNNativeScene *secondScene;
 @property (nonatomic, copy) RNNativePanGestureHandlerDidGoBackBlock didGoBack;

@@ -6,8 +6,8 @@ import { NativeSplitNavigatorOptionsContext } from 'react-native-navigators';
 import styles from '../styles';
 
 export default function SplitSecondary(props: NavigationInjectedProps) {
-  const [fullscreen, setFullscreen] = useState(false);
-  const { setOptions } = useContext(NativeSplitNavigatorOptionsContext);
+  const { options: { isSplitFullScreen }, setOptions } = useContext(NativeSplitNavigatorOptionsContext);
+  const [fullscreen, setFullscreen] = useState(isSplitFullScreen ?? false);
 
   useEffect(() => {
     setOptions({

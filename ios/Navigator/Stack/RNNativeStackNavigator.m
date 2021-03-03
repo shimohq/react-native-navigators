@@ -83,13 +83,14 @@
  */
 - (void)updateSceneWithTransition:(RNNativeSceneTransition)transition
                            action:(RNNativeStackNavigatorAction)action
+                    currentScenes:(NSArray<RNNativeScene *> *)currentScenes
                        nextScenes:(NSArray<RNNativeScene *> *)nextScenes
                     removedScenes:(NSArray<RNNativeScene *> *)removedScenes
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     BOOL hasAnimation = transition != RNNativeSceneTransitionNone && action != RNNativeStackNavigatorActionNone;
-    beginTransition(!hasAnimation, nil);
+    beginTransition(!hasAnimation);
     
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeScene *scene in nextScenes) {
@@ -108,11 +109,11 @@
                 [_controller setViewControllers:willShowViewControllers animated:NO];
             }
         } else { // 隐藏
-            if (self.currentScenes.count) {
+            if (currentScenes.count) {
                 // INFO: fix https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/9459c34c470c7aa1be4bab8c93777ea9
                 // https://console.firebase.google.com/project/shimo-ios/crashlytics/app/ios:chuxin.shimo.wendang.2014/issues/24bb183291e800bef919893f22702bd5
                 // scene.controller 可能已经被释放。
-                UIViewController *lastController = [self.currentScenes lastObject].controller;
+                UIViewController *lastController = [currentScenes lastObject].controller;
                 if (lastController) {
                     NSMutableArray<UIViewController *> *newControllers = [NSMutableArray arrayWithArray:willShowViewControllers];
                     [newControllers addObject:lastController];
@@ -128,7 +129,7 @@
     } else { // 无动画
         [_controller setViewControllers:willShowViewControllers animated:NO];
     }
-    endTransition(!hasAnimation, nil);
+    endTransition(!hasAnimation);
 }
 
 @end

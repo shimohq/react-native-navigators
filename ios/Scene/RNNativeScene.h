@@ -17,9 +17,6 @@
 - (void)needUpdateForScene:(RNNativeScene *)scene;
 - (BOOL)isDismissedForScene:(RNNativeScene *)scene;
 
-@optional
-- (void)didFullScreenChangedWithScene:(RNNativeScene *)scene;
-
 @end
 
 @interface RNNativeScene : RCTView <RCTInvalidating>
@@ -90,10 +87,9 @@
 @property (nonatomic, assign) BOOL statusBarHidden;
 
 /**
- 分屏模式是否全屏显示
- 只有 Split Card 模式的 scene 支持
+ 分屏模式是否显示在左边的主屏幕
  */
-@property (nonatomic, assign) BOOL splitFullScreen;
+@property (nonatomic, assign) BOOL splitPrimary;
 
 /**
  Whether enable ViewController life cycle to update status

@@ -13,6 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) NSArray<NSDictionary *> *splitRules;
 
+/**
+ 右边屏幕是否全屏显示
+ */
+@property (nonatomic, assign) BOOL splitFullScreen;
+
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 
 @end
