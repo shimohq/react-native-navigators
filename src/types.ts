@@ -38,7 +38,7 @@ export type NativeNavigationRouterConfig =
       mode: NativeNavigatorModes.Card | NativeNavigatorModes.Stack;
       headerMode?: NativeNavigatorHeaderModes;
       initialRouteName?: string;
-      defaultScreenOptions?: NavigationScreenConfig<
+      defaultNavigationOptions?: NavigationScreenConfig<
         NativeNavigationOptions,
         any
       >;
@@ -49,8 +49,11 @@ export interface NativeSplitNavigationRouterConfig {
   mode: NativeNavigatorModes.Split;
   headerMode?: NativeNavigatorHeaderModes;
   initialRouteName?: string;
-  defaultScreenOptions?: NavigationScreenConfig<NativeNavigationOptions, any>;
-  defaultNavigatorOptions?: NativeNavigationSplitOptions;
+  defaultNavigationOptions?: NavigationScreenConfig<
+    NativeNavigationOptions,
+    any
+  >;
+  defaultContextOptions?: NativeNavigationSplitOptions;
 }
 
 export interface NativeNavigationSplitOptions {

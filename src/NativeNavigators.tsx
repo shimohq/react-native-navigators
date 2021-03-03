@@ -154,7 +154,7 @@ export default class NativeNavigators extends PureComponent<
     if (navigationConfig.mode === NativeNavigatorModes.Split) {
       return (
         <NativeSplitNavigatorOptionsWrapper
-          options={navigationConfig.defaultNavigatorOptions}
+          options={navigationConfig.defaultContextOptions}
         >
           {options => (
             <NativeSplitNavigator options={options}>

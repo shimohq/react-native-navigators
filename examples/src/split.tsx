@@ -25,7 +25,7 @@ const SplitNavigator = createSplitNavigator({
   secondary2: SplitSecondary,
 }, {
   initialRouteName: 'index',
-  defaultNavigatorOptions: {
+  defaultContextOptions: {
     splitRules: [
       {
         navigatorWidthRange: [SplitNavigatorMinWidth],
