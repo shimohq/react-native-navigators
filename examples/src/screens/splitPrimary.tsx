@@ -34,7 +34,6 @@ function SplitPrimary(props: NavigationInjectedProps) {
 }
 
 SplitPrimary.navigationOptions = {
-  isSplitPrimary: true,
   transition: NativeNavigatorTransitions.SlideFromRight
 };
 
