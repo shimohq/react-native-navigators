@@ -154,13 +154,6 @@
 - (void)updateSceneWithCurrentScenes:(NSArray<RNNativeScene *> *)currentScenes
                           NextScenes:(NSArray<RNNativeScene *> *)nextScenes
                            comoplete:(nonnull RNNativeNavigatorUpdateCompleteBlock)comoplete {
-    // update viewControllers
-    NSMutableArray *viewControllers = [NSMutableArray array];
-    for (RNNativeScene *scene in nextScenes) {
-        [viewControllers addObject:scene.controller];
-    }
-    [_viewControllers setArray:viewControllers];
-    
     if (self.split) {
         NSMutableArray *currentPrimaryScenes = [NSMutableArray array];
         NSMutableArray *nextPrimaryScenes = [NSMutableArray array];
@@ -194,6 +187,13 @@
     } else {
         [super updateSceneWithCurrentScenes:currentScenes NextScenes:nextScenes comoplete:comoplete];
     }
+    
+    // update viewControllers
+    NSMutableArray *viewControllers = [NSMutableArray array];
+    for (RNNativeScene *scene in nextScenes) {
+        [viewControllers addObject:scene.controller];
+    }
+    [_viewControllers setArray:viewControllers];
 }
 
 /**
@@ -208,6 +208,26 @@
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
+    
+    // 分栏模式，右边屏幕
+    // 第一个场景显示、最后的场景退出的时候需要有动画
+    if (self.split) {
+        if (currentScenes.count == 0 && nextScenes.count > 0) {
+            // 第一个场景显示
+            RNNativeScene *scene = nextScenes.lastObject;
+            if (!scene.splitPrimary) {
+                action = RNNativeStackNavigatorActionShow;
+                transition = scene.transition;
+            }
+        } else if (nextScenes.count == 0 && currentScenes.count > 0) {
+            // 最后的场景退出
+            RNNativeScene *scene = currentScenes.lastObject;
+            if (!scene.splitPrimary) {
+                action = RNNativeStackNavigatorActionHide;
+                transition = scene.transition;
+            }
+        }
+    }
     
     // nextTopScene 用于进场动画
     NSInteger nextTopSceneIndex = nextScenes.count - 1;
