@@ -4,7 +4,7 @@ import { NavigationInjectedProps } from 'react-navigation';
 
 import styles from '../styles';
 
-function SplitIndex(props: NavigationInjectedProps) {
+export default function SplitIndex(props: NavigationInjectedProps) {
   return (
     <View style={{ flex: 1, borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Index Scene</Text>
@@ -35,10 +35,3 @@ function SplitIndex(props: NavigationInjectedProps) {
     </View>
   );
 }
-
-SplitIndex.navigationOptions = {
-  isSplitPrimary: true
-};
-
-
-export default SplitIndex;

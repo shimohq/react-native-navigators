@@ -158,7 +158,19 @@ export default class NativeNavigators extends PureComponent<
         >
           {options => (
             <NativeSplitNavigator options={options}>
-              {scenes}
+              <NativeScenes
+                splitPrimaryRouteNames={options.splitPrimaryRouteNames}
+                mode={navigationConfig.mode}
+                headerMode={navigationConfig.headerMode}
+                routes={routes}
+                descriptors={descriptors}
+                navigation={navigation}
+                screenProps={screenProps}
+                onOpenRoute={this.handleOpenRoute}
+                onCloseRoute={this.handleCloseRoute}
+                onDismissRoute={this.handleDismissRoute}
+                closingRouteKey={closingRouteKey}
+              />
             </NativeSplitNavigator>
           )}
         </NativeSplitNavigatorOptionsWrapper>

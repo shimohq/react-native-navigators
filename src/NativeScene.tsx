@@ -14,6 +14,7 @@ import NativeStackSceneContainer from './NativeStackSceneContainer';
 
 export interface NativeSceneProps {
   closing: boolean;
+  isSplitPrimary: boolean;
   descriptor: NativeNavigationDescriptor;
   route: NavigationRoute<NavigationParams>;
   screenProps?: unknown;
@@ -34,6 +35,7 @@ export default memo(function NativeScene(props: NativeSceneProps) {
     route,
     descriptor,
     closing,
+    isSplitPrimary,
     mode,
     screenProps,
     onDidFocus,
@@ -69,10 +71,10 @@ export default memo(function NativeScene(props: NativeSceneProps) {
           ? options.transition || NativeNavigatorTransitions.Default
           : NativeNavigatorTransitions.None
       }
+      isSplitPrimary={isSplitPrimary}
       gestureEnabled={options.gestureEnabled !== false}
       translucent={options.translucent === true}
       transparent={options.transparent === true}
-      isSplitPrimary={options.isSplitPrimary === true}
       style={options.cardStyle}
       statusBarStyle={options.statusBarStyle}
       statusBarHidden={options.statusBarHidden}
