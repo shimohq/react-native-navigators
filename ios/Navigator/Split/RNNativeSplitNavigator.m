@@ -11,6 +11,7 @@
 #import "RNNativeSplitPlaceholder.h"
 #import "RNNativeSplitRule.h"
 #import "RNNativeSplitUtils.h"
+#import "RNNativeTransitionUtils.h"
 
 #import <React/RCTShadowView.h>
 #import <React/RCTRootShadowView.h>
@@ -256,29 +257,85 @@
     }
     
     // transition
+    // 无动画
     CGRect nextTopSceneEndFrame = [self getEndFrameWithScene:nextTopScene];
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
         nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES);
-    } else if (action == RNNativeStackNavigatorActionShow) {
+        return;
+    }
+    
+    // 有动画
+    // 分栏模式动画开始前要把另外一边最顶层的 view 置顶，动画结束后还原
+    UIView *coverView = nil;
+    if (self.split) {
+        RNNativeScene *scene = nextScenes.lastObject ?: currentScenes.lastObject;
+        for (RNNativeScene *otherScene in self.currentScenes.reverseObjectEnumerator) {
+            if (scene.splitPrimary != otherScene.splitPrimary) {
+                coverView = otherScene;
+                break;
+            }
+        }
+        if (!coverView && scene.splitPrimary) {
+            coverView = self.splitPlaceholder;
+        }
+    }
+    
+    if (action == RNNativeStackNavigatorActionShow) {
+        CGRect currentTopSceneOriginalFrame = currentTopScene.frame;
+        CGRect currentTopSceneEndFrame = [RNNativeTransitionUtils getDownViewFrameWithView:currentTopScene transition:transition];
+        
+        CGFloat coverViewOriginalZPosition = coverView.layer.zPosition;
+        coverView.layer.zPosition = 1000;
+        
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             nextTopScene.frame = nextTopSceneEndFrame;
+            currentTopScene.frame = currentTopSceneEndFrame;
         } completion:^(BOOL finished) {
             if (!finished) {
                 nextTopScene.frame = nextTopSceneEndFrame;
             }
+            currentTopScene.frame = currentTopSceneOriginalFrame;
+            
+            coverView.layer.zPosition = coverViewOriginalZPosition;
+            
             [nextTopScene setStatus:RNNativeSceneStatusDidFocus];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
         }];
-    } else if (action == RNNativeStackNavigatorActionHide) {
+        return;
+    }
+    
+    if (action == RNNativeStackNavigatorActionHide) {
+        if (!currentTopScene.controller || [self isDismissedForViewController:currentTopScene.controller]) {
+            [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            endTransition(YES);
+            return;
+        }
+        
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
+        
+        NSInteger currentSecondSceneIndex = currentScenes.count - 2;
+        RNNativeScene *currentSecondScene = currentSecondSceneIndex >= 0 ? currentScenes[currentSecondSceneIndex] : nil;
+        CGRect currentSecondSceneOriginalFrame = currentSecondScene.frame;
+        currentSecondScene.frame = [RNNativeTransitionUtils getDownViewFrameWithView:currentSecondScene transition:transition];
+        
+        CGFloat coverViewOriginalZPosition = coverView.layer.zPosition;
+        coverView.layer.zPosition = 1000;
+        
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [self getBeginFrameWithScene:currentTopScene
                                                       transition:transition];
+            currentSecondScene.frame = currentSecondSceneOriginalFrame;
         } completion:^(BOOL finished) {
+            if (!finished) {
+                currentSecondScene.frame = currentSecondSceneOriginalFrame;
+            }
+            
+            coverView.layer.zPosition = coverViewOriginalZPosition;
+            
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
         }];
