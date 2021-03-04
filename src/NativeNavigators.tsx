@@ -94,12 +94,12 @@ export default class NativeNavigators extends PureComponent<
     screenProps: undefined
   };
 
-  private handleOpenRoute = (route: NavigationRoute) => {
-    this.handleTransitionComplete(route);
+  private handleOpenRoute = () => {
+    this.handleTransitionComplete();
   };
 
   private handleCloseRoute = (route: NavigationRoute) => {
-    this.handleTransitionComplete(route);
+    this.handleTransitionComplete();
 
     this.setState({
       closingRouteKey: null,
@@ -107,7 +107,7 @@ export default class NativeNavigators extends PureComponent<
     });
   };
 
-  private handleTransitionComplete = (route: NavigationRoute) => {
+  private handleTransitionComplete = () => {
     const { navigation } = this.props;
     const { state } = navigation;
     if (state.isTransitioning) {
