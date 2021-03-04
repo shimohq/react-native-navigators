@@ -271,14 +271,23 @@
     UIView *coverView = nil;
     if (self.split) {
         RNNativeScene *scene = nextScenes.lastObject ?: currentScenes.lastObject;
-        for (RNNativeScene *otherScene in self.currentScenes.reverseObjectEnumerator) {
-            if (scene.splitPrimary != otherScene.splitPrimary) {
-                coverView = otherScene;
-                break;
+        if (scene.splitPrimary) {
+            for (RNNativeScene *otherScene in self.currentScenes.reverseObjectEnumerator) {
+                if (!otherScene.splitPrimary) {
+                    coverView = otherScene;
+                    break;
+                }
             }
-        }
-        if (!coverView && scene.splitPrimary) {
-            coverView = self.splitPlaceholder;
+            if (!coverView) {
+                coverView = self.splitPlaceholder;
+            }
+        } else if (!self.splitFullScreen) {
+            for (RNNativeScene *otherScene in self.currentScenes.reverseObjectEnumerator) {
+                if (otherScene.splitPrimary) {
+                    coverView = otherScene;
+                    break;
+                }
+            }
         }
     }
     
@@ -339,6 +348,41 @@
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
         }];
+    }
+}
+
+- (void)addScene:(RNNativeScene *)scene {
+    if (self.split && scene.splitPrimary) {
+        RNNativeScene *bottomSecondaryScene = nil;
+        for (UIView *view in self.viewController.view.subviews) {
+            if ([view isKindOfClass:[RNNativeScene class]]) {
+                RNNativeScene *scene = (RNNativeScene *)view;
+                if (!scene.splitPrimary) {
+                    bottomSecondaryScene = scene;
+                    break;
+                }
+            }
+        }
+        if (bottomSecondaryScene) {
+            UIView *superView = [scene superview];
+            if (superView) {
+                [scene removeFromSuperview];
+            }
+            UIViewController *parentViewController = [scene.controller parentViewController];
+            if (parentViewController && parentViewController != self.viewController) {
+                [scene.controller removeFromParentViewController];
+                parentViewController = nil;
+            }
+            
+            if (!parentViewController) {
+                [self.viewController addChildViewController:scene.controller];
+            }
+            [self.viewController.view insertSubview:scene belowSubview:bottomSecondaryScene];
+        } else {
+            [super addScene:scene];
+        }
+    } else {
+        [super addScene:scene];
     }
 }
 
