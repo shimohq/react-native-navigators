@@ -1,5 +1,9 @@
 import React, { memo, createContext, useContext } from 'react';
-import { NavigationRoute, NavigationParams } from 'react-navigation';
+import {
+  NavigationRoute,
+  NavigationParams,
+  NavigationContext
+} from 'react-navigation';
 
 import {
   NativeNavigationDescriptor,
@@ -94,7 +98,9 @@ export default memo(function NativeScene(props: NativeSceneProps) {
           />
         </NativeNavigationClosingStateContext.Provider>
         {headerMode === NativeNavigatorHeaderModes.Auto ? (
-          <NativeHeader options={options} route={route} />
+          <NavigationContext.Provider value={navigation}>
+            <NativeHeader options={options} route={route} />
+          </NavigationContext.Provider>
         ) : null}
       </NativeStackSceneContainer>
     </NativeStackScene>
