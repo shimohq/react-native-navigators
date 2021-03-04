@@ -10,6 +10,7 @@
 #import "RNNativeScene.h"
 #import "RNNativeCardNavigatorShadowView.h"
 #import "RNNativeSceneShadowView.h"
+#import "RNNativeTransitionUtils.h"
 
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
@@ -20,6 +21,7 @@
 
 #import "RNNativeBaseNavigator+Layout.h"
 #import "UIView+RNNativeNavigator.h"
+
 
 @interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate, RNNativeCardNavigatorControllerDataSource>
 
@@ -116,23 +118,44 @@
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES);
     } else if (action == RNNativeStackNavigatorActionShow) {
+        CGRect currentTopSceneOriginalFrame = currentTopScene.frame;
+        CGRect currentTopSceneEndFrame = [RNNativeTransitionUtils getDownViewFrameWithView:currentTopScene transition:transition];
+        
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             nextTopScene.frame = nextTopSceneEndFrame;
+            currentTopScene.frame = currentTopSceneEndFrame;
         } completion:^(BOOL finished) {
             if (!finished) {
                 nextTopScene.frame = nextTopSceneEndFrame;
             }
+            currentTopScene.frame = currentTopSceneOriginalFrame;
             [nextTopScene setStatus:RNNativeSceneStatusDidFocus];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
+        if (!currentTopScene.controller || [self isDismissedForViewController:currentTopScene.controller]) {
+            [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            endTransition(YES);
+            return;
+        }
+        
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
+        
+        NSInteger currentSecondSceneIndex = currentScenes.count - 2;
+        RNNativeScene *currentSecondScene = currentSecondSceneIndex >= 0 ? currentScenes[currentSecondSceneIndex] : nil;
+        CGRect currentSecondSceneOriginalFrame = currentSecondScene.frame;
+        currentSecondScene.frame = [RNNativeTransitionUtils getDownViewFrameWithView:currentSecondScene transition:transition];
+        
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [self getBeginFrameWithScene:currentTopScene
                                                       transition:transition];
+            currentSecondScene.frame = currentSecondSceneOriginalFrame;
         } completion:^(BOOL finished) {
+            if (!finished) {
+                currentSecondScene.frame = currentSecondSceneOriginalFrame;
+            }
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
         }];

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Text, View, Switch, TouchableOpacity } from 'react-native';
 import { NavigationInjectedProps } from 'react-navigation';
-import { NativeSplitNavigatorOptionsContext } from 'react-native-navigators';
+import { NativeNavigatorTransitions, NativeSplitNavigatorOptionsContext } from 'react-native-navigators';
 
 import styles from '../styles';
 
-export default function SplitSecondary(props: NavigationInjectedProps) {
+const SecondaryPrimary = function SplitSecondary(props: NavigationInjectedProps) {
   const { options: { isSplitFullScreen }, setOptions } = useContext(NativeSplitNavigatorOptionsContext);
   const [fullscreen, setFullscreen] = useState(isSplitFullScreen ?? false);
 
@@ -34,3 +34,8 @@ export default function SplitSecondary(props: NavigationInjectedProps) {
   );
 }
 
+SecondaryPrimary.navigationOptions = {
+  transition: NativeNavigatorTransitions.SlideFromRight
+};
+
+export default SecondaryPrimary;
