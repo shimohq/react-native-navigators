@@ -102,13 +102,23 @@
                                                                                          springDamping:0.0
                                                                                        initialVelocity:0.0
                                                                                          animationType:RCTAnimationTypeEaseInEaseOut];
-    RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {}];
+    RCTLayoutAnimationGroup *layoutAnimationGroup = [[RCTLayoutAnimationGroup alloc] initWithCreatingLayoutAnimation:nil updatingLayoutAnimation:layoutAnimation deletingLayoutAnimation:nil callback:^(NSArray *response) {
+        // 最顶层场景动画结束后更新其它场景
+        [self updateSubShadowViews];
+    }];
     RCTExecuteOnMainQueue(^{
         [self.bridge.uiManager setNextLayoutAnimationGroup:layoutAnimationGroup];
     });
     
-    // 最顶层场景动画结束后更新其它场景
-    [self updateSubShadowViews];
+    // 最顶层场景播放动画
+    for (RCTShadowView *shadowView in self.reactSubviews.reverseObjectEnumerator) {
+       if ([shadowView isKindOfClass:[RNNativeSceneShadowView class]]) {
+           RNNativeSceneShadowView *sceneShadowView = (RNNativeSceneShadowView *)shadowView;
+           if (!sceneShadowView.splitPrimary) {
+               [self updateSceneShadowView:sceneShadowView];
+           }
+        }
+    }
 }
 
 #pragma mark - Setter - Compute Result
