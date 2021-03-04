@@ -109,10 +109,12 @@ export default class NativeNavigators extends PureComponent<
 
   private handleTransitionComplete = (route: NavigationRoute) => {
     const { navigation } = this.props;
-
-    if (navigation.state.isTransitioning) {
+    const { state } = navigation;
+    if (state.isTransitioning) {
       navigation.dispatch(
-        StackActions.completeTransition({ toChildKey: route.key })
+        StackActions.completeTransition({
+          toChildKey: state.routes[state.index]?.key
+        })
       );
     }
   };

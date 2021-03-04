@@ -68,7 +68,7 @@ export default memo(function NativeScene(props: NativeSceneProps) {
       key={key}
       transition={
         navigation.dangerouslyGetParent()?.state?.isTransitioning
-          ? options.transition || NativeNavigatorTransitions.Default
+          ? options.transition ?? NativeNavigatorTransitions.Default
           : NativeNavigatorTransitions.None
       }
       isSplitPrimary={isSplitPrimary}
