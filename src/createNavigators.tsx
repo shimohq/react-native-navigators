@@ -1,11 +1,8 @@
-import {
-  createNavigator,
-  StackRouter,
-  NavigationRouteConfigMap
-} from 'react-navigation';
+import { createNavigator, NavigationRouteConfigMap } from 'react-navigation';
 
 import NativeNavigators from './NativeNavigators';
 import SplitRouter from './SplitRouter';
+import StackRouter from './StackRouter';
 import {
   NativeNavigationRouterConfig,
   NativeSplitNavigationRouterConfig,

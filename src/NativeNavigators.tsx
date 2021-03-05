@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react';
-import {
-  NavigationRoute,
-  StackActions,
-  NavigationActions
-} from 'react-navigation';
+import { NavigationRoute } from 'react-navigation';
 
+import { StackActions } from './StackActions';
 import {
   NativeNavigatorsProps,
   NativeNavigationDescriptorMap,
@@ -150,11 +147,7 @@ export default class NativeNavigators extends PureComponent<
       propRoutes: propRoutes.filter(r => r.key !== route.key)
     });
 
-    navigation.dispatch({
-      type: NavigationActions.BACK,
-      key: route.key,
-      immediate: true
-    });
+    navigation.dispatch(StackActions.remove({ key: route.key }) as any);
   };
 
   public render() {

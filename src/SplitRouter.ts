@@ -1,5 +1,4 @@
 import {
-  StackRouter,
   NavigationRouter,
   NavigationRouteConfigMap,
   NavigationTabRouterConfig,
@@ -8,6 +7,7 @@ import {
   NavigationState
 } from 'react-navigation';
 
+import StackRouter from './StackRouter';
 import { NativeNavigationRouterConfig } from './types';
 
 export default function SplitRouter(
@@ -19,8 +19,8 @@ export default function SplitRouter(
 
   stackRouter.getStateForAction = (
     action: NavigationAction,
-    state: NavigationState
-  ) => {
+    state: NavigationState | undefined
+  ): NavigationState | null => {
     if (state) {
       if (action.type === NavigationActions.NAVIGATE) {
         const newState: NavigationState | null = getStateForAction(

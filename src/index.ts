@@ -4,3 +4,4 @@ export { NativeNavigationClosingStateContext } from './NativeScene';
 export { NativeSplitNavigatorOptionsContext } from './NativeSplitNavigatorOptionsWrapper';
 export * from './splitNavigatorRules';
 export * from './types';
+export * from './overrides';
