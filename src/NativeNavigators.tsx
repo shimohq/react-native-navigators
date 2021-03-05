@@ -19,7 +19,7 @@ import NativeScenes from './NativeScenes';
 interface NativeStackScenesState {
   propRoutes: NavigationRoute[];
   routes: NavigationRoute[];
-  closingRouteKey: string | null;
+  closingRoutes: { [key: string]: boolean };
   descriptors: NativeNavigationDescriptorMap;
   screenProps: unknown;
 }
@@ -41,34 +41,48 @@ export default class NativeNavigators extends PureComponent<
       return null;
     }
 
-    let routes =
-      navigation.state.index < navigation.state.routes.length - 1
-        ? // Remove any extra routes from the state
-          // The last visible route should be the focused route, i.e. at current index
-          navigation.state.routes.slice(0, navigation.state.index + 1)
-        : navigation.state.routes;
-    const routeKeys: string[] = routes.map(route => route.key);
+    // Remove any extra routes from the state
+    // The last visible route should be the focused route, i.e. at current index
+    const propRoutes = navigation.state.routes.slice(
+      0,
+      navigation.state.index + 1
+    );
 
-    let { closingRouteKey } = state;
-    const previousFocusedRoute = state.routes[state.routes.length - 1] as
-      | NavigationRoute
-      | undefined;
-    const nextFocusedRoute = routes[routes.length - 1];
+    const propRouteKeys: Set<string> = new Set(
+      propRoutes.map(route => route.key)
+    );
 
-    if (closingRouteKey === previousFocusedRoute?.key) {
-      // During a closing transition, just update the routes state.
-      routes = [...routes, previousFocusedRoute];
-    } else if (
-      previousFocusedRoute &&
-      previousFocusedRoute.key !== nextFocusedRoute.key
-    ) {
-      // Should perform a closing transition, and keep the topmost scene in the routes state.
-      if (!routeKeys.includes(previousFocusedRoute.key as string)) {
-        routes = [...routes, previousFocusedRoute];
-        closingRouteKey = previousFocusedRoute.key;
+    const stateRoutes = state.routes;
+
+    const closingRoutes: { [key: string]: boolean } = {};
+
+    // 基于 prop routes 生成新的 routes 拷贝
+    // 该拷贝会包含当前 prop routes 和 closing routes，并交给 native 进行渲染和执行动画
+    const routes = propRoutes.slice();
+
+    for (let index = 0; index < stateRoutes.length; index++) {
+      const route = stateRoutes[index];
+      const { key } = route;
+
+      if (!propRouteKeys.has(key)) {
+        if (index > 0) {
+          // 获取在当前 route 前面的 route: routeBeforeIt
+          const routeBeforeIt = stateRoutes[index - 1];
+
+          // 将当前 route 在新数组中插入到 routeBeforeIt 后面
+          // 由于插入算法保证了 stateRoutes 前面遍历的 route 一定在 routes 中，所以 routeBeforeIt 一定可在 routes 里面找到.
+          const insertIndex =
+            routes.findIndex(r => r.key === routeBeforeIt.key) + 1;
+          routes.splice(insertIndex, 0, route);
+        } else {
+          routes.unshift(route);
+        }
+
+        // 当前 route 不在 propRouteKeys 中，表示当前 route 需要标记 closing ，交给 native 执行动画
+        // 当 native 动画完成后回调 onDidBlur 并标记 dismissed: true 通知组件删除 closing 完成的路由
+        closingRoutes[key] = true;
       }
     }
-
     const descriptors: NativeNavigationDescriptorMap = routes.reduce<
       NativeNavigationDescriptorMap
     >((acc, route) => {
@@ -79,9 +93,9 @@ export default class NativeNavigators extends PureComponent<
 
     return {
       descriptors,
-      closingRouteKey,
+      closingRoutes,
       routes,
-      propRoutes: navigation.state.routes,
+      propRoutes,
       screenProps
     };
   }
@@ -89,7 +103,7 @@ export default class NativeNavigators extends PureComponent<
   public state: NativeStackScenesState = {
     propRoutes: [],
     routes: [],
-    closingRouteKey: null,
+    closingRoutes: {},
     descriptors: {},
     screenProps: undefined
   };
@@ -100,9 +114,17 @@ export default class NativeNavigators extends PureComponent<
 
   private handleCloseRoute = (route: NavigationRoute) => {
     this.handleTransitionComplete();
+    let { closingRoutes } = this.state;
+
+    if (closingRoutes[route.key]) {
+      closingRoutes = {
+        ...closingRoutes,
+        [route.key]: false
+      };
+    }
 
     this.setState({
-      closingRouteKey: null,
+      closingRoutes,
       routes: this.state.routes.filter(r => r.key !== route.key)
     });
   };
@@ -137,7 +159,8 @@ export default class NativeNavigators extends PureComponent<
 
   public render() {
     const { navigation, navigationConfig } = this.props;
-    const { closingRouteKey, routes, descriptors, screenProps } = this.state;
+    const { closingRoutes, routes, descriptors, screenProps } = this.state;
+
     const scenes = (
       <NativeScenes
         mode={navigationConfig.mode}
@@ -149,7 +172,7 @@ export default class NativeNavigators extends PureComponent<
         onOpenRoute={this.handleOpenRoute}
         onCloseRoute={this.handleCloseRoute}
         onDismissRoute={this.handleDismissRoute}
-        closingRouteKey={closingRouteKey}
+        closingRoutes={closingRoutes}
       />
     );
 
@@ -171,7 +194,7 @@ export default class NativeNavigators extends PureComponent<
                 onOpenRoute={this.handleOpenRoute}
                 onCloseRoute={this.handleCloseRoute}
                 onDismissRoute={this.handleDismissRoute}
-                closingRouteKey={closingRouteKey}
+                closingRoutes={closingRoutes}
               />
             </NativeSplitNavigator>
           )}
