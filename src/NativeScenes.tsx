@@ -18,7 +18,7 @@ export interface NativeScenesProps extends NavigationInjectedProps {
   onOpenRoute: (route: NavigationRoute) => void;
   onCloseRoute: (route: NavigationRoute) => void;
   onDismissRoute: (route: NavigationRoute) => void;
-  closingRouteKey: string | null;
+  closingRoutes: { [key: string]: boolean };
 }
 
 export default class NativeScenes extends PureComponent<NativeScenesProps> {
@@ -29,7 +29,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
   private handleDidBlur = (route: NavigationRoute, dismissed: boolean) => {
     // If the scene has been removed from native side.
     if (dismissed) {
-      if (this.props.closingRouteKey === route.key) {
+      if (this.props.closingRoutes[route.key]) {
         // Handle close transition complete.
         this.props.onCloseRoute(route);
       } else {
@@ -45,7 +45,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
       descriptors,
       screenProps,
       mode,
-      closingRouteKey,
+      closingRoutes,
       headerMode,
       splitPrimaryRouteNames
     } = this.props;
@@ -60,7 +60,7 @@ export default class NativeScenes extends PureComponent<NativeScenesProps> {
             <NativeScene
               key={route.key}
               isSplitPrimary={splitPrimaryRouteSet.has(route.routeName)}
-              closing={closingRouteKey === route.key}
+              closing={closingRoutes[route.key]}
               descriptor={descriptor}
               route={route}
               screenProps={screenProps}
