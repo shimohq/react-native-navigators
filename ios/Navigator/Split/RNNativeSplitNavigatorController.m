@@ -46,10 +46,15 @@
     [self computePanInfoWithGestureRecognizer:gestureRecognizer completion:^(NSArray<RNNativeScene *> *theTargetScenes, __kindof UIView *coverView) {
         targetScenes = theTargetScenes;
     }];
-    if (targetScenes.count < 2) {
+    NSInteger count = targetScenes.count;
+    if (count < 1) {
         return NO;
     }
+    
     RNNativeScene *topScene = targetScenes.lastObject;
+    if (count < 2 && topScene.splitPrimary) {
+        return NO;
+    }
     if (!topScene.gestureEnabled) {
         return NO;
     }
@@ -73,15 +78,20 @@
         }];
         
         NSInteger count = targetScenes.count;
-        if (count < 2) {
+        if (count < 1) {
             return;
         }
         
         RNNativeScene *firstScene = targetScenes[count - 1];
-        RNNativeScene *secondScene = targetScenes[count - 2];
+        if (count < 2) {
+            if (firstScene.splitPrimary) {
+                return;
+            }
+        } else {
+            self.panGestureHandler.secondScene = targetScenes[count - 2];
+        }
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
         self.panGestureHandler.firstScene = firstScene;
-        self.panGestureHandler.secondScene = secondScene;
         self.panGestureHandler.coverView = coverView;
         __weak typeof(self) weakSelf = self;
         self.panGestureHandler.didGoBack = ^{
