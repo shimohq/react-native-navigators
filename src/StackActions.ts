@@ -17,8 +17,10 @@ export const remove = (
   key: payload.key
 });
 
-export const StackActions = {
+const StackActions = {
   ...OriginalStackActions,
-  REMOVE,
-  remove
+  remove,
+  REMOVE
 };
+
+export default StackActions;

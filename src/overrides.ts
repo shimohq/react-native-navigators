@@ -4,10 +4,7 @@ import {
   NavigationAction as OriginalNavigationAction
 } from 'react-navigation';
 
-import {
-  NavigationRemoveAction,
-  NavigationRemoveActionPayload
-} from './StackActions';
+import { NavigationRemoveAction } from './StackActions';
 
 export type NavigationStackAction =
   | OriginalNavigationStackAction
@@ -17,14 +14,6 @@ export type NavigationAction =
   | OriginalNavigationAction
   | NavigationRemoveAction;
 
-declare module 'react-navigation' {
-  export namespace StackActions {
-    export const REMOVE: 'Navigation/REMOVE';
-    export function remove(
-      payload: NavigationRemoveActionPayload
-    ): NavigationRemoveAction;
-  }
-}
-
-import * as StackActions from './StackActions';
+import StackActions from './StackActions';
+export * from './StackActions';
 export { StackActions };

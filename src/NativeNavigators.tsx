@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { NavigationRoute } from 'react-navigation';
 
-import { StackActions } from './StackActions';
+import StackActions from './StackActions';
 import {
   NativeNavigatorsProps,
   NativeNavigationDescriptorMap,
