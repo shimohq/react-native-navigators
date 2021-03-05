@@ -81,8 +81,8 @@ export default class NativeNavigators extends PureComponent<
 
       // 当前 route 不在 propRouteKeys 中，表示当前 route 需要标记 closing ，交给 native 执行动画
       // 当 native 动画完成后回调 onDidBlur 并标记 dismissed: true 通知组件删除 closing 完成的路由
-      if (!propRouteKeys.has(route.key)) {
-        closingRoutes[route.key] = true;
+      if (!propRouteKeys.has(key)) {
+        closingRoutes[key] = true;
       }
     }
     const descriptors: NativeNavigationDescriptorMap = routes.reduce<
