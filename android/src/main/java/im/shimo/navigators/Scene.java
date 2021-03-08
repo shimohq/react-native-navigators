@@ -84,19 +84,19 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-//    if (changed) {
-//      mRect.set(l, t, r, b);
-//      final ReactContext reactContext = (ReactContext) getContext();
-//      reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
-//    }
+    if (changed) {
+      mRect.set(l, t, r, b);
+      final ReactContext reactContext = (ReactContext) getContext();
+      reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
+    }
   }
 
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    mRect.set(0, 0, w, h);
-    final ReactContext reactContext = (ReactContext) getContext();
-    reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
+//    mRect.set(0, 0, w, h);
+//    final ReactContext reactContext = (ReactContext) getContext();
+//    reactContext.getNativeModule(UIManagerModule.class).setViewLocalData(getId(), mRect);
   }
 
   @Override

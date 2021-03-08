@@ -235,11 +235,7 @@ public class SplitScene extends SceneContainer {
       }
       markUpdated();
     } else if (mIsSplitMode == SPLIT_MODE_OFF) {
-      scene.setVisibility(INVISIBLE);
-      addView(scene, getChildCount());
-      mScenes.add(index, scene);
-      scene.setContainer(this);
-      markUpdated();
+      super.addScene(scene,index);
     }
     if (mIsSplitMode == SPLIT_MODE_INVALID) {
       markUpdated();
