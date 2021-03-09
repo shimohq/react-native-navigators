@@ -36,6 +36,9 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [splitPrimaryRouteNames, setSplitPrimaryRouteNames] = useState(
     () => options?.splitPrimaryRouteNames
   );
+  const [splitLineColor, setSplitLineColor] = useState(
+    () => options?.splitLineColor
+  );
 
   const setOptions = useCallback(
     (options: Partial<NativeNavigationSplitOptions>) => {
@@ -54,6 +57,10 @@ export default function NativeSplitNavigatorOptionsWrapper(
       if (options.hasOwnProperty('splitPrimaryRouteNames')) {
         setSplitPrimaryRouteNames(options.splitPrimaryRouteNames);
       }
+
+      if (options.hasOwnProperty('splitLineColor')) {
+        setSplitLineColor(options.splitLineColor);
+      }
     },
     []
   );
@@ -64,11 +71,18 @@ export default function NativeSplitNavigatorOptionsWrapper(
         isSplitFullScreen,
         splitRules,
         splitPlaceholder,
-        splitPrimaryRouteNames
+        splitPrimaryRouteNames,
+        splitLineColor
       },
       setOptions
     };
-  }, [isSplitFullScreen, splitRules, splitPlaceholder, splitPrimaryRouteNames]);
+  }, [
+    isSplitFullScreen,
+    splitRules,
+    splitPlaceholder,
+    splitPrimaryRouteNames,
+    splitLineColor
+  ]);
 
   return (
     <NativeSplitNavigatorOptionsContext.Provider value={value}>
