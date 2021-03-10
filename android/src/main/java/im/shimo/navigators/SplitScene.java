@@ -3,11 +3,14 @@ package im.shimo.navigators;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -35,10 +38,14 @@ public class SplitScene extends SceneContainer {
   private final InnerSceneContainer mPrimaryContainer;
   private final InnerSceneContainer mSecondaryContainer;
   private final ArrayList<Scene> mSceneList = new ArrayList<>();
+  @ColorInt
+  private int mSplitLineColor;
+  private Paint mPaint;
 
 
   public SplitScene(Context context) {
     super(context);
+    setWillNotDraw(false);
     mPrimaryContainer = new InnerSceneContainer(context);
     mSecondaryContainer = new InnerSceneContainer(context);
     addView(mPrimaryContainer);
@@ -66,7 +73,7 @@ public class SplitScene extends SceneContainer {
         } else {
           if (child == mPrimaryContainer) {
             child.measure(MeasureSpec.makeMeasureSpec(
-              mCurrentRule.primarySceneWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
+              mCurrentRule.primarySceneWidth - 1, MeasureSpec.EXACTLY), heightMeasureSpec);
           } else {
             int childWidth = getMeasuredWidth() - layoutParams.leftMargin - layoutParams.rightMargin
               - getPaddingLeft() - getPaddingRight() - mCurrentRule.primarySceneWidth;
@@ -79,6 +86,20 @@ public class SplitScene extends SceneContainer {
     }
   }
 
+  @Override
+  protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+    if (isSplitModeOn()) {
+      if (mPaint == null) {
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setColor(mSplitLineColor);
+        mPaint.setStrokeWidth(1.0f);
+      }
+      canvas.drawLine((getLeft() + mCurrentRule.primarySceneWidth), 0,
+        (getLeft() + mCurrentRule.primarySceneWidth), (getBottom()), mPaint);
+    }
+  }
 
   private void setSplitMode(boolean isSplitMode) {
     if (isSplitMode && isSplitModeOn()) {
@@ -211,8 +232,7 @@ public class SplitScene extends SceneContainer {
         if (isSplitModeOn()) {
           if (child == mSecondaryContainer) {
             LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
-            childLeft += mCurrentRule.primarySceneWidth + layoutParams.leftMargin
-              + layoutParams.rightMargin;
+            childLeft += mCurrentRule.primarySceneWidth + layoutParams.leftMargin;
           }
         }
         child.layout(childLeft, top, childLeft + childWidth, top + childHeight);
@@ -235,7 +255,7 @@ public class SplitScene extends SceneContainer {
       }
       markUpdated();
     } else if (mIsSplitMode == SPLIT_MODE_OFF) {
-      super.addScene(scene,index);
+      super.addScene(scene, index);
     }
     if (mIsSplitMode == SPLIT_MODE_INVALID) {
       markUpdated();
@@ -330,7 +350,6 @@ public class SplitScene extends SceneContainer {
       mCurrentRule = DEFAULT_RULE;
       isSplitMode = false;
     }
-
     setSplitMode(isSplitMode);
     if (mSplitPlaceholder != null) {
       mSplitPlaceholder.setVisibility(isSplitModeOn() ? VISIBLE : GONE);
@@ -391,6 +410,10 @@ public class SplitScene extends SceneContainer {
   @Override
   public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
     return new LayoutParams(getContext(), attrs);
+  }
+
+  public void setSplitLineColor(@ColorInt int color) {
+    this.mSplitLineColor = color;
   }
 
   public static class LayoutParams extends MarginLayoutParams {

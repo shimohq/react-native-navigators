@@ -45,6 +45,11 @@ public class SplitSceneManager extends ViewGroupManager<SplitScene> {
     scene.setSplitFullScreen(isSplitFullScreen);
   }
 
+  @ReactProp(name = "splitLineColor" ,customType = "Color")
+  public void setSplitLineColor(SplitScene scene, Integer color) {
+    scene.setSplitLineColor(color);
+  }
+
   @Override
   public void addView(SplitScene parent, View child, int index) {
     if (!(child instanceof Scene)) {
