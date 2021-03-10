@@ -20,9 +20,8 @@
 
 #import "RNNativeBaseNavigator+Layout.h"
 
-@interface RNNativeSplitNavigator() <RNNativeSplitNavigatorControllerDelegate, RNNativeSplitNavigatorControllerDataSource>
+@interface RNNativeSplitNavigator() <RNNativeSplitNavigatorControllerDataSource>
 
-@property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 @property (nonatomic, assign) BOOL updating;
 @property (nonatomic, strong) NSArray<RNNativeSplitRule *> *rules;
 @property (nonatomic, assign) CGFloat navigatorWidth;
@@ -37,11 +36,9 @@
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     RNNativeSplitNavigatorController *viewController = [RNNativeSplitNavigatorController new];
-    viewController.delegate = self;
     viewController.dataSource = self;
     self = [super initWithBridge:bridge viewController:viewController];
     if (self) {
-        _viewControllers = [NSMutableArray array];
         _updating = NO;
         
         _splitFullScreen = NO;
@@ -104,12 +101,6 @@
     [self addSplitPlaceholder];
 }
 
-#pragma mark - RNNativeSplitNavigatorControllerDelegate
-
-- (void)didRemoveController:(nonnull UIViewController *)viewController {
-    [_viewControllers removeObject:viewController];
-}
-
 #pragma mark - RNNativeSplitNavigatorControllerDataSource
 
 - (BOOL)isSplit {
@@ -148,10 +139,6 @@
     }
 }
 
-- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    return viewController && ![_viewControllers containsObject:viewController];
-}
-
 - (void)updateSceneWithCurrentScenes:(NSArray<RNNativeScene *> *)currentScenes
                           NextScenes:(NSArray<RNNativeScene *> *)nextScenes
                            comoplete:(nonnull RNNativeNavigatorUpdateCompleteBlock)comoplete {
@@ -188,13 +175,6 @@
     } else {
         [super updateSceneWithCurrentScenes:currentScenes NextScenes:nextScenes comoplete:comoplete];
     }
-    
-    // update viewControllers
-    NSMutableArray *viewControllers = [NSMutableArray array];
-    for (RNNativeScene *scene in nextScenes) {
-        [viewControllers addObject:scene.controller];
-    }
-    [_viewControllers setArray:viewControllers];
 }
 
 /**
@@ -209,6 +189,10 @@
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
+    
+    for (RNNativeScene *scene in removedScenes) {
+        scene.dismissed = YES;
+    }
     
     // 分栏模式，右边屏幕
     // 第一个场景显示、最后的场景退出的时候需要有动画
@@ -317,7 +301,7 @@
     }
     
     if (action == RNNativeStackNavigatorActionHide) {
-        if (!currentTopScene.controller || [self isDismissedForViewController:currentTopScene.controller]) {
+        if ([self isDismissedForScene:currentTopScene]) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
             return;

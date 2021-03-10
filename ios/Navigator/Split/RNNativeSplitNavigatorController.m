@@ -93,10 +93,6 @@
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
         self.panGestureHandler.firstScene = firstScene;
         self.panGestureHandler.coverView = coverView;
-        __weak typeof(self) weakSelf = self;
-        self.panGestureHandler.didGoBack = ^{
-            [weakSelf.delegate didRemoveController:firstScene.controller];
-        };
     }
     [self.panGestureHandler panWithGestureRecognizer:gestureRecognizer];
     if (gestureRecognizer.state == UIGestureRecognizerStateEnded

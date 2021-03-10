@@ -9,8 +9,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^RNNativePanGestureHandlerDidGoBackBlock)(void);
-
 @class RNNativeScene;
 
 @interface RNNativePanGestureHandler : NSObject
@@ -18,7 +16,6 @@ typedef void (^RNNativePanGestureHandlerDidGoBackBlock)(void);
 @property (nonatomic, weak) UIView *coverView;
 @property (nonatomic, weak) RNNativeScene *firstScene;
 @property (nonatomic, weak) RNNativeScene *secondScene;
-@property (nonatomic, copy) RNNativePanGestureHandlerDidGoBackBlock didGoBack;
 
 - (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture;
 
