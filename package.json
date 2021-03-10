@@ -58,6 +58,6 @@
   },
   "dependencies": {
     "hoist-non-react-statics": "^3.3.2",
-    "static-container": "^1.7.0"
+    "static-container": "^1.7.1"
   }
 }
