@@ -23,9 +23,8 @@
 #import "UIView+RNNativeNavigator.h"
 
 
-@interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDelegate, RNNativeCardNavigatorControllerDataSource>
+@interface RNNativeCardNavigator() <RNNativeCardNavigatorControllerDataSource>
 
-@property (nonatomic, strong) NSMutableArray<UIViewController *> *viewControllers;
 @property (nonatomic, assign) BOOL updating;
 
 @end
@@ -34,11 +33,9 @@
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     RNNativeCardNavigatorController *viewController = [RNNativeCardNavigatorController new];
-    viewController.delegate = self;
     viewController.dataSource = self;
     self = [super initWithBridge:bridge viewController:viewController];
     if (self) {
-        _viewControllers = [NSMutableArray array];
         _updating = NO;
     }
     return self;
@@ -52,12 +49,6 @@
     self.viewController.view.frame = self.bounds;
 }
 
-#pragma mark - RNNativeCardNavigatorControllerDelegate
-
-- (void)didRemoveController:(nonnull UIViewController *)viewController {
-    [_viewControllers removeObject:viewController];
-}
-
 #pragma mark - RNNativeCardNavigatorControllerDataSource
 
 - (NSArray<RNNativeScene *> *)getCurrentScenes {
@@ -65,10 +56,6 @@
 }
 
 #pragma mark - RNNativeBaseNavigator
-
-- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    return viewController && ![_viewControllers containsObject:viewController];
-}
 
 /**
  addChildViewController removeFromParentViewController
@@ -83,12 +70,10 @@
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
-    // viewControllers
-    NSMutableArray *viewControllers = [NSMutableArray array];
-    for (RNNativeScene *scene in nextScenes) {
-        [viewControllers addObject:scene.controller];
+    // update dismissed
+    for (RNNativeScene *scene in removedScenes) {
+        scene.dismissed = YES;
     }
-    [_viewControllers setArray:viewControllers];
 
     // update will show view frame
     RNNativeScene *currentTopScene = currentScenes.lastObject;
@@ -134,7 +119,7 @@
             endTransition(YES);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
-        if (!currentTopScene.controller || [self isDismissedForViewController:currentTopScene.controller]) {
+        if ([self isDismissedForScene:currentTopScene]) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
             endTransition(YES);
             return;

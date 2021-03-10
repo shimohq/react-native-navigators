@@ -11,12 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RNNativeScene;
 
-@protocol RNNativeSplitNavigatorControllerDelegate <NSObject>
-
-- (void)didRemoveController:(nonnull UIViewController *)viewController;
-
-@end
-
 @protocol RNNativeSplitNavigatorControllerDataSource <NSObject>
 
 - (BOOL)isSplit;
@@ -29,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RNNativeSplitNavigatorController : UIViewController
 
-@property (nonatomic, weak) id<RNNativeSplitNavigatorControllerDelegate> delegate;
 @property (nonatomic, weak) id<RNNativeSplitNavigatorControllerDataSource> dataSource;
 
 @end

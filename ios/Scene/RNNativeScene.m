@@ -151,11 +151,16 @@
     }
 }
 
+- (void)setDismissed:(BOOL)dismissed {
+    _dismissed = dismissed;
+}
+
 - (void)setStatus:(RNNativeSceneStatus)status {
-    BOOL dismissed = false;
+    BOOL dismissedChanged = false;
     if (status == RNNativeSceneStatusDidBlur && !_dismissed) {
-        dismissed = [_delegate isDismissedForScene:self];
-        _dismissed = dismissed;
+        if ([_delegate isDismissedForScene:self]) {
+            _dismissed = YES;
+        }
     }
     BOOL statusChanged = _status != status
     && !(_status == RNNativeSceneStatusDidBlur && status == RNNativeSceneStatusWillBlur)
@@ -169,8 +174,8 @@
             [listener scene:self didUpdateStatus:status];
         }
     }
-    if (statusChanged || dismissed) {
-        [self sendStatus:_status andDismissed:dismissed];
+    if (statusChanged || dismissedChanged) {
+        [self sendStatus:_status andDismissed:_dismissed];
     }
 }
 
