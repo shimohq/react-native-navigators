@@ -12,7 +12,7 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
 
-@interface RNNativeBaseNavigator () <UINavigationControllerDelegate, RNNativeSceneDelegate>
+@interface RNNativeBaseNavigator () <UINavigationControllerDelegate>
 
 @property (nonatomic, weak) RCTBridge *bridge;
 @property (nonatomic, strong) __kindof UIViewController *viewController;
@@ -41,12 +41,6 @@
         [self addSubview:viewController.view];
     }
     return self;
-}
-
-- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    @throw [NSException exceptionWithName:NSInternalInconsistencyException
-                                   reason:[NSString stringWithFormat:@"For `RNNativeBaseNavigator` subclass, you must override %@ method", NSStringFromSelector(_cmd)]
-                                 userInfo:nil];
 }
 
 - (void)layoutSubviews {
@@ -140,7 +134,7 @@
 }
 
 - (BOOL)isDismissedForScene:(RNNativeScene *)scene {
-    return [self isDismissedForViewController:scene.controller];
+    return !scene.controller || scene.dismissed;
 }
 
 #pragma mark - Update Container

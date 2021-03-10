@@ -101,9 +101,7 @@
         secondSceneFrame.origin.x = self.secondSceneBeginX;
         self.secondScene.frame = secondSceneFrame;
     } completion:^(BOOL finished) {
-        if (self.didGoBack) {
-            self.didGoBack();
-        }
+        self.firstScene.dismissed = YES;
         
         [self.firstScene removeFromSuperview];
         [self.firstScene.controller removeFromParentViewController];

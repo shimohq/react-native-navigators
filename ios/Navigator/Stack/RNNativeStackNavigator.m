@@ -54,11 +54,15 @@
     return nil;
 }
 
-#pragma mark - RNNativeBaseNavigator
+#pragma mark - RNNativeBaseNavigator - RNNativeSceneDelegate
 
-- (BOOL)isDismissedForViewController:(UIViewController *)viewController {
-    return viewController && ![_controller.viewControllers containsObject:viewController];
+- (BOOL)isDismissedForScene:(RNNativeScene *)scene {
+    // 因为无法监听 UINavigationController 手势返回，没法在手势返回的时候更新 scene.dismissed，
+    // 所以通过 [_controller.viewControllers containsObject:scene.controller] 判断 scene 是否已经消失。
+    return [super isDismissedForScene:scene] || ![_controller.viewControllers containsObject:scene.controller];
 }
+
+#pragma mark - RNNativeBaseNavigator
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
     [super insertReactSubview:subview atIndex:atIndex];
@@ -92,6 +96,11 @@
     BOOL hasAnimation = transition != RNNativeSceneTransitionNone && action != RNNativeStackNavigatorActionNone;
     beginTransition(!hasAnimation);
     
+    // update dismissed
+    for (RNNativeScene *scene in removedScenes) {
+        scene.dismissed = YES;
+    }
+
     NSMutableArray<UIViewController *> *willShowViewControllers = [NSMutableArray new];
     for (RNNativeScene *scene in nextScenes) {
         if (![willShowViewControllers containsObject:scene.controller]) {

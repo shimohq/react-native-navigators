@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
     RNNativeStackNavigatorActionHide
 };
 
-@interface RNNativeBaseNavigator : RCTView <RCTInvalidating>
+@interface RNNativeBaseNavigator : RCTView <RCTInvalidating, RNNativeSceneDelegate>
 
 @property (nonatomic, strong, readonly) __kindof UIViewController *viewController;
 @property (nonatomic, strong, readonly) NSMutableArray<RNNativeScene *> *currentScenes;
@@ -48,8 +48,6 @@ typedef NS_ENUM(NSInteger, RNNativeStackNavigatorAction) {
                    insertedScenes:(NSArray<RNNativeScene *> *)insertedScenes
                   beginTransition:(RNNativeNavigatorTransitionBlock)beginTransition
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition;
-
-- (BOOL)isDismissedForViewController:(UIViewController *)viewController;
 
 @end
 
