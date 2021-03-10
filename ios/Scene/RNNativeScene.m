@@ -160,6 +160,7 @@
     if (status == RNNativeSceneStatusDidBlur && !_dismissed) {
         if ([_delegate isDismissedForScene:self]) {
             _dismissed = YES;
+            dismissedChanged = YES;
         }
     }
     BOOL statusChanged = _status != status
