@@ -18,8 +18,13 @@ RCT_EXPORT_MODULE()
     self = [super init];
     if (self) {
         UINavigationController *navigationController = [[UINavigationController alloc] init];
-        _headerHeight = CGRectGetHeight(navigationController.navigationBar.frame);
-        _headerTop = [UIApplication sharedApplication].delegate.window.rootViewController.view.safeAreaInsets.top;
+        CGRect frame = navigationController.navigationBar.frame;
+        _headerHeight = CGRectGetHeight(frame);
+        if (@available(iOS 11.0, *)) {
+            _headerTop = [UIApplication sharedApplication].delegate.window.rootViewController.view.safeAreaInsets.top;
+        } else {
+            _headerTop = CGRectGetMinY(frame);
+        }
     }
     return self;
 }
