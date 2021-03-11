@@ -135,7 +135,7 @@
         }
         if (targetScenes == primaryScenes) {
             coverView = secondaryScenes.count > 0 ? secondaryScenes.lastObject : [self.dataSource getSplitPlaceholder];
-        } else {
+        } else if (![self.dataSource isSplitFullScreen]) {
             coverView = primaryScenes.lastObject;
         }
     } else {
