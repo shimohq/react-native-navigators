@@ -28,7 +28,6 @@ public abstract class SceneContainer extends ViewGroup {
 
   protected final Set<Scene> mDismissed = new HashSet<>();
 
-
   @Nullable
   private FragmentTransaction mCurrentTransaction;
 
@@ -107,6 +106,7 @@ public abstract class SceneContainer extends ViewGroup {
   }
 
   protected void removeSceneAt(int index) {
+
     mScenes.get(index).setContainer(null);
     mScenes.remove(index);
     markUpdated();
@@ -184,6 +184,17 @@ public abstract class SceneContainer extends ViewGroup {
           insertedFragments.add(fragment);
       }
     }
+
+    ArrayList<Scene>bringToFrontScenes = new ArrayList<>();
+    for (int i = 0; i < mScenes.size(); i++) {
+      Scene scene = mScenes.get(i);
+      if (!scene.equals(getChildAt(i)) && !removedScene.contains(scene) ){
+        bringToFrontScenes.add(scene);
+      }
+    }
+
+
+
 
     // find top scene
     Scene nextTopScene = getTopScene(nextFragments);
@@ -289,6 +300,8 @@ public abstract class SceneContainer extends ViewGroup {
     // remove
     removeFragments(removedScene);
 
+    bringToFrontScene(bringToFrontScenes);
+
     // update
     showFragments(nextFragments);
 
@@ -342,6 +355,12 @@ public abstract class SceneContainer extends ViewGroup {
         fragment.setVisibility(VISIBLE);
       }
     }
+  }
+
+  protected void bringToFrontScene(ArrayList<Scene> bringToFrontScene){
+      for (Scene scene : bringToFrontScene){
+          bringChildToFront(scene);
+      }
   }
 
   protected boolean isShow(ArrayList<Scene> nextFragments, int index, int size) {
