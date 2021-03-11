@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) NSArray<NSDictionary *> *splitRules;
 @property (nonatomic, assign) BOOL splitFullScreen;
+@property (nonatomic, strong) UIColor *splitLineColor;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 

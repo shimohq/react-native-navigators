@@ -29,6 +29,7 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [isSplitFullScreen, setIsSplitFullScreen] = useState(
     () => options?.isSplitFullScreen
   );
+  const [splitLineColor, setSplitLineColor] = useState(() => options?.splitLineColor);
   const [splitRules, setSplitRules] = useState(() => options?.splitRules);
   const [splitPlaceholder, setSplitPlaceholder] = useState(
     () => options?.splitPlaceholder
@@ -41,6 +42,10 @@ export default function NativeSplitNavigatorOptionsWrapper(
     (options: Partial<NativeNavigationSplitOptions>) => {
       if (options.hasOwnProperty('isSplitFullScreen')) {
         setIsSplitFullScreen(options.isSplitFullScreen);
+      }
+
+      if (options.hasOwnProperty('splitLineColor')) {
+        setSplitLineColor(options.splitLineColor);
       }
 
       if (options.hasOwnProperty('splitRules')) {
@@ -62,13 +67,14 @@ export default function NativeSplitNavigatorOptionsWrapper(
     return {
       options: {
         isSplitFullScreen,
+        splitLineColor,
         splitRules,
         splitPlaceholder,
         splitPrimaryRouteNames
       },
       setOptions
     };
-  }, [isSplitFullScreen, splitRules, splitPlaceholder, splitPrimaryRouteNames]);
+  }, [isSplitFullScreen, splitLineColor, splitRules, splitPlaceholder, splitPrimaryRouteNames]);
 
   return (
     <NativeSplitNavigatorOptionsContext.Provider value={value}>

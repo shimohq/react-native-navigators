@@ -61,6 +61,7 @@ export interface NativeNavigationSplitOptions {
   splitRules?: NativeNavigatorSplitRules;
   splitPrimaryRouteNames?: string[];
   splitPlaceholder?: ElementType<{}>;
+  splitLineColor?: string;
 }
 
 export enum NativeNavigationStatusBarStyle {
