@@ -47,7 +47,7 @@
         return NO;
     }
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x > 120) {
+    if (location.x > 60) {
         return NO;
     }
     return YES;
@@ -67,10 +67,6 @@
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
         self.panGestureHandler.firstScene = firstScene;
         self.panGestureHandler.secondScene = secondScene;
-        __weak typeof(self) weakSelf = self;
-        self.panGestureHandler.didGoBack = ^{
-            [weakSelf.delegate didRemoveController:firstScene.controller];
-        };
     }
     [self.panGestureHandler panWithGestureRecognizer:gesture];
     if (gesture.state == UIGestureRecognizerStateEnded

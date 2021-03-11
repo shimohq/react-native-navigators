@@ -30,11 +30,14 @@ export default function SplitRouter(
 
         // StackRouter 对非 active 的子路由进行 NAVIGATE 操作时会主动将该子路由切换成 active
         // 如果在 SplitRouter 中对 primary route 的子路由做 NAVIGATE 导航会导致右侧路由退出，交互不符合预期
-        if (newState?.index === 0 && state.index > 0) {
+        if (newState && newState.index > -1 && newState.index < state.index) {
+          const newRoutes = state.routes.slice();
+          newRoutes.splice(newState.index, 1, newState.routes[newState.index]);
+
           return {
             ...newState,
             index: state.index,
-            routes: [...newState.routes, ...state.routes.slice(1)]
+            routes: newRoutes
           };
         } else {
           return newState;
@@ -47,7 +50,7 @@ export default function SplitRouter(
 
         // StackRouter 通过指定 key 的 action 对非 active 的子路由进行 BACK 导航时会将 active index 切换到该子路由
         // 如果 SplitRouter 中对 primary route 的子路由做 BACK 导航会导致右侧路由退出，交互不符合预期
-        if (newState?.index === 0 && newState.routes.length > 1) {
+        if (newState && newState.index < newState.routes.length - 1) {
           return {
             ...newState,
             index: newState.routes.length - 1

@@ -11,12 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RNNativeScene;
 
-@protocol RNNativeCardNavigatorControllerDelegate <NSObject>
-
-- (void)didRemoveController:(nonnull UIViewController *)viewController;
-
-@end
-
 @protocol RNNativeCardNavigatorControllerDataSource <NSObject>
 
 - (NSArray<RNNativeScene *> *)getCurrentScenes;
@@ -25,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RNNativeCardNavigatorController : UIViewController
 
-@property (nonatomic, weak) id<RNNativeCardNavigatorControllerDelegate> delegate;
 @property (nonatomic, weak) id<RNNativeCardNavigatorControllerDataSource> dataSource;
 
 @end
