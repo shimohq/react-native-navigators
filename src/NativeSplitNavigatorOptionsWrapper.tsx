@@ -29,7 +29,6 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [isSplitFullScreen, setIsSplitFullScreen] = useState(
     () => options?.isSplitFullScreen
   );
-  const [splitLineColor, setSplitLineColor] = useState(() => options?.splitLineColor);
   const [splitRules, setSplitRules] = useState(() => options?.splitRules);
   const [splitPlaceholder, setSplitPlaceholder] = useState(
     () => options?.splitPlaceholder
@@ -37,15 +36,14 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [splitPrimaryRouteNames, setSplitPrimaryRouteNames] = useState(
     () => options?.splitPrimaryRouteNames
   );
+  const [splitLineColor, setSplitLineColor] = useState(
+    () => options?.splitLineColor
+  );
 
   const setOptions = useCallback(
     (options: Partial<NativeNavigationSplitOptions>) => {
       if (options.hasOwnProperty('isSplitFullScreen')) {
         setIsSplitFullScreen(options.isSplitFullScreen);
-      }
-
-      if (options.hasOwnProperty('splitLineColor')) {
-        setSplitLineColor(options.splitLineColor);
       }
 
       if (options.hasOwnProperty('splitRules')) {
@@ -59,6 +57,10 @@ export default function NativeSplitNavigatorOptionsWrapper(
       if (options.hasOwnProperty('splitPrimaryRouteNames')) {
         setSplitPrimaryRouteNames(options.splitPrimaryRouteNames);
       }
+
+      if (options.hasOwnProperty('splitLineColor')) {
+        setSplitLineColor(options.splitLineColor);
+      }
     },
     []
   );
@@ -67,14 +69,20 @@ export default function NativeSplitNavigatorOptionsWrapper(
     return {
       options: {
         isSplitFullScreen,
-        splitLineColor,
         splitRules,
         splitPlaceholder,
-        splitPrimaryRouteNames
+        splitPrimaryRouteNames,
+        splitLineColor
       },
       setOptions
     };
-  }, [isSplitFullScreen, splitLineColor, splitRules, splitPlaceholder, splitPrimaryRouteNames]);
+  }, [
+    isSplitFullScreen,
+    splitRules,
+    splitPlaceholder,
+    splitPrimaryRouteNames,
+    splitLineColor
+  ]);
 
   return (
     <NativeSplitNavigatorOptionsContext.Provider value={value}>

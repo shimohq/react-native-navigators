@@ -23,6 +23,7 @@ export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
     <RNNativeSplitNavigator
       style={styles.navigator}
       splitRules={options?.splitRules}
+      splitLineColor={options?.splitLineColor}
       isSplitFullScreen={options?.isSplitFullScreen === true}
       splitLineColor={options?.splitLineColor}
     >
