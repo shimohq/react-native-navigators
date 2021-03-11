@@ -60,7 +60,7 @@
     }
     CGFloat topSceneMinX = CGRectGetMinX(topScene.frame);
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x < topSceneMinX || location.x > topSceneMinX + 120) {
+    if (location.x < topSceneMinX || location.x > topSceneMinX + 60) {
         return NO;
     }
     return YES;

@@ -47,7 +47,7 @@
         return NO;
     }
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x > 120) {
+    if (location.x > 60) {
         return NO;
     }
     return YES;
