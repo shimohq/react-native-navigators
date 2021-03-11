@@ -7,7 +7,7 @@ import styles from '../styles';
 
 function SplitPrimary(props: NavigationInjectedProps) {
   return (
-    <View style={{ flex: 1, backgroundColor: 'red', borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: 'red', borderColor: 'blue', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Primary Scene</Text>
       <TouchableOpacity
         onPress={() => props.navigation.goBack()}>

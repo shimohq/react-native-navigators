@@ -12,6 +12,7 @@
 #import "RNNativeSplitRule.h"
 #import "RNNativeSplitUtils.h"
 #import "RNNativeTransitionUtils.h"
+#import "RNNativeConst.h"
 
 #import <React/RCTShadowView.h>
 #import <React/RCTRootShadowView.h>
@@ -29,6 +30,7 @@
 // whether split mode
 @property (nonatomic, assign) BOOL split;
 @property (nullable, nonatomic, strong) RNNativeSplitPlaceholder *splitPlaceholder;
+@property (nullable, nonatomic, strong) UIView *splitLine;
 
 @end
 
@@ -47,14 +49,27 @@
         _navigatorWidth = CGRectGetWidth(self.frame);
         _primarySceneWidth = [RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth];
         _split = _primarySceneWidth > 0;
+        
+        _splitLine = [UIView new];
+        [viewController.view addSubview:_splitLine];
+        [self updateSplitLine];
     }
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
     [self setNavigatorWidth:CGRectGetWidth(self.bounds)];
+    [self updateSplitLine];
+}
+
+- (void)updateSplitLine {
+    if (self.split) {
+        self.splitLine.frame = CGRectMake(self.primarySceneWidth, 0, [RNNativeSplitUtils splitLineWidth], CGRectGetHeight(self.frame));
+        [self.splitLine setHidden:NO];
+    } else {
+        [self.splitLine setHidden:YES];
+    }
 }
 
 #pragma mark - Setter
@@ -99,6 +114,14 @@
     _splitPlaceholder = splitPlaceholder;
    
     [self addSplitPlaceholder];
+}
+
+- (void)setSplitLineColor:(UIColor *)splitLineColor {
+    if (!splitLineColor) {
+        return;
+    }
+    _splitLineColor = splitLineColor;
+    self.splitLine.backgroundColor = _splitLineColor;
 }
 
 #pragma mark - RNNativeSplitNavigatorControllerDataSource
@@ -484,9 +507,9 @@
         if (primary) {
             frame.origin.x = 0;
         } else if (placeHolder) {
-            frame.origin.x = self.primarySceneWidth;
+            frame.origin.x = self.primarySceneWidth + [RNNativeSplitUtils splitLineWidth];
         } else {
-            frame.origin.x = self.splitFullScreen ? 0 : self.primarySceneWidth;
+            frame.origin.x = self.splitFullScreen ? 0 : self.primarySceneWidth + [RNNativeSplitUtils splitLineWidth];
         }
     } else {
         frame.origin.x = 0;

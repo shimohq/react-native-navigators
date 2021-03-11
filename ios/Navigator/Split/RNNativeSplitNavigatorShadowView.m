@@ -11,6 +11,7 @@
 #import "RNNativeSceneShadowView.h"
 #import "RNNativeSplitPlaceholderShadowView.h"
 #import "RNNativeConst.h"
+#import "RNNativeSplitUtils.h"
 
 #import <React/RCTShadowView.h>
 #import <React/RCTUIManager.h>
@@ -218,8 +219,9 @@
                 [shadowView setWidth:(YGValue){self.navigatorWidth, YGUnitPoint}];
                 [shadowView setRight:YGValueUndefined];
             } else {
-                [shadowView setLeft:(YGValue){self.primarySceneWidth,YGUnitPoint}];
-                [shadowView setWidth:(YGValue){self.navigatorWidth - self.primarySceneWidth,YGUnitPoint}];
+                CGFloat splitLineWidth = [RNNativeSplitUtils splitLineWidth];
+                [shadowView setLeft:(YGValue){self.primarySceneWidth + splitLineWidth, YGUnitPoint}];
+                [shadowView setWidth:(YGValue){self.navigatorWidth - self.primarySceneWidth - splitLineWidth, YGUnitPoint}];
                 [shadowView setRight:YGValueUndefined];
             }
         }
