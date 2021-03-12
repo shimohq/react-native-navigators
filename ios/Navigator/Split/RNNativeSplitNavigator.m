@@ -213,6 +213,7 @@
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
+    // removed scenes 标记为 dismissed
     for (RNNativeScene *scene in removedScenes) {
         scene.dismissed = YES;
     }
@@ -245,11 +246,6 @@
     NSInteger currentTopSceneIndex = currentScenes.count - 1;
     RNNativeScene *currentTopScene = currentTopSceneIndex >= 0 ? currentScenes[currentTopSceneIndex] : nil;
     
-    // update will show view frame
-    if (action == RNNativeStackNavigatorActionShow) {
-        nextTopScene.frame = [self getBeginFrameWithScene:nextTopScene transition:transition];
-    }
-    
     // add scene
     for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
         RNNativeScene *scene = nextScenes[index];
@@ -263,17 +259,15 @@
         [self addScene:scene];
     }
     
-    // transition
     // 无动画
-    CGRect nextTopSceneEndFrame = [self getEndFrameWithScene:nextTopScene];
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES);
         return;
     }
     
     // 有动画
+    
     // 分栏模式动画开始前要把另外一边最顶层的 view 置顶，动画结束后还原
     UIView *coverView = nil;
     if (self.split) {
@@ -298,7 +292,13 @@
         }
     }
     
+    // 有动画显示
     if (action == RNNativeStackNavigatorActionShow) {
+        // update will show view frame
+        nextTopScene.frame = [self getBeginFrameWithScene:nextTopScene transition:transition];
+        
+        CGRect nextTopSceneEndFrame = [self getEndFrameWithScene:nextTopScene];
+        
         CGRect currentTopSceneOriginalFrame = currentTopScene.frame;
         CGRect currentTopSceneEndFrame = [RNNativeTransitionUtils getDownViewFrameWithView:currentTopScene transition:transition];
         
@@ -323,6 +323,7 @@
         return;
     }
     
+    // 有动画退出
     if (action == RNNativeStackNavigatorActionHide) {
         if ([self isDismissedForScene:currentTopScene]) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
