@@ -3,7 +3,8 @@ import React, {
   useState,
   createContext,
   useMemo,
-  useCallback
+  useCallback,
+  useEffect
 } from 'react';
 import { NavigationInjectedProps } from 'react-navigation';
 
@@ -42,16 +43,50 @@ export default function NativeSplitNavigatorOptionsWrapper(
   const [isSplitFullScreen, setIsSplitFullScreen] = useState(
     () => options?.isSplitFullScreen
   );
+
+  useEffect(() => {
+    if (options?.isSplitFullScreen !== isSplitFullScreen) {
+      setIsSplitFullScreen(options?.isSplitFullScreen);
+    }
+  }, [options?.isSplitFullScreen]);
+
   const [splitRules, setSplitRules] = useState(() => options?.splitRules);
+
+  useEffect(() => {
+    if (options?.splitRules !== splitRules) {
+      setSplitRules(options?.splitRules);
+    }
+  }, [options?.splitRules]);
+
   const [splitPlaceholder, setSplitPlaceholder] = useState(
     () => options?.splitPlaceholder
   );
+
+  useEffect(() => {
+    if (options?.splitPlaceholder !== splitPlaceholder) {
+      setSplitPlaceholder(options?.splitPlaceholder);
+    }
+  }, [options?.splitPlaceholder]);
+
   const [splitPrimaryRouteNames, setSplitPrimaryRouteNames] = useState(
     () => options?.splitPrimaryRouteNames
   );
+
+  useEffect(() => {
+    if (options?.splitPrimaryRouteNames !== splitPrimaryRouteNames) {
+      setSplitPrimaryRouteNames(options?.splitPrimaryRouteNames);
+    }
+  }, [options?.splitPrimaryRouteNames]);
+
   const [splitLineColor, setSplitLineColor] = useState(
     () => options?.splitLineColor
   );
+
+  useEffect(() => {
+    if (options?.splitLineColor !== splitLineColor) {
+      setSplitLineColor(options?.splitLineColor);
+    }
+  }, [options?.splitLineColor]);
 
   const setOptions = useCallback(
     (options: Partial<NativeNavigationSplitOptions>) => {
