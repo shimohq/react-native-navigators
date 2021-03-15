@@ -180,6 +180,8 @@ export default class NativeNavigators extends PureComponent<
       return (
         <NativeSplitNavigatorOptionsWrapper
           options={navigationConfig.defaultContextOptions}
+          navigation={navigation}
+          screenProps={screenProps}
         >
           {options => (
             <NativeSplitNavigator options={options}>

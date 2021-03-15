@@ -5,12 +5,18 @@ import React, {
   useMemo,
   useCallback
 } from 'react';
+import { NavigationInjectedProps } from 'react-navigation';
 
 import NativeStackScenes, { NativeScenesProps } from './NativeScenes';
-import { NativeNavigationSplitOptions } from './types';
+import {
+  NativeNavigationSplitOptions,
+  NativeNavigationSplitConfig
+} from './types';
 
-export interface NativeSplitNavigatorOptionsWrapperProps {
-  options?: NativeNavigationSplitOptions;
+export interface NativeSplitNavigatorOptionsWrapperProps
+  extends NavigationInjectedProps {
+  options?: NativeNavigationSplitConfig;
+  screenProps: unknown;
   children: (
     options: NativeNavigationSplitOptions
   ) => ReactElement<NativeScenesProps, typeof NativeStackScenes>;
@@ -24,7 +30,14 @@ export const NativeSplitNavigatorOptionsContext = createContext<{
 export default function NativeSplitNavigatorOptionsWrapper(
   props: NativeSplitNavigatorOptionsWrapperProps
 ) {
-  const { children, options } = props;
+  const { children, navigation, screenProps } = props;
+  const options =
+    typeof props.options === 'function'
+      ? props.options({
+          navigation,
+          screenProps
+        })
+      : props.options;
 
   const [isSplitFullScreen, setIsSplitFullScreen] = useState(
     () => options?.isSplitFullScreen

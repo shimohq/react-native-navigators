@@ -53,8 +53,16 @@ export interface NativeSplitNavigationRouterConfig {
     NativeNavigationOptions,
     any
   >;
-  defaultContextOptions?: NativeNavigationSplitOptions;
+  defaultContextOptions?: NativeNavigationSplitConfig;
 }
+
+export type NativeNavigationSplitConfig =
+  | NativeNavigationSplitOptions
+  | ((
+      contextOptionsContainer: {
+        screenProps: unknown;
+      } & NavigationInjectedProps
+    ) => NativeNavigationSplitOptions);
 
 export interface NativeNavigationSplitOptions {
   isSplitFullScreen?: boolean;
