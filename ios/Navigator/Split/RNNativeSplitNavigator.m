@@ -325,12 +325,6 @@
     
     // 有动画退出
     if (action == RNNativeStackNavigatorActionHide) {
-        if ([self isDismissedForScene:currentTopScene]) {
-            [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
-            endTransition(YES);
-            return;
-        }
-        
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
         
