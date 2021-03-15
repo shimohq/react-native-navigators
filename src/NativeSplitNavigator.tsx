@@ -19,11 +19,11 @@ const styles = StyleSheet.create({
 
 export default function NativeStackNavigator(props: NativeStackNavigatorProps) {
   const { options } = props;
-
   return (
     <RNNativeSplitNavigator
       style={styles.navigator}
       splitRules={options?.splitRules}
+      splitLineColor={options?.splitLineColor}
       isSplitFullScreen={options?.isSplitFullScreen === true}
     >
       {options?.splitPlaceholder ? (

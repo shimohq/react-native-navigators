@@ -67,6 +67,7 @@ export type NativeNavigationSplitConfig =
 export interface NativeNavigationSplitOptions {
   isSplitFullScreen?: boolean;
   splitRules?: NativeNavigatorSplitRules;
+  splitLineColor?: string;
   splitPrimaryRouteNames?: string[];
   splitPlaceholder?: ElementType<{}>;
 }

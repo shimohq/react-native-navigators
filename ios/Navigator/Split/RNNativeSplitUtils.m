@@ -35,4 +35,8 @@
     return 0;
 }
 
++ (CGFloat)splitLineWidth {
+    return 1.0 / [UIScreen mainScreen].scale;
+}
+
 @end

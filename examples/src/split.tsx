@@ -33,6 +33,7 @@ const SplitNavigator = createSplitNavigator({
       }
     ],
     splitPlaceholder: SplitPlaceholder,
+    splitLineColor: 'blue',
     splitPrimaryRouteNames: ['index', 'primary', 'primary1', 'primary2']
   }
  

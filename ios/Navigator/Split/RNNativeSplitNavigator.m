@@ -12,6 +12,7 @@
 #import "RNNativeSplitRule.h"
 #import "RNNativeSplitUtils.h"
 #import "RNNativeTransitionUtils.h"
+#import "RNNativeConst.h"
 
 #import <React/RCTShadowView.h>
 #import <React/RCTRootShadowView.h>
@@ -29,6 +30,7 @@
 // whether split mode
 @property (nonatomic, assign) BOOL split;
 @property (nullable, nonatomic, strong) RNNativeSplitPlaceholder *splitPlaceholder;
+@property (nullable, nonatomic, strong) UIView *splitLine;
 
 @end
 
@@ -47,14 +49,27 @@
         _navigatorWidth = CGRectGetWidth(self.frame);
         _primarySceneWidth = [RNNativeSplitUtils getPrimarySceneWidthWithRules:_rules navigatorWidth:_navigatorWidth];
         _split = _primarySceneWidth > 0;
+        
+        _splitLine = [UIView new];
+        [viewController.view addSubview:_splitLine];
+        [self updateSplitLine];
     }
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
     [self setNavigatorWidth:CGRectGetWidth(self.bounds)];
+    [self updateSplitLine];
+}
+
+- (void)updateSplitLine {
+    if (self.split) {
+        self.splitLine.frame = CGRectMake(self.primarySceneWidth, 0, [RNNativeSplitUtils splitLineWidth], CGRectGetHeight(self.frame));
+        [self.splitLine setHidden:NO];
+    } else {
+        [self.splitLine setHidden:YES];
+    }
 }
 
 #pragma mark - Setter
@@ -99,6 +114,14 @@
     _splitPlaceholder = splitPlaceholder;
    
     [self addSplitPlaceholder];
+}
+
+- (void)setSplitLineColor:(UIColor *)splitLineColor {
+    if (!splitLineColor) {
+        return;
+    }
+    _splitLineColor = splitLineColor;
+    self.splitLine.backgroundColor = _splitLineColor;
 }
 
 #pragma mark - RNNativeSplitNavigatorControllerDataSource
@@ -190,6 +213,7 @@
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
+    // removed scenes 标记为 dismissed
     for (RNNativeScene *scene in removedScenes) {
         scene.dismissed = YES;
     }
@@ -222,11 +246,6 @@
     NSInteger currentTopSceneIndex = currentScenes.count - 1;
     RNNativeScene *currentTopScene = currentTopSceneIndex >= 0 ? currentScenes[currentTopSceneIndex] : nil;
     
-    // update will show view frame
-    if (action == RNNativeStackNavigatorActionShow) {
-        nextTopScene.frame = [self getBeginFrameWithScene:nextTopScene transition:transition];
-    }
-    
     // add scene
     for (NSInteger index = 0, size = nextScenes.count; index < size; index++) {
         RNNativeScene *scene = nextScenes[index];
@@ -240,17 +259,15 @@
         [self addScene:scene];
     }
     
-    // transition
     // 无动画
-    CGRect nextTopSceneEndFrame = [self getEndFrameWithScene:nextTopScene];
     if (transition == RNNativeSceneTransitionNone || action == RNNativeStackNavigatorActionNone) {
-        nextTopScene.frame = nextTopSceneEndFrame;
         [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
         endTransition(YES);
         return;
     }
     
     // 有动画
+    
     // 分栏模式动画开始前要把另外一边最顶层的 view 置顶，动画结束后还原
     UIView *coverView = nil;
     if (self.split) {
@@ -275,7 +292,13 @@
         }
     }
     
+    // 有动画显示
     if (action == RNNativeStackNavigatorActionShow) {
+        // update will show view frame
+        nextTopScene.frame = [self getBeginFrameWithScene:nextTopScene transition:transition];
+        
+        CGRect nextTopSceneEndFrame = [self getEndFrameWithScene:nextTopScene];
+        
         CGRect currentTopSceneOriginalFrame = currentTopScene.frame;
         CGRect currentTopSceneEndFrame = [RNNativeTransitionUtils getDownViewFrameWithView:currentTopScene transition:transition];
         
@@ -300,6 +323,7 @@
         return;
     }
     
+    // 有动画退出
     if (action == RNNativeStackNavigatorActionHide) {
         if ([self isDismissedForScene:currentTopScene]) {
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
@@ -484,9 +508,9 @@
         if (primary) {
             frame.origin.x = 0;
         } else if (placeHolder) {
-            frame.origin.x = self.primarySceneWidth;
+            frame.origin.x = self.primarySceneWidth + [RNNativeSplitUtils splitLineWidth];
         } else {
-            frame.origin.x = self.splitFullScreen ? 0 : self.primarySceneWidth;
+            frame.origin.x = self.splitFullScreen ? 0 : self.primarySceneWidth + [RNNativeSplitUtils splitLineWidth];
         }
     } else {
         frame.origin.x = 0;

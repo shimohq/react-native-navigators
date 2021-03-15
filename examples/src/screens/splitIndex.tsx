@@ -6,7 +6,7 @@ import styles from '../styles';
 
 export default function SplitIndex(props: NavigationInjectedProps) {
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', borderColor: 'blue', borderWidth: 2, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: 'white', borderColor: 'blue', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Index Scene</Text>
       <TouchableOpacity
         onPress={() => props.navigation.navigate('primary')}>
