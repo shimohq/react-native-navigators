@@ -38,8 +38,6 @@ public class SplitScene extends SceneContainer {
   private final InnerSceneContainer mPrimaryContainer;
   private final InnerSceneContainer mSecondaryContainer;
   private final ArrayList<Scene> mSceneList = new ArrayList<>();
-  @ColorInt
-  private int mSplitLineColor;
   private Paint mPaint;
 
 
@@ -90,12 +88,6 @@ public class SplitScene extends SceneContainer {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
     if (isSplitModeOn()) {
-      if (mPaint == null) {
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setColor(mSplitLineColor);
-        mPaint.setStrokeWidth(1.0f);
-      }
       canvas.drawLine((getLeft() + mCurrentRule.primarySceneWidth), 0,
         (getLeft() + mCurrentRule.primarySceneWidth), (getBottom()), mPaint);
     }
@@ -414,7 +406,12 @@ public class SplitScene extends SceneContainer {
   }
 
   public void setSplitLineColor(@ColorInt int color) {
-    this.mSplitLineColor = color;
+    if (mPaint == null) {
+      mPaint = new Paint();
+      mPaint.setAntiAlias(true);
+      mPaint.setStrokeWidth(1.0f);
+    }
+    mPaint.setColor(color);
   }
 
   public static class LayoutParams extends MarginLayoutParams {
