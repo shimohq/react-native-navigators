@@ -18,6 +18,7 @@ static CGFloat const RNNativePanGestureEdgeWidth = 60;
 @property (nonatomic, weak) UIView *coverView;
 @property (nonatomic, weak) RNNativeScene *firstScene;
 @property (nonatomic, weak) RNNativeScene *secondScene;
+@property (nonnull, nonatomic, copy) void(^completeBolck)(BOOL goBack);
 
 - (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture;
 
