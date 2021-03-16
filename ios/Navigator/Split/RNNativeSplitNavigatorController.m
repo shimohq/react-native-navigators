@@ -92,6 +92,7 @@
             return;
         }
         
+        RNNativeScene *firstScene = targetScenes[count - 1];
         if (count < 2 && firstScene.splitPrimary) {
             return;
         }

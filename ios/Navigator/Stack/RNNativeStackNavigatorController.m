@@ -9,6 +9,7 @@
 #import "RNNativeStackNavigatorController.h"
 #import "RNNativeScene.h"
 #import "RNNativePanGestureRecognizerManager.h"
+#import "RNNativePanGestureHandler.h"
 
 #import <React/RCTRootContentView.h>
 #import <React/RCTTouchHandler.h>
