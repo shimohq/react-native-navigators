@@ -42,12 +42,22 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }
+    
+    UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+    CGPoint point = [panGestureRecognizer translationInView:panGestureRecognizer.view];
+    if (point.x <= 0) {
+        return NO;
+    }
+    
     NSArray<RNNativeScene *> *topTwoScenes = [self rnn_getTopScenesWithCount:2];
     if (topTwoScenes.count < 2 || !topTwoScenes[0].gestureEnabled) {
         return NO;
     }
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x > 60) {
+    if (location.x > RNNativePanGestureEdgeWidth) {
         return NO;
     }
     return YES;
