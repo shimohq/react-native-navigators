@@ -112,6 +112,7 @@
         if (self.coverView) {
             self.coverView.layer.zPosition = self.coverViewOriginZPosition;
         }
+        self.completeBolck(YES);
     }];
 }
 
@@ -141,6 +142,7 @@
         if (self.coverView) {
             self.coverView.layer.zPosition = self.coverViewOriginZPosition;
         }
+        self.completeBolck(NO);
     }];
 }
 

@@ -73,6 +73,9 @@
     if (location.x < topSceneMinX || location.x > topSceneMinX + RNNativePanGestureEdgeWidth) {
         return NO;
     }
+    if (self.panGestureHandler) {
+        return NO;
+    }
     return YES;
 }
 
@@ -103,13 +106,12 @@
         }
         self.panGestureHandler.firstScene = firstScene;
         self.panGestureHandler.coverView = coverView;
+        __weak typeof(self) weakSelf = self;
+        self.panGestureHandler.completeBolck = ^(BOOL goBack) {
+            weakSelf.panGestureHandler = nil;
+        };
     }
     [self.panGestureHandler panWithGestureRecognizer:gestureRecognizer];
-    if (gestureRecognizer.state == UIGestureRecognizerStateEnded
-        || gestureRecognizer.state == UIGestureRecognizerStateCancelled
-        || gestureRecognizer.state == UIGestureRecognizerStateFailed) {
-        self.panGestureHandler = nil;
-    }
 }
 
 #pragma mark - Private

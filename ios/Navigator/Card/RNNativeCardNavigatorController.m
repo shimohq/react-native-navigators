@@ -72,11 +72,13 @@
         if (count < 2) {
             return;
         }
-        RNNativeScene *firstScene = currentScenes[count - 1];
-        RNNativeScene *secondScene = currentScenes[count - 2];
         self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
-        self.panGestureHandler.firstScene = firstScene;
-        self.panGestureHandler.secondScene = secondScene;
+        self.panGestureHandler.firstScene = currentScenes[count - 1];
+        self.panGestureHandler.secondScene = currentScenes[count - 2];
+        __weak typeof(self) weakSelf = self;
+        self.panGestureHandler.completeBolck = ^(BOOL goBack) {
+            weakSelf.panGestureHandler = nil;
+        };
     }
     [self.panGestureHandler panWithGestureRecognizer:gesture];
     if (gesture.state == UIGestureRecognizerStateEnded
