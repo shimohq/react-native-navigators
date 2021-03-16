@@ -342,15 +342,17 @@ public class SplitScene extends SceneContainer {
         break;
       }
     }
-    boolean isSplitMode;
-    if (current != null) {
-      mCurrentRule = current;
-      isSplitMode = true;
-    } else {
-      mCurrentRule = DEFAULT_RULE;
-      isSplitMode = false;
+    if (current == null) {
+      current = DEFAULT_RULE;
     }
-    setSplitMode(isSplitMode);
+    boolean currentRuleChanged = mCurrentRule != current;
+    mCurrentRule = current;
+    if (currentRuleChanged
+      && (((LayoutParams) mSecondaryContainer.getLayoutParams()).leftMargin != 0)
+      && mCurrentRule.primarySceneWidth > 0) {
+      ((LayoutParams) mSecondaryContainer.getLayoutParams()).leftMargin = -mCurrentRule.primarySceneWidth;
+    }
+    setSplitMode(current != DEFAULT_RULE);
     if (mSplitPlaceholder != null) {
       mSplitPlaceholder.setVisibility(isSplitModeOn() ? VISIBLE : GONE);
     }
@@ -371,7 +373,6 @@ public class SplitScene extends SceneContainer {
     if (mIsFullScreen == isFullScreen) return;
     mIsFullScreen = isFullScreen;
 
-    int formLeft = mSecondaryContainer.getLeft();
     int left = 0;
     if (!mIsFullScreen) {
       left = mCurrentRule.primarySceneWidth;
