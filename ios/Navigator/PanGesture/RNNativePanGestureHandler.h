@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static CGFloat const RNNativePanGestureEdgeWidth = 60;
+
 @class RNNativeScene;
 
 @interface RNNativePanGestureHandler : NSObject

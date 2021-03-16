@@ -42,6 +42,16 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }
+    
+    UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+    CGPoint point = [panGestureRecognizer translationInView:panGestureRecognizer.view];
+    if (point.x <= 0) {
+        return NO;
+    }
+    
     __block NSArray<RNNativeScene *> *targetScenes = nil;;
     [self computePanInfoWithGestureRecognizer:gestureRecognizer completion:^(NSArray<RNNativeScene *> *theTargetScenes, __kindof UIView *coverView) {
         targetScenes = theTargetScenes;
@@ -60,7 +70,7 @@
     }
     CGFloat topSceneMinX = CGRectGetMinX(topScene.frame);
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x < topSceneMinX || location.x > topSceneMinX + 60) {
+    if (location.x < topSceneMinX || location.x > topSceneMinX + RNNativePanGestureEdgeWidth) {
         return NO;
     }
     return YES;
@@ -82,15 +92,14 @@
             return;
         }
         
-        RNNativeScene *firstScene = targetScenes[count - 1];
-        if (count < 2) {
-            if (firstScene.splitPrimary) {
-                return;
-            }
-        } else {
+        if (count < 2 && firstScene.splitPrimary) {
+            return;
+        }
+        
+        self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
+        if (count >= 2) {
             self.panGestureHandler.secondScene = targetScenes[count - 2];
         }
-        self.panGestureHandler = [[RNNativePanGestureHandler alloc] init];
         self.panGestureHandler.firstScene = firstScene;
         self.panGestureHandler.coverView = coverView;
     }

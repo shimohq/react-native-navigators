@@ -59,8 +59,18 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }
+    
+    UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+    CGPoint point = [panGestureRecognizer translationInView:panGestureRecognizer.view];
+    if (point.x <= 0) {
+        return NO;
+    }
+    
     CGPoint location = [gestureRecognizer locationInView:self.view];
-    if (location.x > 40) {
+    if (location.x > RNNativePanGestureEdgeWidth) {
         return NO;
     }
 
