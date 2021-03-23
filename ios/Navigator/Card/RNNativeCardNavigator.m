@@ -119,12 +119,6 @@
             endTransition(YES);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
-        if ([self isDismissedForScene:currentTopScene]) {
-            [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
-            endTransition(YES);
-            return;
-        }
-        
         [currentTopScene.superview bringSubviewToFront:currentTopScene];
         [currentTopScene setStatus:RNNativeSceneStatusWillBlur];
         
