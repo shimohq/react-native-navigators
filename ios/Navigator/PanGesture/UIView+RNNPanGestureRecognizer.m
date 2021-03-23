@@ -12,7 +12,7 @@
 
 @implementation UIView (RNNPanGestureRecognizer)
 
-void Swizzle(Class c, SEL orig, SEL new) {
+static void Swizzle(Class c, SEL orig, SEL new) {
     Method origMethod = class_getInstanceMethod(c, orig);
     Method newMethod  = class_getInstanceMethod(c, new);
     if (class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod))) {
