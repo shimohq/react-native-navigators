@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isSplit;
 - (BOOL)isSplitFullScreen;
+- (BOOL)isEnableGestureWhenSplitFullScreen;
 - (CGFloat)getPrimarySceneWidth;
 - (NSArray<RNNativeScene *> *)getCurrentScenes;
 - (__kindof UIView *)getSplitPlaceholder;

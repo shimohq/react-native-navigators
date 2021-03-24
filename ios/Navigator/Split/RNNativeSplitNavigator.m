@@ -44,6 +44,7 @@
         _updating = NO;
         
         _splitFullScreen = NO;
+        _enableGestureWhenSplitFullScreen = NO;
         _splitRules = nil;
         _rules = [RNNativeSplitUtils parseSplitRules:_splitRules];
         _navigatorWidth = CGRectGetWidth(self.frame);
@@ -132,6 +133,10 @@
 
 - (BOOL)isSplitFullScreen {
     return self.splitFullScreen;
+}
+
+- (BOOL)isEnableGestureWhenSplitFullScreen {
+    return self.enableGestureWhenSplitFullScreen;
 }
 
 - (CGFloat)getPrimarySceneWidth {

@@ -37,6 +37,7 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_VIEW_PROPERTY(splitRules, NSArray)
 RCT_REMAP_VIEW_PROPERTY(isSplitFullScreen, splitFullScreen, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(disableGestureWhenSplitFullScreen, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(splitLineColor, UIColor)
 
 RCT_EXPORT_SHADOW_PROPERTY(splitRules, NSArray)
