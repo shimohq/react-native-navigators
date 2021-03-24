@@ -13,6 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) NSArray<NSDictionary *> *splitRules;
 @property (nonatomic, assign) BOOL splitFullScreen;
+
+/// enable gesture to return when splitFullScreen is enabled. default NO
+@property (nonatomic, assign) BOOL enableGestureWhenSplitFullScreen;
 @property (nonatomic, strong) UIColor *splitLineColor;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;

@@ -42,6 +42,10 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if ([self.dataSource isSplitFullScreen] && [self.dataSource isEnableGestureWhenSplitFullScreen]) {
+        return NO;
+    }
+    
     if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
         return NO;
     }
