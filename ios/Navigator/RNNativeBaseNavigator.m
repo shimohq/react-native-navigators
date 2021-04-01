@@ -8,6 +8,7 @@
 
 #import "RNNativeBaseNavigator.h"
 
+#import <objc/runtime.h>
 #import <React/RCTBridge.h>
 #import <React/RCTUIManager.h>
 #import <React/RCTUIManagerUtils.h>
@@ -61,7 +62,10 @@
 
 - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex
 {
+    // INFO 调用 [super insertReactSubview] 更新 reactSubviews
+    // 但是 didUpdateReactSubviews 不做任何操作，防止调用 addSubview
     [super insertReactSubview:subview atIndex:atIndex];
+    
     [_nextViews insertObject:subview atIndex:atIndex];
     
     if (![subview isKindOfClass:[RNNativeScene class]]) {
@@ -76,9 +80,12 @@
 
 - (void)removeReactSubview:(UIView *)subview
 {
-    [super removeReactSubview:subview];
-    [_nextViews removeObject:subview];
+    // INFO 不调用 [super removeReactSubview] 防止调用 removeFromSuperview,
+    // 但是 为了更新 reactSubviews，拷贝了下面代码
+    NSMutableArray *subviews = objc_getAssociatedObject(self, @selector(reactSubviews));
+    [subviews removeObject:subview];
     
+    [_nextViews removeObject:subview];
     if (![subview isKindOfClass:[RNNativeScene class]]) {
         return;
     }
