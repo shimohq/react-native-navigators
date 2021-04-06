@@ -4,7 +4,10 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +27,8 @@ public class SplitScene extends SceneContainer {
 
   private static final SplitRule DEFAULT_RULE = new SplitRule(LayoutParams.MATCH_PARENT, 0, Integer.MAX_VALUE);
 
+  private static final int SPLIT_LINT_WIDTH = 1;
+
   private ArrayList<SplitRule> mRules;
   private SplitRule mCurrentRule = DEFAULT_RULE;
   private SplitPlaceholder mSplitPlaceholder;
@@ -39,7 +44,6 @@ public class SplitScene extends SceneContainer {
   private final InnerSceneContainer mSecondaryContainer;
   private final ArrayList<Scene> mSceneList = new ArrayList<>();
   private Paint mPaint;
-
 
   public SplitScene(Context context) {
     super(context);
@@ -71,7 +75,7 @@ public class SplitScene extends SceneContainer {
         } else {
           if (child == mPrimaryContainer) {
             child.measure(MeasureSpec.makeMeasureSpec(
-              mCurrentRule.primarySceneWidth - 1, MeasureSpec.EXACTLY), heightMeasureSpec);
+              mCurrentRule.primarySceneWidth - SPLIT_LINT_WIDTH, MeasureSpec.EXACTLY), heightMeasureSpec);
           } else {
             int childWidth = getMeasuredWidth() - layoutParams.leftMargin - layoutParams.rightMargin
               - getPaddingLeft() - getPaddingRight() - mCurrentRule.primarySceneWidth;
@@ -87,9 +91,12 @@ public class SplitScene extends SceneContainer {
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
-    if (isSplitModeOn()) {
-      canvas.drawLine((getLeft() + mCurrentRule.primarySceneWidth), 0,
-        (getLeft() + mCurrentRule.primarySceneWidth), (getBottom()), mPaint);
+    if (isSplitModeOn() && mPaint !=null ) {
+      canvas.save();
+      canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+      float x = getLeft() + mCurrentRule.primarySceneWidth - SPLIT_LINT_WIDTH / 2f;
+      canvas.drawLine(x, 0, x, (getBottom()), mPaint);
+      canvas.restore();
     }
   }
 
@@ -405,13 +412,14 @@ public class SplitScene extends SceneContainer {
     return new LayoutParams(getContext(), attrs);
   }
 
-  public void setSplitLineColor(@ColorInt int color) {
-    if (mPaint == null) {
+  public void setSplitLineColor(@ColorInt Integer color) {
+    if (mPaint == null){
       mPaint = new Paint();
       mPaint.setAntiAlias(true);
-      mPaint.setStrokeWidth(1.0f);
+      mPaint.setStrokeWidth(SPLIT_LINT_WIDTH);
     }
     mPaint.setColor(color);
+    invalidate();
   }
 
   public static class LayoutParams extends MarginLayoutParams {
