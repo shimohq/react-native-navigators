@@ -78,18 +78,20 @@
             success = CGRectGetMinX(frame) + point.x >= self.firstSceneBeginX + CGRectGetWidth(frame) / 2.0;
         }
         if (success) {
-            [self goBack];
+            [self goBackWithGestureView:gesture.view];
         } else {
-            [self cancelGoBack];
+            [self cancelGoBackWithGestureView:gesture.view];
         }
     } else if (gesture.state == UIGestureRecognizerStateCancelled || gesture.state == UIGestureRecognizerStateFailed) {
-        [self cancelGoBack];
+        [self cancelGoBackWithGestureView:gesture.view];
     }
 }
 
 #pragma mark - Private
 
-- (void)goBack {
+- (void)goBackWithGestureView:(UIView *)gestureView {
+    BOOL originalUserInteractionEnabled = gestureView.userInteractionEnabled;
+    gestureView.userInteractionEnabled = NO;
     [UIView animateWithDuration:RNNativeNavigateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         // first scene
         CGRect firstSceneFrame = self.firstScene.frame;
@@ -112,14 +114,18 @@
         if (self.coverView) {
             self.coverView.layer.zPosition = self.coverViewOriginZPosition;
         }
+        
+        gestureView.userInteractionEnabled = originalUserInteractionEnabled;
         self.completeBolck(YES);
     }];
 }
 
-- (void)cancelGoBack {
+- (void)cancelGoBackWithGestureView:(UIView *)gestureView {
     [self.firstScene setStatus:RNNativeSceneStatusWillFocus];
     [self.secondScene setStatus:RNNativeSceneStatusWillBlur];
     
+    BOOL originalUserInteractionEnabled = gestureView.userInteractionEnabled;
+    gestureView.userInteractionEnabled = NO;
     [UIView animateWithDuration:RNNativeNavigateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         // first scene
         CGRect firstSceneFrame = self.firstScene.frame;
@@ -142,6 +148,8 @@
         if (self.coverView) {
             self.coverView.layer.zPosition = self.coverViewOriginZPosition;
         }
+        
+        gestureView.userInteractionEnabled = originalUserInteractionEnabled;
         self.completeBolck(NO);
     }];
 }

@@ -310,6 +310,8 @@
         CGFloat coverViewOriginalZPosition = coverView.layer.zPosition;
         coverView.layer.zPosition = 1000;
         
+        BOOL originalUserInteractionEnabled = self.userInteractionEnabled;
+        self.userInteractionEnabled = NO;
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             nextTopScene.frame = nextTopSceneEndFrame;
             currentTopScene.frame = currentTopSceneEndFrame;
@@ -318,11 +320,12 @@
                 nextTopScene.frame = nextTopSceneEndFrame;
             }
             currentTopScene.frame = currentTopSceneOriginalFrame;
-            
             coverView.layer.zPosition = coverViewOriginalZPosition;
             
             [nextTopScene setStatus:RNNativeSceneStatusDidFocus];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            
+            self.userInteractionEnabled = originalUserInteractionEnabled;
             endTransition(YES);
         }];
         return;
@@ -341,6 +344,8 @@
         CGFloat coverViewOriginalZPosition = coverView.layer.zPosition;
         coverView.layer.zPosition = 1000;
         
+        BOOL originalUserInteractionEnabled = self.userInteractionEnabled;
+        self.userInteractionEnabled = NO;
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [self getBeginFrameWithScene:currentTopScene
                                                       transition:transition];
@@ -349,10 +354,10 @@
             if (!finished) {
                 currentSecondScene.frame = currentSecondSceneOriginalFrame;
             }
-            
             coverView.layer.zPosition = coverViewOriginalZPosition;
-            
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            
+            self.userInteractionEnabled = originalUserInteractionEnabled;
             endTransition(YES);
         }];
     }
