@@ -106,6 +106,8 @@
         CGRect currentTopSceneOriginalFrame = currentTopScene.frame;
         CGRect currentTopSceneEndFrame = [RNNativeTransitionUtils getDownViewFrameWithView:currentTopScene transition:transition];
         
+        BOOL originalUserInteractionEnabled = self.userInteractionEnabled;
+        self.userInteractionEnabled = NO;
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             nextTopScene.frame = nextTopSceneEndFrame;
             currentTopScene.frame = currentTopSceneEndFrame;
@@ -116,6 +118,8 @@
             currentTopScene.frame = currentTopSceneOriginalFrame;
             [nextTopScene setStatus:RNNativeSceneStatusDidFocus];
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            
+            self.userInteractionEnabled = originalUserInteractionEnabled;
             endTransition(YES);
         }];
     } else if (action == RNNativeStackNavigatorActionHide) {
@@ -127,6 +131,8 @@
         CGRect currentSecondSceneOriginalFrame = currentSecondScene.frame;
         currentSecondScene.frame = [RNNativeTransitionUtils getDownViewFrameWithView:currentSecondScene transition:transition];
         
+        BOOL originalUserInteractionEnabled = self.userInteractionEnabled;
+        self.userInteractionEnabled = NO;
         [UIView animateWithDuration:RNNativeNavigateDuration animations:^{
             currentTopScene.frame = [self getBeginFrameWithScene:currentTopScene
                                                       transition:transition];
@@ -136,6 +142,8 @@
                 currentSecondScene.frame = currentSecondSceneOriginalFrame;
             }
             [self removeScenesWithRemovedScenes:removedScenes nextScenes:nextScenes];
+            
+            self.userInteractionEnabled = originalUserInteractionEnabled;
             endTransition(YES);
         }];
     }
