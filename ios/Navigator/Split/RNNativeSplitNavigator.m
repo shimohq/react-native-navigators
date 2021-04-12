@@ -105,7 +105,7 @@
         return;
     }
     _split = split;
-    [self updateScenesOrder];
+    [self reloadScenes];
 }
 
 - (void)setSplitPlaceholder:(nullable RNNativeSplitPlaceholder *)splitPlaceholder {
@@ -168,8 +168,9 @@
 }
 
 - (void)updateSceneWithCurrentScenes:(NSArray<RNNativeScene *> *)currentScenes
-                          NextScenes:(NSArray<RNNativeScene *> *)nextScenes
-                           comoplete:(nonnull RNNativeNavigatorUpdateCompleteBlock)comoplete {
+                          nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                        checkUpdated:(BOOL)checkUpdated
+                           comoplete:(RNNativeNavigatorUpdateCompleteBlock)comoplete {
     if (self.split) {
         NSMutableArray *currentPrimaryScenes = [NSMutableArray array];
         NSMutableArray *nextPrimaryScenes = [NSMutableArray array];
@@ -189,7 +190,7 @@
                 [nextSecondaryScenes addObject:scene];
             }
         }
-        
+
         __block BOOL updated = NO;
         RNNativeNavigatorUpdateCompleteBlock completeBlock = ^(void) {
             if (updated) {
@@ -198,10 +199,19 @@
                 updated = YES;
             }
         };
-        [super updateSceneWithCurrentScenes:currentPrimaryScenes NextScenes:nextPrimaryScenes comoplete:completeBlock];
-        [super updateSceneWithCurrentScenes:currentSecondaryScenes NextScenes:nextSecondaryScenes comoplete:completeBlock];
+        [super updateSceneWithCurrentScenes:currentPrimaryScenes
+                                 nextScenes:nextPrimaryScenes
+                               checkUpdated:checkUpdated
+                                  comoplete:completeBlock];
+        [super updateSceneWithCurrentScenes:currentSecondaryScenes
+                                 nextScenes:nextSecondaryScenes
+                               checkUpdated:checkUpdated
+                                  comoplete:completeBlock];
     } else {
-        [super updateSceneWithCurrentScenes:currentScenes NextScenes:nextScenes comoplete:comoplete];
+        [super updateSceneWithCurrentScenes:currentScenes
+                                 nextScenes:nextScenes
+                               checkUpdated:checkUpdated
+                                  comoplete:comoplete];
     }
 }
 
@@ -421,34 +431,6 @@
         [self.viewController.view addSubview:_splitPlaceholder];
     }
     [self.viewController.view sendSubviewToBack:_splitPlaceholder];
-}
-
-- (void)updateScenesOrder {
-    NSArray<RNNativeScene *> *orderedScenes;
-    if (self.split) {
-        // 分栏模式所有 primary scene 放在 secondary scene 下面
-        NSMutableArray<RNNativeScene *> *primaryScenes = [NSMutableArray array];
-        NSMutableArray<RNNativeScene *> *secondaryScenes = [NSMutableArray array];
-        for (RNNativeScene *scene in self.currentScenes) {
-            if (scene.splitPrimary) {
-                [primaryScenes addObject:scene];
-            } else {
-                [secondaryScenes addObject:scene];
-            }
-        }
-        orderedScenes = [primaryScenes arrayByAddingObjectsFromArray:secondaryScenes];
-    } else {
-        // 非分栏模式按 currentScenes 顺序显示
-        orderedScenes = self.currentScenes;
-    }
-    for (NSInteger index = 0, size = orderedScenes.count; index < size; index++) {
-        RNNativeScene *scene = orderedScenes[size - index - 1];
-        if (index == 0) {
-            [self.viewController.view bringSubviewToFront:scene];
-        } else {
-            [self.viewController.view sendSubviewToBack:scene];
-        }
-    }
 }
 
 #pragma mark - Private

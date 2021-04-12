@@ -22,13 +22,11 @@
 
 @property (nullable, nonatomic, copy) NSArray<RNNativeScene *> *needUpdateScenes;
 @property (nonatomic, assign) BOOL updatingScenes;
+@property (nonatomic, assign) BOOL needUpdate;
 
 @end
 
 @implementation RNNativeBaseNavigator
-{
-    BOOL _needUpdate;
-}
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge viewController:(__kindof UIViewController *)viewController {
     if (self = [super init]) {
@@ -174,22 +172,39 @@
 }
 
 - (void)updateScenes {
-    if (_updatingScenes || !_needUpdateScenes) {
+    if (self.updatingScenes || !self.needUpdateScenes) {
         return;
     }
-    _updatingScenes = YES;
-    NSArray<RNNativeScene *> *nextScenes = [NSArray arrayWithArray:_needUpdateScenes];
-    _needUpdateScenes = nil;
+    self.updatingScenes = YES;
+    NSArray<RNNativeScene *> *nextScenes = [NSArray arrayWithArray:self.needUpdateScenes];
+    self.needUpdateScenes = nil;
     
-    [self updateSceneWithCurrentScenes:_currentScenes NextScenes:nextScenes comoplete:^{
+    [self updateSceneWithCurrentScenes:self.currentScenes
+                            nextScenes:nextScenes
+                          checkUpdated:YES
+                             comoplete:^{
         [self setUpdatingScenes:NO];
     }];
     
-    [_currentScenes setArray:nextScenes];
+    [self.currentScenes setArray:nextScenes];
+}
+
+- (void)reloadScenes {
+    if (self.updatingScenes) {
+        return;
+    }
+    self.updatingScenes = YES;
+    [self updateSceneWithCurrentScenes:self.currentScenes
+                            nextScenes:self.currentScenes
+                          checkUpdated:NO
+                             comoplete:^{
+        [self setUpdatingScenes:NO];
+    }];
 }
 
 - (void)updateSceneWithCurrentScenes:(NSArray<RNNativeScene *> *)currentScenes
-                          NextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                          nextScenes:(NSArray<RNNativeScene *> *)nextScenes
+                        checkUpdated:(BOOL)checkUpdated
                            comoplete:(RNNativeNavigatorUpdateCompleteBlock)comoplete {
     NSMutableArray<RNNativeScene *> *removedScenes = [NSMutableArray new];
     NSMutableArray<RNNativeScene *> *insertedScenes = [NSMutableArray new];
@@ -204,19 +219,22 @@
         }
     }
     
-    if (removedScenes.count == 0 && insertedScenes.count == 0) {
-        BOOL orderChanged = NO;
-        // 检查顺序是否产生变化
-        for (int i = 0; i < currentScenes.count; i++) {
-            if (currentScenes[i] != nextScenes[i]) {
-                orderChanged = YES;
-                break;
+    if (checkUpdated) {
+        if (removedScenes.count == 0 && insertedScenes.count == 0) {
+            // 没有 scene 添加或删除
+            BOOL orderChanged = NO;
+            // 检查顺序是否产生变化
+            for (int i = 0; i < currentScenes.count; i++) {
+                if (currentScenes[i] != nextScenes[i]) {
+                    orderChanged = YES;
+                    break;
+                }
             }
-        }
-        if (!orderChanged) {
-            // 无更新
-            comoplete();
-            return;
+            if (!orderChanged) {
+                // 顺序无更新
+                comoplete();
+                return;
+            }
         }
     }
     
