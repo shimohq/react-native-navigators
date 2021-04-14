@@ -55,9 +55,5 @@
   },
   "peerDependencies": {
     "react-navigation": ">=4.0.0"
-  },
-  "dependencies": {
-    "hoist-non-react-statics": "^3.3.2",
-    "static-container": "^1.7.1"
   }
 }
