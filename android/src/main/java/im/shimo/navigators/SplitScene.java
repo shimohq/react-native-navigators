@@ -3,6 +3,7 @@ package im.shimo.navigators;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -346,9 +347,8 @@ public class SplitScene extends SceneContainer {
     }
     boolean currentRuleChanged = mCurrentRule != current;
     mCurrentRule = current;
-    if (currentRuleChanged
-      && (((LayoutParams) mSecondaryContainer.getLayoutParams()).leftMargin != 0)
-      && mCurrentRule.primarySceneWidth > 0) {
+    if ((currentRuleChanged
+      && (((LayoutParams) mSecondaryContainer.getLayoutParams()).leftMargin != 0)) || mIsFullScreen) {
       ((LayoutParams) mSecondaryContainer.getLayoutParams()).leftMargin = -mCurrentRule.primarySceneWidth;
     }
     setSplitMode(current != DEFAULT_RULE);
@@ -357,7 +357,6 @@ public class SplitScene extends SceneContainer {
     }
     post(this::requestLayout);
   }
-
 
   public void setSplitRules(@NonNull ReadableArray rules) {
     mRules = new ArrayList<>();
