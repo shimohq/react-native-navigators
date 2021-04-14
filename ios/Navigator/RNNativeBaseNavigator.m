@@ -138,10 +138,6 @@
     }
 }
 
-- (BOOL)isDismissedForScene:(RNNativeScene *)scene {
-    return !scene.controller || scene.dismissed;
-}
-
 #pragma mark - Update Container
 
 - (void)markUpdated
@@ -256,7 +252,7 @@
         } else if (![nextScenes containsObject:currentTopScene]) {
             // 即将显示的顶层 scene 在当前列表中，当前显示的顶层 scene 不在即将显示的列表中，取当前显示的顶层 scene 的隐藏动画
             action = RNNativeStackNavigatorActionHide;
-            if (![self isDismissedForScene:currentTopScene]) {
+            if (!currentTopScene.dismissed && currentTopScene.controller) {
                 transition = currentTopScene.transition;
             }
         }
@@ -348,7 +344,7 @@
     // removedScenes
     for (NSInteger index = 0, size = removedScenes.count; index < size; index++) {
         RNNativeScene *scene = removedScenes[index];
-        [scene setStatus:RNNativeSceneStatusDidBlur];
+        [scene remove];
     }
     
     // nextScenes

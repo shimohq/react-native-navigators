@@ -12,6 +12,7 @@
 @property (nonatomic, strong) RNNativeSceneController *controller;
 @property (nonatomic, strong) NSPointerArray *listeners;
 @property (nonatomic, weak) RCTBridge *bridge;
+@property (nonatomic, assign) BOOL dismissed;
 
 @end
 
@@ -47,6 +48,15 @@
     if (index != NSNotFound) {
         [_listeners removePointerAtIndex:index];
     }
+}
+
+- (void)remove {
+    if (_status == RNNativeSceneStatusDidBlur && _dismissed == YES) {
+        return;
+    }
+    _status = RNNativeSceneStatusDidBlur;
+    _dismissed = YES;
+    [self sendStatus:_status andDismissed:_dismissed];
 }
 
 #pragma mark - React Native
@@ -156,13 +166,6 @@
 }
 
 - (void)setStatus:(RNNativeSceneStatus)status {
-    BOOL dismissedChanged = false;
-    if (status == RNNativeSceneStatusDidBlur && !_dismissed) {
-        if ([_delegate isDismissedForScene:self]) {
-            _dismissed = YES;
-            dismissedChanged = YES;
-        }
-    }
     BOOL statusChanged = _status != status
     && !(_status == RNNativeSceneStatusDidBlur && status == RNNativeSceneStatusWillBlur)
     && !(_status == RNNativeSceneStatusDidFocus && status == RNNativeSceneStatusWillFocus);
@@ -174,8 +177,7 @@
         for (id<RNNativeSceneListener> listener in _listeners) {
             [listener scene:self didUpdateStatus:status];
         }
-    }
-    if (statusChanged || dismissedChanged) {
+        
         [self sendStatus:_status andDismissed:_dismissed];
     }
 }

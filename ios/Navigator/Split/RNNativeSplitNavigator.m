@@ -228,11 +228,6 @@
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
-    // removed scenes 标记为 dismissed
-    for (RNNativeScene *scene in removedScenes) {
-        scene.dismissed = YES;
-    }
-    
     // 分栏模式，右边屏幕
     // 第一个场景显示、最后的场景退出的时候需要有动画
     if (self.split) {

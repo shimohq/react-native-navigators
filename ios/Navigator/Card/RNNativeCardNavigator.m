@@ -70,11 +70,6 @@
                     endTransition:(RNNativeNavigatorTransitionBlock)endTransition {
     beginTransition(YES);
     
-    // update dismissed
-    for (RNNativeScene *scene in removedScenes) {
-        scene.dismissed = YES;
-    }
-
     // update will show view frame
     RNNativeScene *currentTopScene = currentScenes.lastObject;
     RNNativeScene *nextTopScene = nextScenes.lastObject;
