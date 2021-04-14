@@ -15,7 +15,6 @@
 @protocol RNNativeSceneDelegate <NSObject>
 
 - (void)needUpdateForScene:(RNNativeScene *)scene;
-- (BOOL)isDismissedForScene:(RNNativeScene *)scene;
 
 @end
 
@@ -97,13 +96,17 @@
 @property (nonatomic, assign) BOOL enableLifeCycle;
 
 @property (nonatomic, assign) RNNativeSceneStatus status;
-@property (nonatomic, assign) BOOL dismissed;
+/**
+ 是否已经从原生界面移除
+ */
+@property (nonatomic, assign, readonly) BOOL dismissed;
 @property (nonatomic, weak) id<RNNativeSceneDelegate> delegate;
 @property (nonatomic, strong, readonly) RNNativeSceneController *controller;
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge;
 - (void)registerListener:(id<RNNativeSceneListener>)listener;
 - (void)unregisterListener:(id<RNNativeSceneListener>)listener;
+- (void)remove;
 
 @end
 

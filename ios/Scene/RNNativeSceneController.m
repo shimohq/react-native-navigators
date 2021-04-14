@@ -68,7 +68,11 @@
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [super didMoveToParentViewController:parent];
     if (_enableLifeCycle) {
-        [_nativeScene setStatus:parent ? RNNativeSceneStatusDidFocus : RNNativeSceneStatusDidBlur];
+        if (parent) {
+            [_nativeScene setStatus:RNNativeSceneStatusDidFocus];
+        } else {
+            [self remove];
+        }
     }
 }
 
@@ -96,7 +100,7 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     if (_enableLifeCycle) {
-        [_nativeScene setStatus:RNNativeSceneStatusDidBlur];
+        [self remove];
     }
 }
 
@@ -157,6 +161,22 @@
 }
 
 #pragma mark - Private
+
+- (void)remove {
+    BOOL dismissed;
+    if (self.navigationController) {
+        dismissed = ![self.navigationController.viewControllers containsObject:self];
+    } else if (self.parentViewController || self.presentingViewController) {
+        dismissed = NO;
+    } else {
+        dismissed = YES;
+    }
+    if (dismissed) {
+        [self.nativeScene remove];
+    } else {
+        [self.nativeScene setStatus:RNNativeSceneStatusDidFocus];
+    }
+}
 
 - (void)updateForStatus:(RNNativeSceneStatus)status {
     switch (status) {
