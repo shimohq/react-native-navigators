@@ -7,7 +7,8 @@ import {
   NavigationScreenConfig,
   NavigationNavigator,
   NavigationProp,
-  NavigationState
+  NavigationState,
+  NavigationRouteConfig
 } from 'react-navigation';
 
 export interface NativeNavigationOptions {
@@ -125,4 +126,9 @@ export enum NativeNavigationHeaderTypes {
 export type NativeNavigator = NavigationNavigator<
   NativeNavigationRouterConfig,
   NavigationProp<NavigationState>
+>;
+
+export type NativeNavigationScreen = NavigationRouteConfig<
+  NativeNavigationOptions,
+  any
 >;
