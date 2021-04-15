@@ -109,8 +109,6 @@ public class Scene extends ViewGroup implements ReactPointerEventsView {
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
 
-    mDismissed = true;
-
     // This method implements a workaround for RN's autoFocus functionality. Because of the way
     // autoFocus is implemented it sometimes gets triggered before native text view is mounted. As
     // a result Android ignores calls for opening soft keyboard and here we trigger it manually
