@@ -4,7 +4,10 @@ import {
   NavigationParams,
   NavigationDescriptor,
   NavigationInjectedProps,
-  NavigationScreenConfig
+  NavigationScreenConfig,
+  NavigationNavigator,
+  NavigationProp,
+  NavigationState
 } from 'react-navigation';
 
 export interface NativeNavigationOptions {
@@ -118,3 +121,8 @@ export enum NativeNavigationHeaderTypes {
   Left = 'left',
   Right = 'right'
 }
+
+export type NativeNavigator = NavigationNavigator<
+  NativeNavigationRouterConfig,
+  NavigationProp<NavigationState>
+>;
