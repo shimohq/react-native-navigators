@@ -11,13 +11,13 @@ import {
   NativeSplitNavigationRouterConfig,
   NativeNavigationOptions,
   NativeNavigatorModes,
-  NativeNavigator
+  NativeNavigationNavigator
 } from './types';
 
 export function createNativeNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   stackConfig: NativeNavigationRouterConfig
-): NativeNavigator {
+): NativeNavigationNavigator {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, stackConfig);
 }
@@ -25,7 +25,7 @@ export function createNativeNavigator(
 export function createStackNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   stackConfig: Omit<NativeNavigationRouterConfig, 'mode'>
-): NativeNavigator {
+): NativeNavigationNavigator {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {
     ...stackConfig,
@@ -36,7 +36,7 @@ export function createStackNavigator(
 export function createCardNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   stackConfig: Omit<NativeNavigationRouterConfig, 'headerMode' | 'mode'>
-): NativeNavigator {
+): NativeNavigationNavigator {
   const router = StackRouter(routeConfigMap, stackConfig);
   return createNavigator(NativeNavigators, router, {
     ...stackConfig,
@@ -47,7 +47,7 @@ export function createCardNavigator(
 export function createSplitNavigator(
   routeConfigMap: NavigationRouteConfigMap<NativeNavigationOptions, any>,
   splitConfig: Omit<NativeSplitNavigationRouterConfig, 'headerMode' | 'mode'>
-): NativeNavigator {
+): NativeNavigationNavigator {
   const router = SplitRouter(routeConfigMap, splitConfig);
   return createNavigator(NativeNavigators, router, {
     ...splitConfig,

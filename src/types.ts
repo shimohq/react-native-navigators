@@ -123,10 +123,12 @@ export enum NativeNavigationHeaderTypes {
   Right = 'right'
 }
 
-export type NativeNavigator = NavigationNavigator<
+export type NativeNavigationNavigator = NavigationNavigator<
   NativeNavigationRouterConfig,
   NavigationProp<NavigationState>
 >;
+
+export type NativeNavigationRouter = NativeNavigationNavigator['router'];
 
 export type NativeNavigationScreen = NavigationRouteConfig<
   NativeNavigationOptions,
