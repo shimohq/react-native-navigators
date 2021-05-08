@@ -64,6 +64,11 @@ public class SplitSceneManager extends ViewGroupManager<SplitScene> {
   }
 
   @Override
+  public View getChildAt(SplitScene parent, int index) {
+    return parent.getSceneAt(index);
+  }
+
+  @Override
   public int getChildCount(SplitScene parent) {
     return parent.getSceneCount();
   }
