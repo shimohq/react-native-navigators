@@ -174,7 +174,7 @@
     if (dismissed) {
         [self.nativeScene remove];
     } else {
-        [self.nativeScene setStatus:RNNativeSceneStatusDidFocus];
+        [self.nativeScene setStatus:RNNativeSceneStatusDidBlur];
     }
 }
 
