@@ -101,16 +101,20 @@
             if (willShowViewControllersCount > 0) {
                 NSArray *viewControllers = [willShowViewControllers subarrayWithRange:NSMakeRange(0, willShowViewControllersCount - 1)];
                 // INFO 当前可见的 ViewController 不在 willShowViewControllers 时，为防止出现界面抖动的问题，先不移除，动画结束后再移除
-                UIViewController *visibleViewController = _controller.visibleViewController;
-                if (visibleViewController && ![willShowViewControllers containsObject:visibleViewController ]) {
-                    viewControllers = [viewControllers arrayByAddingObject:visibleViewController];
+                UIViewController *outViewController = _controller.visibleViewController;
+                if (outViewController) {
+                    if ([willShowViewControllers containsObject:outViewController]) {
+                        outViewController = nil;
+                    } else {
+                        viewControllers = [viewControllers arrayByAddingObject:outViewController];
+                    }
                 }
                 [_controller setViewControllers:viewControllers animated:NO];
                 [_controller pushViewController:[willShowViewControllers lastObject] animated:YES];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     NSMutableArray *currentViewControllers = [_controller.viewControllers mutableCopy];
-                    if (visibleViewController && [currentViewControllers containsObject:visibleViewController]) {
-                        [currentViewControllers removeObject:visibleViewController];
+                    if (outViewController && [currentViewControllers containsObject:outViewController]) {
+                        [currentViewControllers removeObject:outViewController];
                         [_controller setViewControllers:currentViewControllers animated:NO];
                     }
                 });
