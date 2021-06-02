@@ -27,7 +27,7 @@ RCT_EXPORT_MODULE()
         if (@available(iOS 11.0, *)) {
             _headerTop = [UIApplication sharedApplication].delegate.window.rootViewController.view.safeAreaInsets.top;
         } else {
-            _headerTop = CGRectGetMinY(frame);
+            _headerTop = [UIApplication sharedApplication].statusBarFrame.size.height;
         }
     }
     return self;
