@@ -2,6 +2,7 @@ package im.shimo.navigators;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -106,7 +107,10 @@ public abstract class SceneContainer extends ViewGroup {
   }
 
   protected void removeSceneAt(int index) {
-
+    if (index>= mScenes.size()) {
+      Log.e(TAG, "removeSceneAt out of Bounds, index:" + index +",size:" + mScenes.size());
+      return;
+    }
     mScenes.get(index).setContainer(null);
     mScenes.remove(index);
     markUpdated();
