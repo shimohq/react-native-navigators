@@ -16,6 +16,7 @@
 @interface RNNativeStackNavigatorShadowView() <RCTUIManagerObserver>
 
 @property (nonatomic, weak) RCTBridge *bridge;
+@property (nonatomic, assign) CGFloat topToWindow;
 
 @end
 
@@ -24,6 +25,7 @@
 - (instancetype)initWithBridge:(RCTBridge *)bridge {
     self = [super init];
     if (self) {
+        _topToWindow = 0;
         _bridge = bridge;
         [bridge.uiManager.observerCoordinator addObserver:self];
     }
@@ -60,6 +62,16 @@
         topToWindow += CGRectGetMinY(shadowView.layoutMetrics.frame);
         shadowView = shadowView.superview;
     }
+    [self setTopToWindow:topToWindow];
+}
+
+#pragma mark - Setter
+
+- (void)setTopToWindow:(CGFloat)topToWindow {
+    if (_topToWindow == topToWindow) {
+        return;
+    }
+    _topToWindow = topToWindow;
     for (RCTShadowView *subview in self.reactSubviews) {
         if ([subview isKindOfClass:[RNNativeSceneShadowView class]]) {
             RNNativeSceneShadowView *shadowView = (RNNativeSceneShadowView *)subview;

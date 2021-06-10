@@ -24,7 +24,7 @@
         _headerTop = headerTop;
         _headerHeight = headerHeight;
         
-        _topToWindow = headerTop;
+        _topToWindow = 0;
         _inStack = NO;
         _sceneTop = 0;
     }
@@ -97,7 +97,7 @@
 
 - (void)updateSceneTop {
     if (_inStack && _hasHeader) {
-        [self setSceneTop: _headerHeight + (_topToWindow > _headerTop ? 0 : _headerTop)];
+        [self setSceneTop: _headerHeight + MAX(_headerTop - _topToWindow, 0)];
     } else {
         [self setSceneTop:0];
     }
