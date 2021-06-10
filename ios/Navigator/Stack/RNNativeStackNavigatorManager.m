@@ -19,7 +19,7 @@ RCT_EXPORT_MODULE()
 }
 
 - (RCTShadowView *)shadowView {
-  return [[RNNativeStackNavigatorShadowView alloc] init];
+  return [[RNNativeStackNavigatorShadowView alloc] initWithBridge:self.bridge];
 }
 
 #pragma mark - RCTInvalidating

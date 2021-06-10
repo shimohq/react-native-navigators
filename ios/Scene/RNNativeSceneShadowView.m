@@ -24,6 +24,7 @@
         _headerTop = headerTop;
         _headerHeight = headerHeight;
         
+        _topToWindow = headerTop;
         _inStack = NO;
         _sceneTop = 0;
     }
@@ -37,6 +38,14 @@
         return;
     }
     _inStack = inStack;
+    [self updateSceneTop];
+}
+
+- (void)setTopToWindow:(CGFloat)topToRootWindow {
+    if (_topToWindow == topToRootWindow) {
+        return;
+    }
+    _topToWindow = topToRootWindow;
     [self updateSceneTop];
 }
 
@@ -88,7 +97,7 @@
 
 - (void)updateSceneTop {
     if (_inStack && _hasHeader) {
-        [self setSceneTop:_headerTop + _headerHeight];
+        [self setSceneTop: _headerHeight + (_topToWindow > _headerTop ? 0 : _headerTop)];
     } else {
         [self setSceneTop:0];
     }
