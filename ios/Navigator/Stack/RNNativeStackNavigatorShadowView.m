@@ -44,6 +44,7 @@
     if ([subview isKindOfClass:[RNNativeSceneShadowView class]]) {
         RNNativeSceneShadowView *shadowView = (RNNativeSceneShadowView *)subview;
         [shadowView setInStack:YES];
+        [shadowView setTopToWindow:_topToWindow];
     }
 }
 
