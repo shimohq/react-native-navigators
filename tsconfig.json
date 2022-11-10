@@ -8,7 +8,8 @@
     "moduleResolution": "node",
     "lib": ["es2015", "es2016", "esnext"],
     "jsx": "react-native",
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "ios", "android", "lib"]
