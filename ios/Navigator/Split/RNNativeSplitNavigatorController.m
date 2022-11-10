@@ -82,7 +82,7 @@
     if (self.panGestureHandler) {
         return NO;
     }
-    [self.panGestureHandler cancelTouchesInParent:self.view];
+    [[RNNativePanGestureRecognizerManager sharedInstance] cancelTouchesInParent:self.view];
     return YES;
 }
 

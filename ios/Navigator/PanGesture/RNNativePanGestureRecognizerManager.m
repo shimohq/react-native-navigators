@@ -7,6 +7,8 @@
 
 #import "RNNativePanGestureRecognizerManager.h"
 
+#import <React/RCTTouchHandler.h>
+
 @interface RNNativePanGestureRecognizerManager()
 
 @property (nonatomic, strong) NSHashTable<UIPanGestureRecognizer *> *panGestureRecognizers;
@@ -39,6 +41,21 @@
 
 - (NSArray<UIPanGestureRecognizer *> *)getAllPanGestureRecognizers {
     return _panGestureRecognizers.allObjects;
+}
+
+- (void)cancelTouchesInParent:(UIView *)parent {
+    // cancel touches in parent, this is needed to cancel RN touch events. For example when Touchable
+    // item is close to an edge and we start pulling from edge we want the Touchable to be cancelled.
+    // Without the below code the Touchable will remain active (highlighted) for the duration of back
+    // gesture and onPress may fire when we release the finger.
+    while (parent != nil && ![parent respondsToSelector:@selector(touchHandler)])
+        parent = parent.superview;
+    if (parent != nil) {
+        RCTTouchHandler *touchHandler = [parent performSelector:@selector(touchHandler)];
+        [touchHandler setEnabled:NO];
+        [touchHandler setEnabled:YES];
+        [touchHandler reset];
+    }
 }
 
 @end

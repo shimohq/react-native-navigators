@@ -62,7 +62,7 @@
     if (location.x > RNNativePanGestureEdgeWidth) {
         return NO;
     }
-    [self.panGestureHandler cancelTouchesInParent:self.view];
+    [[RNNativePanGestureRecognizerManager sharedInstance] cancelTouchesInParent:self.view];
     return YES;
 }
 

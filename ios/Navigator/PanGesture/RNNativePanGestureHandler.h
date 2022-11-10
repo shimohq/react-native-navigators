@@ -21,11 +21,6 @@ static CGFloat const RNNativePanGestureEdgeWidth = 60;
 @property (nonnull, nonatomic, copy) void(^completeBolck)(BOOL goBack);
 
 - (void)panWithGestureRecognizer:(UIPanGestureRecognizer *)gesture;
-/**
- 滑动手势触发时，取消点击事件
- @see https://github.com/software-mansion/react-native-screens/blob/1a7019be8ad7e62cfa68d3b59b90c103eda66dc4/ios/RNSScreenStack.mm#L578
- */
-- (void)cancelTouchesInParent:(UIView *)parent;
 
 @end
 
