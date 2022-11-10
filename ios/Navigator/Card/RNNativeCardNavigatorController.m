@@ -12,6 +12,7 @@
 
 #import "UIViewController+RNNativeNavigator.h"
 
+
 @interface RNNativeCardNavigatorController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) RNNativePanGestureHandler *panGestureHandler;
@@ -41,6 +42,7 @@
 
 #pragma mark - UIGestureRecognizerDelegate
 
+
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
         return NO;
@@ -60,6 +62,7 @@
     if (location.x > RNNativePanGestureEdgeWidth) {
         return NO;
     }
+    [self.panGestureHandler cancelTouchesInParent:self.view];
     return YES;
 }
 

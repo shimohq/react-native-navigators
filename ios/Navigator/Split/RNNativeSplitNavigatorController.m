@@ -82,6 +82,7 @@
     if (self.panGestureHandler) {
         return NO;
     }
+    [self.panGestureHandler cancelTouchesInParent:self.view];
     return YES;
 }
 
