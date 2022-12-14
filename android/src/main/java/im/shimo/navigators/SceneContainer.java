@@ -175,10 +175,10 @@ public abstract class SceneContainer extends ViewGroup {
       }
     }
 
-    final ArrayList<Scene> removedScene = new ArrayList<>();
+    final ArrayList<Scene> removedScenes = new ArrayList<>();
     for (Scene scene : mStack) {
       if (scene.isClosing() || !mScenes.contains(scene)) {
-        removedScene.add(scene);
+        removedScenes.add(scene);
       }
     }
 
@@ -192,13 +192,10 @@ public abstract class SceneContainer extends ViewGroup {
     ArrayList<Scene>bringToFrontScenes = new ArrayList<>();
     for (int i = 0; i < mScenes.size(); i++) {
       Scene scene = mScenes.get(i);
-      if (!scene.equals(getChildAt(i)) && !removedScene.contains(scene) ){
+      if (!scene.equals(getChildAt(i)) && !removedScenes.contains(scene) ){
         bringToFrontScenes.add(scene);
       }
     }
-
-
-
 
     // find top scene
     Scene nextTopScene = getTopScene(nextFragments);
@@ -206,7 +203,7 @@ public abstract class SceneContainer extends ViewGroup {
 
     // save or restore focused view
     if (currentTopScene != nextTopScene) {
-      if (currentTopScene != null && !removedScene.contains(currentTopScene)) {
+      if (currentTopScene != null) {
         currentTopScene.saveFocusedView();
       }
       if (nextTopScene != null && mStack.contains(nextTopScene)) {
@@ -237,13 +234,13 @@ public abstract class SceneContainer extends ViewGroup {
           anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-              onPushStart(nextFragments, removedScene);
+              onPushStart(nextFragments, removedScenes);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
               hideFragments(nextFragments);
-              onPushEnd(nextFragments, removedScene);
+              onPushEnd(nextFragments, removedScenes);
               mNeedUpdate = true;
               if (mNeedUpdateOnAnimEnd) {
                 mNeedUpdateOnAnimEnd = false;
@@ -274,13 +271,13 @@ public abstract class SceneContainer extends ViewGroup {
           anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-              onPopStart(nextFragments, removedScene);
+              onPopStart(nextFragments, removedScenes);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
               hideFragments(nextFragments);
-              onPopEnd(nextFragments, removedScene);
+              onPopEnd(nextFragments, removedScenes);
               mNeedUpdate = true;
               if (mNeedUpdateOnAnimEnd) {
                 mNeedUpdateOnAnimEnd = false;
@@ -302,7 +299,7 @@ public abstract class SceneContainer extends ViewGroup {
     addFragments(insertedFragments);
 
     // remove
-    removeFragments(removedScene);
+    removeFragments(removedScenes);
 
     bringToFrontScene(bringToFrontScenes);
 
@@ -314,11 +311,11 @@ public abstract class SceneContainer extends ViewGroup {
 
     if (anim == null) {
       if (isPushAction) {
-        onPushStart(nextFragments, removedScene);
-        onPushEnd(nextFragments, removedScene);
+        onPushStart(nextFragments, removedScenes);
+        onPushEnd(nextFragments, removedScenes);
       } else {
-        onPopStart(nextFragments, removedScene);
-        onPopEnd(nextFragments, removedScene);
+        onPopStart(nextFragments, removedScenes);
+        onPopEnd(nextFragments, removedScenes);
       }
       showFragments(nextFragments);
       hideFragments(nextFragments);
